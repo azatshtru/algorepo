@@ -28,7 +28,7 @@ int len(float* A) {
 
 int prettyPrint(float* A) {
     int i;
-    printf("[ ");
+    printf("\n[ ");
     for(i = 0; i < *A-1; i++) {
         printf("%.2f, ", get(A, i));
     }

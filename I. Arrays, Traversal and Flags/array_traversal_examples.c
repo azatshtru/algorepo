@@ -7,6 +7,13 @@
 //A loop can be used to traverse through an array using its API.
 //Additionally, a flag can be used to keep track of properties of the entire array that are derived through individual analysis of elements.
 
+int traverse(float* A) {
+    for(int i = 0; i < len(A); i++) {
+        //process element
+    }
+    return 0;
+}
+
 //Following function traverses through an array and prints all the numbers that are between zero and one.
 //This is an example of conditional traversal.
 int nums_bw01(float* A) {

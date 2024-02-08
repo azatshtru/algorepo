@@ -12,7 +12,7 @@
 
 int assert_eq(char* test_name, float a, float b) {
 
-    printf(CYN "\n\n\n------------------------\n\n" RESET);
+    printf(CYN "\n------------------------\n\n" RESET);
     printf(CYN "Performing test " RESET);
     printf(YEL "%s\n" RESET, test_name);
     if(a == b) {
@@ -22,7 +22,7 @@ int assert_eq(char* test_name, float a, float b) {
         printf(RED "TEST FAILED: " RESET);
         printf("expected %f, found %f\n", b, a);
     }
-    printf(CYN "\n------------------------\n\n\n" RESET);
+    printf(CYN "\n------------------------\n" RESET);
     return 0;
 }
 
