@@ -6,7 +6,6 @@ int sorted(float* A) {
     for(int i = 1; i < len(A); i++) {
         if(get(A, i)<get(A, i-1)){
             flag = 0;
-            break;
         }
     }
     return flag;
@@ -24,11 +23,13 @@ int shuffle(float* A) {
 
 // O(n^2) sorting algorithm
 int bubble_sort(float* A) {
-    for(int i = 0; i < len(A)-1; i++) {
-        for(int j = i+1; j < len(A)-i; j++) {
-            if(get(A, j)<get(A, j-1)) {
-                float k = get(A, j-1);
-                set(A, j-1, get(A, j));
+    int i;
+    int j;
+    for(i = 0; i < len(A); i++) {
+        for(j = 0; j < len(A)-i-1; j++) {
+            if(get(A, j+1)<get(A, j)) {
+                float k = get(A, j+1);
+                set(A, j+1, get(A, j));
                 set(A, j, k);
             }
         }
