@@ -19,6 +19,7 @@ int shuffle(float* A) {
         set(A, r, get(A, i));
         set(A, i, k);
     }
+    return 0;
 }
 
 // O(n^2) sorting algorithm
