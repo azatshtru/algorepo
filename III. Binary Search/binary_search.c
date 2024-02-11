@@ -33,3 +33,25 @@ int binary_search_l(float* A, float x) {
     if(get(A, b) == x) { return b; }
     return -1;
 }
+
+//This method probes the sorted array to slowly reduce searching grounds until it either finds the value or nothing.
+
+//binary search can be used to find where the maxima of a function or array occurs.
+int maxima(float* A) {
+    int a = -1;
+    int b;
+    for(b = len(A)/2; b >= 1; b /= 2) {
+        while (get(A, a+b) < get(A, a+b+1)) { a+=b; }
+    }
+    return a+1;
+}
+
+//binary search can be used to find where the value of a function or array changes.
+int value_changed_at(float* A) {
+    int a = -1;
+    int b;
+    for(b = len(A)/2; b >= 1; b /= 2) {
+        while(get(A, a+b) != 1) { a+=b; }
+    }
+    return a;
+}
