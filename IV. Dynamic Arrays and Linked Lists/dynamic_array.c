@@ -25,6 +25,8 @@ int push(DynamicArray* P, float x) {
         int i;
         for (i = 0; i < P->fill; i++){ *(A+i)=*(P->array+i); }
         for (; i < P->size; i++){ *(A+i)=0; }
+        free(P->array);
+        P->array = A;
     }
     *(P->array+P->fill)=x;
     return 0;
@@ -38,7 +40,9 @@ float pop(DynamicArray* P, int i) {
         P->size /= 2;
         float* A = (float*)malloc(sizeof(float)*P->size);
         int k;
-        for (k = 0; k < P->fill; k++){ *(A+k)=*(P->array+k); }
+        for (k = 0; k < P->fill+1; k++){ *(A+k)=*(P->array+k); }
+        free(P->array);
+        P->array = A;
     }
     return v;
 }
