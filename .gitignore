@@ -54,3 +54,4 @@ dkms.conf
 # tests
 tests/
 test.c
+test

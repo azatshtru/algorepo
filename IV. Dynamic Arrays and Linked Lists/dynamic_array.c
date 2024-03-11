@@ -7,7 +7,7 @@ typedef struct dynamic_array {
     float* array;
 } DynamicArray;
 
-DynamicArray* Dynamic_Array() {
+DynamicArray* createDynamicArray() {
     DynamicArray* P = (DynamicArray*)malloc(sizeof(DynamicArray));
     P->size = 5;
     P->fill = -1;
@@ -15,6 +15,10 @@ DynamicArray* Dynamic_Array() {
     for (int i = 0; i < 5; i++){ *(A+i)=0; }
     P->array = A;
     return P;
+}
+
+float get(DynamicArray* P, int i) {
+    return *(P->array + i);
 }
 
 int push(DynamicArray* P, float x) {
@@ -48,6 +52,10 @@ float pop(DynamicArray* P, int i) {
 }
 
 int insert(DynamicArray* P, int i, float x) {
+    if(i > P->fill) { 
+        push(P, x); 
+        return 0;
+    }
     push(P, 0);
     for (int j = P->fill+1; j > i; j--){ 
         *(P->array+j)=*(P->array+j-1); 
