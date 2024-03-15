@@ -1,5 +1,7 @@
 #include "../IV. Dynamic Arrays and Linked Lists/dynamic_array.c"
 
+//pronounced "Deck"
+
 typedef struct deque {
     DynamicArray* A;
 } Deque;
