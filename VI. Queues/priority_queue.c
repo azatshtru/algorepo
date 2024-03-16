@@ -13,3 +13,8 @@ PriorityQueue* createPriorityQueue() {
     q->A = createDynamicArray();
     return q;
 }
+
+int nq(PriorityQueue* q) {
+    
+    return 0;
+}

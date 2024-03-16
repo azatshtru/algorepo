@@ -1,14 +1,14 @@
-#include "../IV. Dynamic Arrays and Linked Lists/dynamic_array.c"
+#include "../IV. Dynamic Arrays and Linked Lists/linked_list.c"
 
 //pronounced "Deck"
 
 typedef struct deque {
-    DynamicArray* A;
+    LinkedList* A;
 } Deque;
 
 Deque* createDeque() {
     Deque* q = (Deque*)malloc(sizeof(Deque));
-    q->A = createDynamicArray();
+    q->A = createLinkedList();
     return q;
 }
 
@@ -18,7 +18,7 @@ int push_front(Deque* q, float x) {
 }
 
 float pop_front(Deque* q) {
-    return pop(q->A, q->A->fill);
+    return pop(q->A, q->A->size-1);
 }
 
 int push_back(Deque* q, float x) {
