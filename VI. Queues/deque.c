@@ -3,77 +3,76 @@
 
 //pronounced "Deck"
 
-#define MIN_DEQUE_SIZE = 5;
+typedef struct node {
+    float value;
+    struct node* next;
+    struct node* prev;
+} Node;
 
 typedef struct deque {
-    int front;
-    int rear;
     int size;
-    int fill;
-    float* A;
+    Node* front;
+    Node* back;
 } Deque;
 
 Deque* createDeque() {
     Deque* q = (Deque*)malloc(sizeof(Deque));
-    q->A = (float*)malloc(sizeof(float)*5);
-    q->front = -1;
-    q->rear = -1;
-    q->fill = -1;
-    q->size = 5;
+    q->size = 0;
     return q;
 }
 
-int resize(Deque* q, int cap) {
-    float* T = (float*)malloc(sizeof(float)*cap);
-    for(int i = q->front+1; i < q->front+q->size+1; i++) { *(T+i-q->front-1) = *(q->A+i%q->size); }
-    free(q->A);
-    q->A = T;
-    q->rear = q->size-1;
-    q->front = -1;
-    q->size = cap;
-    return 0;
-}
-
-int push_back(Deque* q, float x) {
-    q->fill += 1;
-    if(q->fill >= q->size) { resize(q, q->size*2); }
-    q->rear = (q->rear + 1)%q->size;
-    *(q->A + q->rear) = x;
-    return 0;
-}
-
-int push_front(Deque* q, float x) {
-    q->fill += 1;
-    if(q->fill >= q->size) { resize(q, q->size*2); }
-    if(q->fill==0) {
-        q->front = q->size-1;
-        q->rear = 0;
-        *(q->A) = x;
-        return 0;
+int push_front(Deque* q, float v) {
+    Node* n = (Node*)malloc(sizeof(Node));
+    n->value = v;
+    if(q->size == 0) { q->front = q->back = n; }
+    else {
+        q->front->next = n;
+        n->prev = q->front;
+        q->front = n;
     }
-    q->front = (q->front - 1)%q->size;
-    *(q->A + q->front + 1) = x;
+    q->size += 1;
+    return 0;
+}
+
+int push_back(Deque* q, float v) {
+    Node* n = (Node*)malloc(sizeof(Node));
+    n->value = v;
+    if(q->size == 0) { q->front = q->back = n; }
+    else {
+        q->back->prev = n;
+        n->next = q->back;
+        q->back = n;
+    }
+    q->size += 1;
     return 0;
 }
 
 float pop_front(Deque* q) {
-    q->fill -= 1;
-    if(q->fill < q->size/2 && q->size/2 > 5) { resize(q, q->size/2); }
-    q->front = (q->front + 1)%q->size;
-    return *(q->A+q->front);
+    float v = q->front->value;
+    Node* temp = q->front;
+    q->front = q->front->prev;
+    free(temp);
+    q->size -= 1;
+    return v;
 }
 
 float pop_back(Deque* q) {
-    q->fill -= 1;
-    if(q->fill < q->size/2 && q->size/2 > 5) { resize(q, q->size/2); }
-    q->rear = (q->rear - 1)%q->size;
-    return *(q->A+q->rear);
+    float v = q->back->value;
+    Node* temp = q->back;
+    q->back = q->back->next;
+    free(temp);
+    q->size -= 1;
+    return v;
 }
 
-int displayQueue(Deque* q) {
+float displayDeque(Deque* q) {
     int i;
-    printf("\n[ ");
-    for(i = 1; i<=q->fill; i++) { printf("%.2f, ", *(q->A+(q->front+i)%q->size)); }
-    printf("%.2f ]\n", *(q->A+(q->front+i)%q->size));
+    Node* ni = q->back;
+    printf("\n[ %.2f, ", q->back->value);
+    for(i = 1; i < q->size-1; i++) { 
+        printf("%.2f, ", ni->next->value); 
+        ni = ni->next;
+    }
+    printf("%.2f ]\n", q->front->value);
     return 0;
 }
