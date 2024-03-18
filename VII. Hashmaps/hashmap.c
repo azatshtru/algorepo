@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "../V. Sets, Iterators and Options/option.c"
 
 #define FNV_PRIME 16777619
 #define FNV_OFFSET_BASIS 2166136261
@@ -34,45 +35,61 @@ typedef struct kvnode {
     struct kvnode* next;
 } KeyValuePair;
 
+Option(KeyValuePair);
+
 typedef struct hashmap {
-    KeyValuePair* table;
+    Option_KeyValuePair* table;
+    int* tableCount;
 } Hashmap;
 
 Hashmap* createHashmap() {
     Hashmap* A = (Hashmap*)malloc(sizeof(Hashmap));
-    A->table = (KeyValuePair*)malloc(sizeof(KeyValuePair)*TABLE_SIZE);
-    for(int i = 0; i < TABLE_SIZE; i++) { 
-        (A->table+i)->next = NULL; 
-        (A->table+i)->key = "";
-        (A->table+i)->value = 0;
-    }
+    A->table = (Option_KeyValuePair*)malloc(sizeof(Option_KeyValuePair)*TABLE_SIZE);
+    A->tableCount = (int*)malloc(sizeof(int)*TABLE_SIZE);
+    for(int i = 0; i < TABLE_SIZE; i++) { *(A->table+i) = None(); }
     return A;
 }
 
-KeyValuePair* entry(Hashmap* A, char* key) {
-    KeyValuePair* kvi = A->table + fnv1a_hash(key);
-    while(kvi->next != NULL && !streql(kvi->key, key)) { kvi = kvi->next; }
-    return kvi;
+Option_KeyValuePair entry(Hashmap* A, char* key) {
+    Option_KeyValuePair o = *(A->table + fnv1a_hash(key));
+    if(o.none) { return None(); }
+    KeyValuePair* kv = o.some;
+    for(int i = 0; i < *(A->tableCount+fnv1a_hash(key)); i++) { 
+        if(streql(kv->key, key)) { break; }
+        kv = kv->next;
+    }
+    if(!streql(kv->key, key)) { return None(); }
+    return Some(kv);
 }
 
 float get(Hashmap* A, char* key) {
-    if(streql(entry(A, key)->key, key)) { return entry(A, key)->value; }
-    return -1;
+    return entry(A, key).none ? -1 : entry(A, key).some->value;
 }
 
 int insert(Hashmap* A, char* key, float value) {
+    Option_KeyValuePair* o = A->table+fnv1a_hash(key);
     KeyValuePair* kv = (KeyValuePair*)malloc(sizeof(KeyValuePair));
     kv->key = key;
     kv->value = value;
-    kv->next = NULL;
-    if(!len((A->table+fnv1a_hash(key))->key)) {
-        *(A->table + fnv1a_hash(key)) = *kv; 
-        free(kv);
-    } else if(streql(entry(A, key)->key, key)){
-        entry(A, key)->value = value; 
-        free(kv);
+    if(o->none) {
+        *o = Some(kv);
+        *(A->tableCount + fnv1a_hash(key)) = 0;
+    } else if(entry(A, key).none) {
+        kv->next = o->some;
+        o->some = kv;
+        *(A->tableCount + fnv1a_hash(key)) += 1;
     } else {
-        entry(A, key)->next = kv;
+        entry(A, key).some->value = value;
+        free(kv);
     }
+    return 0;
+}
+
+int discard(Hashmap* A, char* key) {
+    Option_KeyValuePair* o = A->table+fnv1a_hash(key);
+    if(*(A->tableCount + fnv1a_hash(key)) == 0) {
+        
+    }
+
     return 0;
 }
