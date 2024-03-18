@@ -70,6 +70,7 @@ int insert(Hashmap* A, char* key, float value) {
         free(kv);
     } else if(streql(entry(A, key)->key, key)){
         entry(A, key)->value = value; 
+        free(kv);
     } else {
         entry(A, key)->next = kv;
     }
