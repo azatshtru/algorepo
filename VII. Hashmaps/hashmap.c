@@ -39,31 +39,32 @@ Option(KeyValuePair);
 
 typedef struct hashmap {
     Option_KeyValuePair* table;
-    int* tableCount;
+    int* cardinality;
 } Hashmap;
 
 Hashmap* createHashmap() {
     Hashmap* A = (Hashmap*)malloc(sizeof(Hashmap));
     A->table = (Option_KeyValuePair*)malloc(sizeof(Option_KeyValuePair)*TABLE_SIZE);
-    A->tableCount = (int*)malloc(sizeof(int)*TABLE_SIZE);
-    for(int i = 0; i < TABLE_SIZE; i++) { *(A->table+i) = None(); }
+    A->cardinality = (int*)malloc(sizeof(int)*TABLE_SIZE);
+    for(int i = 0; i < TABLE_SIZE; i++) { *(A->table+i) = None_KeyValuePair(); }
     return A;
 }
 
 Option_KeyValuePair entry(Hashmap* A, char* key) {
     Option_KeyValuePair o = *(A->table + fnv1a_hash(key));
-    if(o.none) { return None(); }
+    if(o.none) { return None_KeyValuePair(); }
     KeyValuePair* kv = o.some;
-    for(int i = 0; i < *(A->tableCount+fnv1a_hash(key)); i++) { 
+    for(int i = 0; i < *(A->cardinality+fnv1a_hash(key)); i++) { 
         if(streql(kv->key, key)) { break; }
         kv = kv->next;
     }
-    if(!streql(kv->key, key)) { return None(); }
-    return Some(kv);
+    if(!streql(kv->key, key)) { return None_KeyValuePair(); }
+    return Some_KeyValuePair(kv);
 }
 
-float get(Hashmap* A, char* key) {
-    return entry(A, key).none ? -1 : entry(A, key).some->value;
+Option(float);
+Option_float get(Hashmap* A, char* key) {
+    return entry(A, key).none ? None_float() : Some_float(&entry(A, key).some->value);
 }
 
 int insert(Hashmap* A, char* key, float value) {
@@ -72,24 +73,15 @@ int insert(Hashmap* A, char* key, float value) {
     kv->key = key;
     kv->value = value;
     if(o->none) {
-        *o = Some(kv);
-        *(A->tableCount + fnv1a_hash(key)) = 0;
+        *o = Some_KeyValuePair(kv);
+        *(A->cardinality + fnv1a_hash(key)) = 0;
     } else if(entry(A, key).none) {
         kv->next = o->some;
         o->some = kv;
-        *(A->tableCount + fnv1a_hash(key)) += 1;
+        *(A->cardinality + fnv1a_hash(key)) += 1;
     } else {
         entry(A, key).some->value = value;
         free(kv);
     }
-    return 0;
-}
-
-int discard(Hashmap* A, char* key) {
-    Option_KeyValuePair* o = A->table+fnv1a_hash(key);
-    if(*(A->tableCount + fnv1a_hash(key)) == 0) {
-        
-    }
-
     return 0;
 }
