@@ -85,3 +85,29 @@ int insert(Hashmap* A, char* key, float value) {
     }
     return 0;
 }
+
+int discard(Hashmap* A, char* key) {
+    Option_KeyValuePair* o = A->table+fnv1a_hash(key);
+    int* s = A->cardinality+fnv1a_hash(key);
+    if(entry(A, key).none) { return 0; }
+    KeyValuePair* kv = o->some;
+    if(streql(kv->key, key)) {
+        o->some = kv->next;
+        free(kv);
+        *s -= 1;
+        return 0;
+    }
+    int i = 0;
+    while(i < *s && !streql(kv->next->key, key)) { 
+        kv = kv->next;
+        i+=1;
+    }
+    if(i == *s && streql(kv->next->key, key)) { free(kv->next); }
+    else { 
+        KeyValuePair* temp = kv->next;
+        kv->next = kv->next->next;
+        free(temp);
+    }
+    *s -= 1;
+    return 0;
+}
