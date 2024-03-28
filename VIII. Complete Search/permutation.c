@@ -12,6 +12,7 @@ int permutations(int n) {
     static DynamicArray* C = NULL;
     if(P==NULL) { P = createDynamicArray(); }
     if(C==NULL) { C = createDynamicArray(); }
+
     if(P->fill+1 == n) {
         //process permutation
         printf("[ ");

@@ -11,6 +11,7 @@ int subsets(int n) {
     //bookkeeping
     static DynamicArray* S = NULL;
     if(S==NULL) { S=createDynamicArray(); }
+
     if(n==0) {
         //process subset
         printf("[ ");
@@ -32,6 +33,7 @@ int subsets1(DynamicArray* A, int n) {
     static DynamicArray* S = NULL;
     if(S==NULL) { S=createDynamicArray(); }
     if(n==-1) { n = A->fill+1; }
+
     if(n==0) {
         //process subset
         printf("[ ");
