@@ -19,7 +19,7 @@ int permutations(int n) {
         for(int i = 0; i <= P->fill; i++) { printf("%.2f ", *(P->array + i)); }
         printf("]\n");
     } else {
-        //core algorithm
+        //core algorithm: [check, choose, push, permutations, unchoose, pop]
         for(int i = 0; i < n; i++) {
             if(*(C->array + i)) { continue; }
             *(C->array + i) = 1;

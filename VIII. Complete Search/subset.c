@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "../IV. Dynamic Arrays and Linked Lists/dynamic_array.c"
 
-//The standard elegant algorithm to find all subsets of the set of first n positive integers has a core-recursive-algorithm, and a processing stage.
+//The standard elegant algorithm to find all subsets of the set of first n nonnegative integers has a core-recursive-algorithm, and a processing stage.
 //An integer n is used to keep track of when to perform processing stage during recursion, once n becomes zero, the subset is processed.
 //The core algorithm is pretty simple, it has 4 steps: Push, Search, Pop, Search [PSPS]
 //n is pushed into an array S, and then subsets of set of first n-1 integers are found, this gives all subsets of set of first n-1 positive integers that also include n.
@@ -27,7 +27,7 @@ int subsets(int n) {
     return 0;
 }
 
-//Once the subsets of the set of first n positive integers are found, they can be used on an array as its indices to perform complete search.
+//Once the subsets of the set of first n nonnegative integers are found, they can be used on an array as its indices to perform complete search.
 int subsets1(DynamicArray* A, int n) {
     //bookkeeping
     static DynamicArray* S = NULL;
