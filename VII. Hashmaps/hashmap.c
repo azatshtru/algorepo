@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include "../V. Sets, Iterators and Options/option.c"
 
 #define FNV_PRIME 16777619
 #define FNV_OFFSET_BASIS 2166136261
@@ -35,79 +34,52 @@ typedef struct kvnode {
     struct kvnode* next;
 } KeyValuePair;
 
-Option(KeyValuePair);
-
 typedef struct hashmap {
-    Option_KeyValuePair* table;
-    int* cardinality;
+    KeyValuePair** table;
 } Hashmap;
 
 Hashmap* createHashmap() {
     Hashmap* A = (Hashmap*)malloc(sizeof(Hashmap));
-    A->table = (Option_KeyValuePair*)malloc(sizeof(Option_KeyValuePair)*TABLE_SIZE);
-    A->cardinality = (int*)malloc(sizeof(int)*TABLE_SIZE);
-    for(int i = 0; i < TABLE_SIZE; i++) { *(A->table+i) = None_KeyValuePair(); }
+    A->table = (KeyValuePair**)malloc(sizeof(KeyValuePair*)*TABLE_SIZE);
+    for(int i = 0; i < TABLE_SIZE; i++) { *(A->table+i) = NULL; }
     return A;
 }
 
-Option_KeyValuePair entry(Hashmap* A, char* key) {
-    Option_KeyValuePair o = *(A->table + fnv1a_hash(key));
-    if(o.none) { return None_KeyValuePair(); }
-    KeyValuePair* kv = o.some;
-    for(int i = 0; i < *(A->cardinality+fnv1a_hash(key)); i++) { 
-        if(streql(kv->key, key)) { break; }
-        kv = kv->next;
-    }
-    if(!streql(kv->key, key)) { return None_KeyValuePair(); }
-    return Some_KeyValuePair(kv);
+KeyValuePair* entry(Hashmap* map, char* key) {
+    KeyValuePair* kv = *(map->table + fnv1a_hash(key));
+    while(kv != NULL && !streql(kv->key, key)) { kv = kv->next; }
+    return kv;
 }
 
-Option(float);
-Option_float get(Hashmap* A, char* key) {
-    return entry(A, key).none ? None_float() : Some_float(&entry(A, key).some->value);
-}
-
-int insert(Hashmap* A, char* key, float value) {
-    Option_KeyValuePair* o = A->table+fnv1a_hash(key);
-    KeyValuePair* kv = (KeyValuePair*)malloc(sizeof(KeyValuePair));
-    kv->key = key;
-    kv->value = value;
-    if(o->none) {
-        *o = Some_KeyValuePair(kv);
-        *(A->cardinality + fnv1a_hash(key)) = 0;
-    } else if(entry(A, key).none) {
-        kv->next = o->some;
-        o->some = kv;
-        *(A->cardinality + fnv1a_hash(key)) += 1;
+int insert(Hashmap* map, char* key, float value) {
+    if(entry(map, key) == NULL) {
+        KeyValuePair* kv = (KeyValuePair*)malloc(sizeof(KeyValuePair));
+        kv->key = key;
+        kv->value = value;
+        kv->next = *(map->table + fnv1a_hash(key));
+        *(map->table + fnv1a_hash(key)) = kv;
     } else {
-        entry(A, key).some->value = value;
-        free(kv);
+        entry(map, key)->value = value;
     }
     return 0;
 }
 
-int discard(Hashmap* A, char* key) {
-    Option_KeyValuePair* o = A->table+fnv1a_hash(key);
-    int* s = A->cardinality+fnv1a_hash(key);
-    if(entry(A, key).none) { return 0; }
-    KeyValuePair* kv = o->some;
-    if(streql(kv->key, key)) {
-        o->some = kv->next;
+float discard(Hashmap* map, char* key) {
+    KeyValuePair* kv = *(map->table + fnv1a_hash(key));
+    if(kv==NULL) {
+        return -1;
+    } else if(streql(kv->key, key)) { 
+        float v = kv->value;
         free(kv);
-        *s -= 1;
-        return 0;
+        return v;
     }
-    int i = 0;
-    while(i < *s && !streql(kv->next->key, key)) { 
-        kv = kv->next;
-        i+=1;
-    }
-    if(i == *s && streql(kv->next->key, key)) { free(kv->next); }
-    else { 
-        KeyValuePair* temp = kv->next;
+    while(kv->next != NULL && !streql(kv->next->key, key)) { kv=kv->next; }
+    if(kv->next != NULL) {
+        KeyValuePair* kvx = kv->next;
         kv->next = kv->next->next;
-        free(temp);
-    }
-    *s -= 1;
-    return 0;
+        float v = kvx->value;
+        free(kvx);
+        return v;
+    } 
+    return -1;
 }

@@ -32,7 +32,6 @@ int push_vector##TYPE (Vector_##TYPE * P, TYPE x) {\
 TYPE pop_vector##TYPE (Vector_##TYPE * P, int i) {\
     TYPE v = *(P->array+i);\
     P->fill -= 1;\
-    if(P->fill == -1) { *(P->array)=0; }\
     for (int j = i; j < P->fill+1; j++){ *(P->array+j)=*(P->array+j+1); }\
     if(P->fill < P->size/2 && P->size/2 > 5) {\
         P->size /= 2;\
@@ -43,14 +42,13 @@ TYPE pop_vector##TYPE (Vector_##TYPE * P, int i) {\
         P->array = A;\
     }\
     return v;\
-}
-
-#define vectorInsert(TYPE) int insert_vector##TYPE (Vector_##TYPE * P, int i, TYPE x) {\
+} \
+int insert_vector##TYPE (Vector_##TYPE * P, int i, TYPE x) {\
     if(i > P->fill) {\
         push_vector##TYPE(P, x);\
         return 0;\
     }\
-    push_vector##TYPE(P, 0);\
+    push_vector##TYPE(P, x);\
     for (int j = P->fill+1; j > i; j--){\
         *(P->array+j)=*(P->array+j-1);\
     }\
