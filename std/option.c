@@ -1,4 +1,4 @@
-#define initOption(TYPE) \
+#define stdOption(TYPE) \
 typedef struct option_##TYPE { TYPE * some; int none; } Option_##TYPE; \
 Option_##TYPE Some_##TYPE (TYPE * value) {\
     Option_##TYPE o;\

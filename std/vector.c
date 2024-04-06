@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#define initVector(TYPE) typedef struct vector_##TYPE {\
+#define stdVector(TYPE) typedef struct vector_##TYPE {\
 int size;\
 int fill;\
 TYPE * array;\
