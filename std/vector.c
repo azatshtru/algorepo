@@ -55,6 +55,29 @@ int insert_vector##TYPE (Vector_##TYPE * P, int i, TYPE x) {\
     *(P->array+i) = x;\
     return 0;\
 }\
+int partition_##TYPE (Vector_##TYPE * v, int lo, int hi, int (*cmp)(TYPE, TYPE)) {\
+    TYPE pivot = get_vector##TYPE(v, hi);\
+    int index = lo-1;\
+    for(int i = lo; i < hi; i++) {\
+        if(cmp(get_vector##TYPE(v, i), pivot)) {\
+            index++;\
+            TYPE tmp = get_vector##TYPE(v, i);\
+            *(v->array + i) = *(v->array + index);\
+            *(v->array + index) = tmp;\
+        }\
+    }\
+    index++;\
+    *(v->array + hi) = *(v->array + index);\
+    *(v->array + index) = pivot;\
+    return index;\
+}\
+int quick_sort_##TYPE (Vector_##TYPE * v, int lo, int hi, int (*cmp)(TYPE, TYPE)) {\
+    if(lo >= hi) { return 0; }\
+    int index = partition_##TYPE(v, lo, hi, cmp);\
+    quick_sort_##TYPE(v, lo, index-1, cmp);\
+    quick_sort_##TYPE(v, index+1, hi, cmp);\
+    return 0;\
+}
 
 #define Vector(TYPE) Vector_##TYPE *
 #define createVector(TYPE) createVector_##TYPE()
@@ -62,3 +85,4 @@ int insert_vector##TYPE (Vector_##TYPE * P, int i, TYPE x) {\
 #define push(TYPE, P, x) push_vector##TYPE(P, x)
 #define pop(TYPE, P, i) pop_vector##TYPE(P, i)
 #define insert(TYPE, P, i, x) insert_vector##TYPE(P, i, x)
+#define quick_sort(TYPE, P, lo, hi, cmp) quick_sort_##TYPE(P, lo, hi, cmp) 
