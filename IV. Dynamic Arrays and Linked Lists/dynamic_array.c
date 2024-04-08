@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef DYNAMIC_ARRAY
+#define DYNAMIC_ARRAY
+
 typedef struct dynamic_array {
     int size;
     int fill;
@@ -74,3 +77,5 @@ int prettyPrint(DynamicArray* P) {
     printf("%.2f ]\n", *(P->array+i));
     return 0;
 }
+
+#endif

@@ -1,7 +1,7 @@
 # Minimizing sums
 
 Consider the expression of the form:
-$$|a_1-x|^c+|a_2-x|^c+\dots+|a_n-x|^c
+$$|a_1-x|^c+|a_2-x|^c+\dots+|a_n-x|^c$$
 The goal is to minimize the above expression at some c and x.
 
 - For c = 1, the optimal strategy is to take x as the median of $a_1, a_2\dots a_n$ arranged in ascending order.
