@@ -91,3 +91,14 @@ int constructTileMatrix(int X, int Y) {
     for(int i = 0; i < vxi[Y-1]->fill+1; i++) { sum+=get(int, vxi[Y-1], i); }
     return sum;
 }
+
+int countingTilings_exp(int X, int Y) {
+    int A;
+    int B;
+    if(X>Y) { A=Y; B=X; }
+    else { A=X; B=Y; }
+    return constructTileMatrix(A, B);
+}
+
+
+//There is also a direct formula for calculating tilings which works in O(nm). [$\prod_{a=1}^{n/2}\prod_{b=1}^{m/2}4(cos^2\frac{\pi a}{n+1}+cos^2\frac{\pi b}{m+1})$]
