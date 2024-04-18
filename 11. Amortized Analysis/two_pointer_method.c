@@ -1,6 +1,6 @@
 #include "../II. Sorting/sorting.c"
 
-//Find if a subarray sums to a number k.
+//Find if a subarray sums to a number k. Amortized O(n)
 int find_subarray_sum(int len, int* A, int k) {
     int p = 0;
     int q = 0;
@@ -21,7 +21,7 @@ int find_subarray_sum(int len, int* A, int k) {
     return -1;
 }
 
-//Find two numbers in the array such that their sum is k.
+//Find two numbers in the array such that their sum is k. Amortized O(n)
 int two_sum(int len, float* A, int k) {
     //sort the array
     merge_sort(A, -1, len-1);
