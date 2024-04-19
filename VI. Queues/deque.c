@@ -66,12 +66,14 @@ float pop_back(Deque* q) {
 }
 
 float displayDeque(Deque* q) {
+    if(q->size==0) { printf("\n[ ]\n"); return 0; }
+    if(q->front == q->back) { printf("\n[ %.2f ]\n", q->back->value); return 0; }
     int i;
     Node* ni = q->back;
     printf("\n[ %.2f, ", q->back->value);
     for(i = 1; i < q->size-1; i++) { 
-        printf("%.2f, ", ni->next->value); 
         ni = ni->next;
+        printf("%.2f, ", ni->value); 
     }
     printf("%.2f ]\n", q->front->value);
     return 0;
