@@ -1,11 +1,11 @@
 #include <stdlib.h>
 
-//Binary indexed tree with the property that every kth index contains the sum of elements in the range [k-p+1, k]
+//While sum prefix tables can query in O(1) time, they need to process in O(n) time whenever the undelying array changes.
+//A fenwick tree can process changes much faster in O(log n), with the small tradeoff of query processing in O(log n) time.
+//It is a binary indexed tree with the property that every kth index contains the sum of elements in the range [k-p+1, k]
 //where p is the largest power of 2 that divided k. p can be easily found with the bit operation k&-k.
 
-//function to calculate the sum to k in O(log k)
-
-
+//Function to add a value x at an index k and corresponding position in the tree.
 int add(int k, int x, int len, int* tree) {
     while(k <= len) {
         tree[k] += x;
@@ -21,6 +21,7 @@ int* initializeFenwickTree(int len, int* A) {
     return tree;
 }
 
+//function to calculate the sum to k in O(log k)
 int sum(int k, int* tree) {
     int s = 0;
     while(k >= 1) {
