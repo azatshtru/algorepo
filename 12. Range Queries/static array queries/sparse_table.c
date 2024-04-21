@@ -18,6 +18,7 @@ int min(int a, int b) {
 }
 
 int min_q(int* A, int a, int b, int** P) {
+    if(P[logb2(b-a+1)][a]) { return P[logb2(b-a+1)][a]; }
     int w = (b-a+1)/2;
     int v;
     if(a==b) { v = A[a]; }
@@ -40,6 +41,11 @@ int fillSparseTable(int** P, int len, int* A) {
             min_q(A, j, j+pow_2(i)-1, P);
         }
     }
+    return 0;
+}
+
+int printSparseTable(int** P, int len) {
+    int p = logb2(len);
     for(int i = 0; i < p; i++) {
         for(int j = 0; j < len-pow_2(i)+1; j++) {
             printf("%d ", P[i][j]);
@@ -61,6 +67,7 @@ int calculateMin(int len, int* A, int a, int b) {
     int p = logb2(b-a+1);
     int k = pow_2(p);
     int** P = generateMinSparseTable(len, A);
+    fillSparseTable(P, len, A);
     int x = min(min_q(A, a, a+k-1, P), min_q(A, b-k+1, b, P));
     releaseSparseTable(P, len);
     return x;
