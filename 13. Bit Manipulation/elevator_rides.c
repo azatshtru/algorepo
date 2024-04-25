@@ -1,6 +1,8 @@
 //There is an elevator that can take maximum weight and there are n people with known weights,..
 //The goal is to find the minimum number of rides required to take each of them from one floor to another.
 
+//This can be done naively by calculating and checking each permutation of people
+//A much more efficient method is by converting permutations into subsets using bits.
 int min_rides(int n, int* weights, int w_max) {
     int best[1<<n][2];
     best[0][0] = 1;
