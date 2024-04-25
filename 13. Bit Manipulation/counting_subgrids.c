@@ -1,7 +1,7 @@
 #include "./popcount.c"
 
 //In a given grid with white and black squares, find all the subgrids where the corners are black squares.
-//This can be solved easily if each row is represented as a binary number.
+//This can be solved easily if each row is represented as a binary number, then rows are anded.
 
 int count_subgrids(int n, int* grid) {
     int count = 0;
