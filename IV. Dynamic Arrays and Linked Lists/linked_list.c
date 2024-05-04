@@ -87,3 +87,10 @@ int prettyPrint(LinkedList* A) {
     printf("]\n");
     return 0;
 }
+
+void linked_list_free(LinkedList* linked_list) {
+    Node* node = linked_list->head;
+    while(node != linked_list->tail) { free(node); }
+    free(linked_list->tail);
+    free(linked_list);
+}

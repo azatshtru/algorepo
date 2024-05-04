@@ -27,3 +27,8 @@ int displayQueue(Queue* q) {
     prettyPrint(q->A);
     return 0;
 }
+
+void queue_free(Queue* q) {
+    linked_list_free(q->A);
+    free(q);
+}

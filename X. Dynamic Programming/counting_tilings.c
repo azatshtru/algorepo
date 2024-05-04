@@ -12,6 +12,8 @@ stdVector(int)
 //V low tile piece
 char Z[4] = { '<', '>', 'V', '^' };
 
+//TODO: put comments to explain the code and change variable names to be more descriptive
+
 int printRow(char* row, int X) {
     for(int i = 0; i < X; i++) { printf("%c", row[i]); }
     return 0;

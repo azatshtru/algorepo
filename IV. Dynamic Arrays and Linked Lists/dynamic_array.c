@@ -78,4 +78,9 @@ int prettyPrint(DynamicArray* P) {
     return 0;
 }
 
+void dynamic_array_free(DynamicArray* P) {
+    free(P->array);
+    free(P);
+}
+
 #endif
