@@ -32,7 +32,6 @@ Vec* vec_address_from_array(void* array_ptr) { return array_ptr-(uintptr_t)(&((V
 
 Vec* vec_resize(Vec* v, uint8 new_len) {
     Vec* new_vec = (Vec*)malloc(sizeof(Vec)+(new_len*v->size));
-    //for(int i = 0; i < v->len*v->size; i++) { new_vec->array[i] = v->array[i]; }
     memcpy(new_vec->array, v->array, v->len*v->size);
     new_vec->cap = new_len;
     new_vec->len = v->len;
@@ -55,7 +54,7 @@ array_ptr[vec_address_from_array(array_ptr)->len++] = value;\
 #define __vec_print__(array_ptr)\
 printf("\n[ ");\
 for(int i = 0; i < vec_address_from_array(array_ptr)->len; i++) { printf("%d, ", array_ptr[i]); }\
-printf("]\n");
+printf("\b\b ]\n");
 
 #define __vec_free__(array_ptr) vec_free((byte*)array_ptr);
 
