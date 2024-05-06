@@ -1,15 +1,15 @@
 #include <stdlib.h>
+#include "../std/vec.c"
 
 #ifndef GRAPH
 #define GRAPH
 
-#define __graph_node_set_neighbourhood__(NODE, LEN, ...){\
-GraphNode* NODE##_neighbourhood[LEN] = { __VA_ARGS__ };\
-graph_node_set_neighbourhood(NODE, LEN, NODE##_neighbourhood);\
-}
+#define __graph_node_set_neighbourhood__(NEIGHBOURHOOD_NAME, NODE, LEN, ...)\
+GraphNode* NODE##_##NEIGHBOURHOOD_NAME[LEN] = { __VA_ARGS__ };\
+graph_node_set_neighbourhood(NODE, LEN, NODE##_##NEIGHBOURHOOD_NAME);
 
 typedef unsigned char uint8;
-
+typedef signed char int8;
 
 typedef enum edge_sync_policy {
     edge_sync, no_edge_sync

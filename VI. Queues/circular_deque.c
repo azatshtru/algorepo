@@ -1,77 +1,74 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define MIN_DEQUE_SIZE 5
+typedef unsigned char uint8;
+typedef signed char int8;
 
-typedef struct circular_deque {
-    int front;
-    int rear;
-    int size;
-    int fill;
-    float* A;
-} CircularDeque;
+typedef struct circular_queue {
+    uint8* array;
+    uint8 max_len;
+    uint8 len;
+    int8 front;
+    int8 rear;
+} CircularQueue;
 
-CircularDeque* createCircularDeque() {
-    CircularDeque* q = (CircularDeque*)malloc(sizeof(CircularDeque));
-    q->A = (float*)malloc(sizeof(float)*MIN_DEQUE_SIZE);
-    q->front = -1;
-    q->rear = -1;
-    q->fill = -1;
-    q->size = MIN_DEQUE_SIZE;
+CircularQueue queue_new() {
+    uint8* array = (uint8*)malloc(sizeof(uint8)*7);
+    CircularQueue q = {array, 7, 0, 0, -1};
     return q;
 }
 
-int resize(CircularDeque* q, int cap) {
-    float* T = (float*)malloc(sizeof(float)*cap);
-    for(int i = q->front+1; i < q->front+q->size+1; i++) { *(T+i-q->front-1) = *(q->A+i%q->size); }
-    free(q->A);
-    q->A = T;
-    q->rear = q->size-1;
-    q->front = -1;
-    q->size = cap;
-    return 0;
+uint8 get_moduloed_index(int8 x, uint8 s) {
+    return (s+x)%s;
 }
 
-int push_back(CircularDeque* q, float x) {
-    q->fill += 1;
-    if(q->fill >= q->size) { resize(q, q->size*2); }
-    q->rear = (q->rear + 1)%q->size;
-    *(q->A + q->rear) = x;
-    return 0;
-}
+void queue_resize(CircularQueue* q, uint8 len) {
+    uint8* array = (uint8*)malloc(sizeof(uint8)*len);
 
-int push_front(CircularDeque* q, float x) {
-    q->fill += 1;
-    if(q->fill >= q->size) { resize(q, q->size*2); }
-    if(q->fill==0) {
-        q->front = q->size-1;
-        q->rear = 0;
-        *(q->A) = x;
-        return 0;
+    for(uint8 i = 0; i < q->len; i++) { 
+        array[i] = q->array[get_moduloed_index(q->rear+i+1, q->max_len)];
     }
-    q->front = (q->front - 1)%q->size;
-    *(q->A + q->front + 1) = x;
-    return 0;
+    free(q->array);
+    q->array = array;
+    q->front = q->len;
+    q->rear = -1;
+    q->max_len = len;
 }
 
-float pop_front(CircularDeque* q) {
-    q->fill -= 1;
-    if(q->fill < q->size/2 && q->size/2 > MIN_DEQUE_SIZE) { resize(q, q->size/2); }
-    q->front = (q->front + 1)%q->size;
-    return *(q->A+q->front);
+void queue_push_front(CircularQueue* q, uint8 x) {
+    if(q->len==q->max_len) { queue_resize(q, q->len*2); }
+    q->array[get_moduloed_index(q->front, q->max_len)] = x;
+    q->front = get_moduloed_index((q->front + 1), q->max_len);
+    ++q->len;
 }
 
-float pop_back(CircularDeque* q) {
-    q->fill -= 1;
-    if(q->fill < q->size/2 && q->size/2 > MIN_DEQUE_SIZE) { resize(q, q->size/2); }
-    q->rear = (q->rear - 1)%q->size;
-    return *(q->A+q->rear);
+uint8 queue_pop_rear(CircularQueue* q) {
+    --q->len;
+    int8 k = q->array[get_moduloed_index(q->rear, q->max_len)];
+    q->rear = get_moduloed_index((q->rear + 1), q->max_len);
+    return k;
 }
 
-int displayCircularDeque(CircularDeque* q) {
-    int i;
-    printf("\n[ ");
-    for(i = 1; i<=q->fill; i++) { printf("%.2f, ", *(q->A+(q->front+i)%q->size)); }
-    printf("%.2f ]\n", *(q->A+(q->front+i)%q->size));
-    return 0;
+void queue_push_rear(CircularQueue* q, uint8 x) {
+    if(q->len==q->max_len) { queue_resize(q, q->len*2); }
+    q->array[get_moduloed_index(q->rear, q->max_len)] = x;
+    q->rear = get_moduloed_index((q->rear - 1), q->max_len);
+    ++q->len;
 }
+
+uint8 queue_pop_front(CircularQueue* q) {
+    --q->len;
+    int8 k = q->array[get_moduloed_index(q->front, q->max_len)];
+    q->front = get_moduloed_index((q->front - 1), q->max_len);
+    return k;
+}
+
+void queue_print(CircularQueue* q) {
+    printf("[ ");
+    for(int i = q->rear; i < q->rear+q->len; i++) {
+        printf("%d, ", (int)q->array[get_moduloed_index(i+1, q->max_len)]);
+    }
+    printf("]\n");
+}
+
+void queue_free(CircularQueue* q) { free(q->array); }

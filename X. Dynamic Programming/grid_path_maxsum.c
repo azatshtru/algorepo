@@ -1,7 +1,7 @@
 //There is a grid with numbers in each cell. Starting from the top-left corner.
 //Find the path to reach the bottom-right corner while only moving down or right such that the sum of the cells in the path is maximum.
 
-int gridPathMaxSum(int* A, int n) {
+int grid_path_max_sum(int* A, int n) {
     int sum[n+1][n+1];
     sum[0][0] = A[0];
     for(int i = 0; i < n; i++) {
