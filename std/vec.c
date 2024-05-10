@@ -28,7 +28,7 @@ byte* vec_new(uint8 size) {
     return vec->array;
 }
 
-Vec* vec_address_from_array(void* array_ptr) { return array_ptr-(uintptr_t)(&((Vec*)0)->array); }
+Vec* vec_address_from_array(void* array_ptr) { return (Vec*)((byte*)array_ptr-(uintptr_t)(&((Vec*)0)->array)); }
 
 uint8 vec_len(void* array_ptr) { return vec_address_from_array(array_ptr)->len; }
 
@@ -43,15 +43,13 @@ Vec* vec_resize(Vec* v, uint8 new_len) {
     return new_vec;
 }
 
-byte* vec_pop(byte** array_ptr, uint8 index) {
-    Vec* v = vec_address_from_array(*array_ptr);
-    memcpy(*array_ptr+(index*v->size), *array_ptr+((index+1)*v->size), v->size*(v->len-index));
-    --v->len;
-    if(v->cap >= INIT_VEC_SIZE*2 && v->len==v->cap/2) { *array_ptr = (void*)vec_resize(v, v->cap/2)->array; }
-    return NULL;
+void vec_free(void* array_ptr, void (*free_func)(void*)) {
+    Vec* v = vec_address_from_array(array_ptr);
+    if(free_func != NULL) {
+        for(int i = 0; i < v->len; i++) { free_func(array_ptr+i); }
+    }
+    free(v);
 }
-
-void vec_free(void* array_ptr) { free(vec_address_from_array(array_ptr)); }
 
 #define __vec_new__(type) (type*)vec_new(sizeof(type));
 
@@ -76,9 +74,37 @@ printf("vec![ ");\
 for(int i = 0; i < vec_address_from_array(array_ptr)->len; i++) { printf(type_specifier, array_ptr[i]); printf(", "); }\
 printf("\b\b ]\n");})
 
-#define __vec_print__(array_ptr, print_func_ptr) ({\
+#define __vec_print__(array_ptr, print_func) ({\
 printf("vec![ ");\
-for(int i = 0; i < vec_address_from_array(array_ptr)->len; i++) { print_func_ptr(array_ptr[i]); printf(", "); }\
+for(int i = 0; i < vec_address_from_array(array_ptr)->len; i++) { print_func(array_ptr[i]); printf(", "); }\
 printf("\b\b ]\n");})
+
+uint8 vec_quicksort_partition(void* array_ptr, int8 lo, int8 hi, int8 (*cmp_func)(void*, void*)) {
+    uint8 size = vec_address_from_array(array_ptr)->size;
+    uint8 pivot = hi*size;
+    int8 index = (lo-1)*size;
+    for(uint8 i = lo*size; i < hi*size; i+=size) {
+        if(cmp_func(array_ptr+i, array_ptr+pivot) < 0) {
+            index+=size;
+            byte temp_value[size];
+            memcpy(temp_value, array_ptr+i, size);
+            memcpy(array_ptr+i, array_ptr+index, size);
+            memcpy(array_ptr+index, temp_value, size);
+        }
+    }
+    index+=size;
+    byte temp_value[size];
+    memcpy(temp_value, array_ptr+pivot, size);
+    memcpy(array_ptr+pivot, array_ptr+index, size);
+    memcpy(array_ptr+index, temp_value, size);
+    return index/size;
+}
+
+void vec_quicksort(void* array_ptr, int8 lo, int8 hi, int8 (*cmp_func)(void*, void*)) {
+    if(lo >= hi || lo < 0) { return; }
+    uint8 index = vec_quicksort_partition(array_ptr, lo, hi, cmp_func);
+    vec_quicksort(array_ptr, lo, index-1, cmp_func);
+    vec_quicksort(array_ptr, index+1, hi, cmp_func);
+}
 
 #endif

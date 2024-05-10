@@ -1,23 +1,21 @@
-#include "../std/box.c"
-#include "../std/vector.c"
+#include "../std/vec.c"
 
 typedef struct event {
-    char* eventName;
-    int start;
-    int end;
+    char* event_name;
+    uint8 start;
+    uint8 end;
 } Event;
 
-Event make_event(char* S, int i, int f) {
-    Event e = { S, i, f };
+Event event_new(char* event_name, int start, int end) {
+    Event e = { event_name, start, end };
     return e;
 }
 
-stdBox(Event)
-stdVector(BoxEvent)
+void event_print(Event event) { printf("{ %s: %d - %d }", event.event_name, event.start, event.end); }
 
 //A greedy strategy of choosing the shortest duration events does not work as larger events that do not overlap can exist.
 //Simiarly, the strategy of choosing an event that begins as early as possible doesn't work cause it might take up the events that begin after and end early.
-//Following, we can derive a greedy strategy of choosing the event that ends as soon as possible, so that other events have the time to begin.
+//Following, we can derive a greedy strategy of choosing the event that ends as soon as possible, so that more events can begin.
 
 int cmp_event_end(BoxEvent a, BoxEvent b) {
     return a.value->end<b.value->end?1:0;

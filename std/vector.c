@@ -72,7 +72,7 @@ int partition_##TYPE (Vector_##TYPE * v, int lo, int hi, int (*cmp)(TYPE, TYPE))
     return index;\
 }\
 int quick_sort_##TYPE (Vector_##TYPE * v, int lo, int hi, int (*cmp)(TYPE, TYPE)) {\
-    if(lo >= hi) { return 0; }\
+    if(lo >= hi || lo < 0) { return 0; }\
     int index = partition_##TYPE(v, lo, hi, cmp);\
     quick_sort_##TYPE(v, lo, index-1, cmp);\
     quick_sort_##TYPE(v, index+1, hi, cmp);\

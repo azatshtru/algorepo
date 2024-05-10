@@ -1,8 +1,13 @@
 #include <stdlib.h>
 
+#ifndef STRING
+#define STRING
+
+typedef unsigned int uint32;
+
 typedef struct length_string {
-    char* str;
-    int length;
+    uint32 length;
+    char str[];
 } string;
 
 string string_new() {
@@ -35,3 +40,5 @@ string string_concat(string a, string b) {
     s.str = str;
     return s;
 }
+
+#endif
