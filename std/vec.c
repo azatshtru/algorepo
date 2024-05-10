@@ -51,6 +51,12 @@ void vec_free(void* array_ptr, void (*free_func)(void*)) {
     free(v);
 }
 
+//void vec_push(void* array_ptr, byte* value) {
+    //Vec* v = vec_address_from_array((byte*)array_ptr);
+    //if(v->len==v->cap) { array_ptr = (void*)vec_resize(v, v->cap*2)->array; }
+    //memcpy(array_ptr+vec_address_from_array(array_ptr)->len++, value, vec_address_from_array(array_ptr)->size);
+//}
+
 #define __vec_new__(type) (type*)vec_new(sizeof(type));
 
 #define __vec_push__(array_ptr, value) ({\
