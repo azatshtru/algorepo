@@ -53,4 +53,12 @@ void string_print(char* str) {
     printf("\"\n");
 }
 
+int8 string_compare(char* s1, char* s2) {
+    uint8 len = string_len(s1) < string_len(s2) ? string_len(s1) : string_len(s2);
+    int i = 0;
+    while(i < len && s1[i] == s2[i]) { i++; }
+    if(i==len && len == string_len(s2)) { return 0; }
+    return s1[i] < s2[i] ? -1 : 1;
+}
+
 #endif

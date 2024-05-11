@@ -46,7 +46,7 @@ Vec* vec_resize(Vec* v, uint8 new_len) {
 void vec_free(void* array_ptr, void (*free_func)(void*)) {
     Vec* v = vec_address_from_array(array_ptr);
     if(free_func != NULL) {
-        for(int i = 0; i < v->len; i++) { free_func(array_ptr+i); }
+        for(int i = 0; i < v->len*v->size; i+=v->size) { free_func(array_ptr+i); }
     }
     free(v);
 }
@@ -57,7 +57,7 @@ void vec_free(void* array_ptr, void (*free_func)(void*)) {
     //memcpy(array_ptr+vec_address_from_array(array_ptr)->len++, value, vec_address_from_array(array_ptr)->size);
 //}
 
-#define __vec_new__(type) (type*)vec_new(sizeof(type));
+#define __vec_new__(type) (type*)vec_new(sizeof(type))
 
 #define __vec_push__(array_ptr, value) ({\
 Vec* v = vec_address_from_array((byte*)array_ptr);\

@@ -1,12 +1,9 @@
 #include <stdlib.h>
+#include <stdarg.h>
 #include "../std/vec.c"
 
 #ifndef GRAPH
 #define GRAPH
-
-#define __graph_node_set_neighbourhood__(NEIGHBOURHOOD_NAME, NODE, LEN, ...)\
-GraphNode* NODE##_##NEIGHBOURHOOD_NAME[LEN] = { __VA_ARGS__ };\
-graph_node_set_neighbourhood(NODE, LEN, NODE##_##NEIGHBOURHOOD_NAME);
 
 typedef unsigned char uint8;
 typedef signed char int8;
@@ -20,94 +17,73 @@ typedef enum graph_reflective_policy {
 } GRAPH_REFLECTIVE_POLICY;
 
 typedef union graph_node_value_type {
-
+    char char_value;
 } GraphNodeT;
 
 typedef struct graph_node {
+    char value;
     struct graph_node **neighbour_list;
-    uint8 neighbour_len;
-    uint8 graph_index;
-    short value;
 } GraphNode;
 
-typedef struct adjacency_list_graph {
-    int size;
-    int capacity;
-    GraphNode* node_list;
-} AdjacencyListGraph;
+typedef GraphNode* AdjacencyListGraph;
 
-AdjacencyListGraph adjacency_list_graph_new(int capacity) {
-    GraphNode* node_list = (GraphNode*)malloc(sizeof(GraphNode)*capacity);
-    AdjacencyListGraph graph = { -1, capacity, node_list };
+AdjacencyListGraph adjacency_list_graph_new() {
+    AdjacencyListGraph graph = __vec_new__(GraphNode);
     return graph;
 }
 
-void adjacency_list_graph_resize(AdjacencyListGraph* graph_ptr, int capacity) {
-    GraphNode* newNodeList = (GraphNode*)malloc(sizeof(GraphNode)*capacity);
-    for(int i = 0; i < graph_ptr->capacity; i++) { newNodeList[i] = graph_ptr->node_list[i]; }
-    free(graph_ptr->node_list);
-    AdjacencyListGraph newGraph = { graph_ptr->size, capacity, newNodeList };
-    *graph_ptr = newGraph;
+GraphNode* graph_node_new(AdjacencyListGraph graph, char value) {
+    GraphNode graph_node = { value, __vec_new__(GraphNode*) };
+    __vec_push__(graph, graph_node);
+    return graph+vec_len(graph)-1;
 }
 
-GraphNode* graph_node_new(AdjacencyListGraph* graph_ptr, short value, GraphNode** neighbour_list) {
-    if(graph_ptr->capacity - 1 == graph_ptr->size) { 
-        printf("Adj Graph %p full, doing nothing.", graph_ptr);
-        return NULL;
+void graph_node_add_neighbours(GraphNode* graph_node, int neighbour_count, ...) {
+    va_list ap;
+    va_start(ap, neighbour_count);
+    for(uint8 i = 0; i < neighbour_count; i++) {
+        __vec_push__(graph_node->neighbour_list, va_arg(ap, GraphNode*));
     }
-    graph_ptr->node_list[++graph_ptr->size].value = value;
-    graph_ptr->node_list[graph_ptr->size].graph_index = (uint8)graph_ptr->size;
-    if(neighbour_list != NULL) { graph_ptr->node_list[graph_ptr->size].neighbour_list = neighbour_list; }
-    return graph_ptr->node_list+graph_ptr->size;
+    va_end(ap);
 }
 
-void graph_node_set_neighbourhood(GraphNode* graph_node, uint8 neighbour_len, GraphNode** neighbour_list) {
-    if(neighbour_list != NULL) { 
-        graph_node->neighbour_len = neighbour_len;
-        graph_node->neighbour_list = neighbour_list;
+void graph_node_free(void* graph_node_voidptr) {
+    GraphNode* graph_node = (GraphNode*)graph_node_voidptr;
+    vec_free(graph_node->neighbour_list, NULL);
+}
+
+void graph_node_print(GraphNode graph_node) {
+    printf("graph_node!{ %c: ", graph_node.value);
+    for(uint8 i = 0; i < vec_len(graph_node.neighbour_list); i++) {
+        printf("%c, ", graph_node.neighbour_list[i]->value);
     }
+    printf("\b\b }");
 }
 
-void adjacency_list_graph_free(AdjacencyListGraph* graph_ptr) { free(graph_ptr->node_list); }
+void adjacency_list_graph_free(AdjacencyListGraph graph) { 
+    vec_free(graph, graph_node_free);
+}
 
 typedef struct graph_edge {
     GraphNode* node_a;    
     GraphNode* node_b;
-    int weight;
+    int8 weight;
 } GraphEdge;
 
-typedef struct edge_list_graph {
-    int size;
-    int capacity;
-    GraphEdge* edge_list;
-} EdgeListGraph;
+typedef GraphEdge* EdgeListGraph;
 
-EdgeListGraph edge_list_graph_new(int capacity) {
-    GraphEdge* edge_list = (GraphEdge*)malloc(sizeof(GraphEdge)*capacity);
-    EdgeListGraph graph = { -1, capacity, edge_list };
+EdgeListGraph edge_list_graph_new() {
+    GraphEdge* graph = __vec_new__(GraphEdge);
     return graph;
 }
 
-void edge_list_graph_resize(EdgeListGraph* graph_ptr, int capacity) {
-    GraphEdge* newEdgeList = (GraphEdge*)malloc(sizeof(GraphEdge)*capacity);
-    for(int i = 0; i < graph_ptr->capacity; i++) { newEdgeList[i] = graph_ptr->edge_list[i]; }
-    free(graph_ptr->edge_list);
-    EdgeListGraph newGraph = { graph_ptr->size, capacity, newEdgeList };
-    *graph_ptr = newGraph;
+GraphEdge* graph_edge_new(EdgeListGraph graph, GraphNode* node_a, GraphNode* node_b, int weight) {
+    GraphEdge graph_edge = { node_a, node_b, weight };
+    __vec_push__(graph, graph_edge);
+    return graph+vec_len(graph)-1;
 }
 
-GraphEdge* graph_edge_new(EdgeListGraph* graph_ptr, GraphNode* node_a, GraphNode* node_b, int weight) {
-    if(graph_ptr->capacity - 1 == graph_ptr->size) { 
-        printf("Edge Graph %p full, doing nothing.", graph_ptr);
-        return NULL;
-    }
-    graph_ptr->edge_list[++graph_ptr->size].weight = weight;
-    graph_ptr->edge_list[graph_ptr->size].node_a = node_a;
-    graph_ptr->edge_list[graph_ptr->size].node_b = node_b;
-    return graph_ptr->edge_list+graph_ptr->size;
-}
-
-void free_edge_list_graph(EdgeListGraph* graph_ptr) { free(graph_ptr->edge_list); }
+void free_edge_list_graph(EdgeListGraph graph) { vec_free(graph, NULL); }
 
 typedef struct adjacency_matrix_graph {
     int** weight_matrix;
