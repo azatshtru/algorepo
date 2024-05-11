@@ -2,13 +2,18 @@
 #include "../VI. Queues/circular_deque.c"
 
 //Takes neighbours of a graph node and traverses them recursively.
-void dfs(GraphNode* s, void (*callback)(GraphNode*)) {
-    static int visited = 0;
-    if(visited&(1<<(s->graph_index))) { return; }
-    visited = visited | (1<<(s->graph_index));
+void _dfs(GraphNode* s, void (*callback)(GraphNode), unsigned int* visited) {
+    if(*visited&(1<<(s->graph_node_index))) { return; }
+    *visited = *visited | (1<<(s->graph_node_index));
 
-    callback(s);
-    for(int i = 0; i < s->neighbour_len; i++) { dfs(s->neighbour_list[i], callback); }
+    callback(*s);
+    for(int i = 0; i < vec_len(s->neighbour_list); i++) { _dfs(s->neighbour_list[i], callback, visited); }
+}
+
+void dfs(GraphNode* s, void (*callback)(GraphNode)) {
+    unsigned int* visited = (unsigned int*)malloc(sizeof (unsigned int));
+    _dfs(s, callback, visited);
+    free(visited);
 }
 
 void _bfs(GraphNode* s, void (*callback)(GraphNode*), long int visited, int* distances, CircularQueue* q) {

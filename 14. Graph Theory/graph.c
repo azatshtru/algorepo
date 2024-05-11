@@ -22,6 +22,7 @@ typedef union graph_node_value_type {
 
 typedef struct graph_node {
     char value;
+    uint8 graph_node_index;
     struct graph_node **neighbour_list;
 } GraphNode;
 
@@ -33,7 +34,7 @@ AdjacencyListGraph adjacency_list_graph_new() {
 }
 
 GraphNode* graph_node_new(AdjacencyListGraph graph, char value) {
-    GraphNode graph_node = { value, __vec_new__(GraphNode*) };
+    GraphNode graph_node = { value, vec_len(graph), __vec_new__(GraphNode*) };
     __vec_push__(graph, graph_node);
     return graph+vec_len(graph)-1;
 }
