@@ -8,21 +8,14 @@
 typedef unsigned char uint8;
 typedef signed char int8;
 
-typedef enum edge_sync_policy {
-    edge_sync, no_edge_sync
-} EDGE_SYNC_POLICY;
-
-typedef enum graph_reflective_policy {
-    reflective, non_reflective
-} GRAPH_REFLECTIVE_POLICY;
-
 typedef union graph_node_value_type {
     char char_value;
+    void* value_ptr;
 } GraphNodeT;
 
 typedef struct graph_node {
     char value;
-    uint8 graph_node_index;
+    uint8 graph_index;
     struct graph_node **neighbour_list;
 } GraphNode;
 

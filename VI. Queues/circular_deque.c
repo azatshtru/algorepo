@@ -44,7 +44,7 @@ void queue_push_front(CircularQueue* q, uint8 x) {
 
 uint8 queue_pop_rear(CircularQueue* q) {
     --q->len;
-    int8 k = q->array[get_moduloed_index(q->rear, q->max_len)];
+    int8 k = q->array[get_moduloed_index(q->rear+1, q->max_len)];
     q->rear = get_moduloed_index((q->rear + 1), q->max_len);
     return k;
 }
@@ -58,7 +58,7 @@ void queue_push_rear(CircularQueue* q, uint8 x) {
 
 uint8 queue_pop_front(CircularQueue* q) {
     --q->len;
-    int8 k = q->array[get_moduloed_index(q->front, q->max_len)];
+    int8 k = q->array[get_moduloed_index(q->front-1, q->max_len)];
     q->front = get_moduloed_index((q->front - 1), q->max_len);
     return k;
 }
@@ -69,6 +69,18 @@ void queue_print(CircularQueue* q) {
         printf("%d, ", (int)q->array[get_moduloed_index(i+1, q->max_len)]);
     }
     printf("]\n");
+}
+
+uint8 queue_is_empty(CircularQueue* q) {
+    return q->len==0;
+}
+
+uint8 queue_front(CircularQueue* q) {
+    return q->array[get_moduloed_index(q->front-1, q->max_len)];
+}
+
+uint8 queue_rear(CircularQueue* q) {
+    return q->array[get_moduloed_index(q->rear+1, q->max_len)];
 }
 
 void queue_free(CircularQueue* q) { free(q->array); }
