@@ -20,11 +20,11 @@ void dfs(GraphNode* s, void (*callback)(GraphNode)) {
 //Add the origin_node to a queue, process it and add its neighbours to the queue as well.
 //Sequentially, process every node on the queue, while adding its neighbours to the queue.
 //Once a node is processed, pop it off the queue.
-void _bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(GraphNode), int* visited, int* distance, CircularQueue* q) {
+void _bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(GraphNode), uint8* visited, int* distance, CircularQueue* q) {
     uint8 x = origin_node->graph_index; // get the index of origin node
-    distance[x] = 0; // set the distance of origin node to zero.
-    visited[x] = 1; // set visited of origin node to true and add index of origin node to the queue.
-    queue_push_rear(q, x);
+    distance[x] = 0; // set the distance of origin node to zero
+    visited[x] = 1; // set visited of origin node to true 
+    queue_push_rear(q, x); //add index of origin node to the queue
     while(!queue_is_empty(q)) {
         uint8 s_index = queue_pop_front(q); // get index of next node in queue and pop it off the queue.
         GraphNode s = graph[s_index]; // get the next node in queue from index.
@@ -41,10 +41,78 @@ void _bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(Gra
 
 //O(n)
 void bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(GraphNode)) {
-    int visited[vec_len(graph)];
-    memset(visited, 0, vec_len(graph)*sizeof(int));
+    uint8 visited[vec_len(graph)];
+    memset(visited, 0, vec_len(graph)*sizeof(uint8));
     int distance[vec_len(graph)];
     CircularQueue q = queue_new();
     _bfs(graph, origin_node, callback, visited, distance, &q);
     queue_free(&q);
+}
+
+//Applications: Connectivity check, whether it possible to reach every node staring with any node.
+void _graph_connectivity_check(GraphNode* s, uint8* visited, uint8* node_count) {
+    if(visited[s->graph_index]) { return; }
+    visited[s->graph_index] = 1;
+    *node_count += 1;
+    for(int i = 0; i < vec_len(s->neighbour_list); i++) {
+        _graph_connectivity_check(s->neighbour_list[i], visited, node_count);
+    }
+}
+
+boolean graph_connectivity_check(AdjacencyListGraph graph) {
+    GraphNode* origin_node = graph+0;
+    uint8 visited[vec_len(graph)];
+    memset(visited, 0, sizeof(uint8)*vec_len(graph));
+    uint8 node_count = 0;
+    _graph_connectivity_check(origin_node, visited, &node_count);
+    return node_count == vec_len(graph);
+}
+
+//Applications: Finding cycles
+boolean graph_cycle_check(GraphNode* s) {
+    static unsigned long int visited = 0;
+    if(visited&(1<<s->graph_index)) {
+        visited = 0;
+        return 1;
+    }
+    visited |= (1<<s->graph_index);
+    uint8 cycle_flag = 0;
+    for(int i = 0; i < vec_len(s->neighbour_list); i++) { 
+        cycle_flag += graph_cycle_check(s->neighbour_list[i]);
+    }
+    return cycle_flag;
+}
+
+//Applications: Bipartiteness check, check if the graph can be colored using two colors such that no two adjacent nodes have the same color.
+boolean graph_bipartiteness_check(AdjacencyListGraph graph) {
+    GraphNode origin_node = graph[0];
+
+    uint8 colors[vec_len(graph)];
+    colors[0] = 1;
+
+    uint8 visited[vec_len(graph)];
+    memset(visited, 0, sizeof(uint8)*vec_len(graph));
+
+    CircularQueue q = queue_new();
+
+    queue_push_rear(&q, origin_node.graph_index);
+    visited[0] = 1;
+
+    while(!queue_is_empty(&q)) {
+        GraphNode s = graph[queue_pop_front(&q)];
+        for(int i = 0; i < vec_len(s.neighbour_list); i++) {
+            GraphNode* u = s.neighbour_list[i];
+            uint8 u_index = u->graph_index;
+            if(visited[u_index]) { 
+                if(colors[u_index] != !colors[s.graph_index]) {
+                    return 0;
+                }
+                continue;
+            }
+            visited[u_index] = 1;
+            colors[u_index] = !colors[s.graph_index];
+            queue_push_rear(&q, u_index);
+        }
+    }
+    return 1;
 }

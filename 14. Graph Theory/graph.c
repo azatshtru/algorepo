@@ -7,6 +7,10 @@
 
 typedef unsigned char uint8;
 typedef signed char int8;
+typedef unsigned char boolean;
+
+#define TRUE 1;
+#define FALSE 0;
 
 typedef union graph_node_value_type {
     char char_value;
@@ -32,11 +36,24 @@ GraphNode* graph_node_new(AdjacencyListGraph graph, char value) {
     return graph+vec_len(graph)-1;
 }
 
-void graph_node_add_neighbours(GraphNode* graph_node, int neighbour_count, ...) {
+boolean graph_node_is_neighbour(GraphNode* node, GraphNode* neighbour) {
+    for(uint8 i = 0; i < vec_len(node->neighbour_list); i++) {
+        if(node->neighbour_list[i]==neighbour) { return TRUE; }
+    }
+    return FALSE;
+}
+
+void graph_node_add_neighbours(GraphNode* graph_node, boolean is_reflective, int neighbour_count, ...) {
     va_list ap;
     va_start(ap, neighbour_count);
     for(uint8 i = 0; i < neighbour_count; i++) {
-        __vec_push__(graph_node->neighbour_list, va_arg(ap, GraphNode*));
+        GraphNode* neighbour_node = va_arg(ap, GraphNode*);
+        if(!graph_node_is_neighbour(graph_node, neighbour_node)) {
+            __vec_push__(graph_node->neighbour_list, neighbour_node);
+        }
+        if(is_reflective && !graph_node_is_neighbour(neighbour_node, graph_node)) {
+            __vec_push__(neighbour_node->neighbour_list, graph_node);
+        }
     }
     va_end(ap);
 }
