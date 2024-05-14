@@ -15,7 +15,7 @@ typedef unsigned char boolean;
 typedef union graph_node_value_type {
     char char_value;
     void* value_ptr;
-} GraphNodeT;
+} GraphNode_T;
 
 typedef struct graph_node {
     char value;
@@ -36,6 +36,7 @@ GraphNode* graph_node_new(AdjacencyListGraph graph, char value) {
     return graph+vec_len(graph)-1;
 }
 
+// an adjacency matrix graph or a simple 2D array can be used to cache this.
 boolean graph_node_is_neighbour(GraphNode* node, GraphNode* neighbour) {
     for(uint8 i = 0; i < vec_len(node->neighbour_list); i++) {
         if(node->neighbour_list[i]==neighbour) { return TRUE; }
@@ -88,13 +89,30 @@ EdgeListGraph edge_list_graph_new() {
     return graph;
 }
 
-GraphEdge* graph_edge_new(EdgeListGraph graph, GraphNode* node_a, GraphNode* node_b, int weight) {
+boolean graph_edge_exists(EdgeListGraph graph, GraphEdge* edge) {
+    for(unsigned int i = 0; i < vec_len(graph)*sizeof(GraphEdge); i+=sizeof(GraphEdge)) {
+        if(!memcmp(graph+i, edge, sizeof(GraphEdge))) { return TRUE; }
+    }
+    return FALSE;
+}
+
+GraphEdge* graph_edge_new(EdgeListGraph graph, GraphNode* node_a, GraphNode* node_b, int weight, boolean is_reflective) {
     GraphEdge graph_edge = { node_a, node_b, weight };
-    __vec_push__(graph, graph_edge);
+    if(!graph_edge_exists(graph, &graph_edge)) {
+        __vec_push__(graph, graph_edge);
+    }
+    if(is_reflective) {
+        GraphEdge reflected_graph_edge = { node_b, node_a, weight };
+        if(!graph_edge_exists(graph, &reflected_graph_edge)) { __vec_push__(graph, reflected_graph_edge); }
+    }
     return graph+vec_len(graph)-1;
 }
 
-void free_edge_list_graph(EdgeListGraph graph) { vec_free(graph, NULL); }
+void graph_edge_print(GraphEdge edge) {
+    printf("graph_edge!{ %c--%d--%c } ", edge.node_a->value, edge.weight, edge.node_b->value);
+}
+
+void edge_list_graph_free(EdgeListGraph graph) { vec_free(graph, NULL); }
 
 typedef struct adjacency_matrix_graph {
     int** weight_matrix;

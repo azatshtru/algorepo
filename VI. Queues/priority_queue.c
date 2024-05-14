@@ -1,48 +1,63 @@
-#include "../IV. Dynamic Arrays and Linked Lists/dynamic_array.c"
+#include "../std/vec.c"
 
-//In a priority queue, every i-th element is greater in value than every (2i+1)-th and (2i+2)th element.
-//Whenever a new element is enqueued/dequeued, priority queue shall arrange itself so that the abovementioned rule is not broken.
-//The process to arrange elements in this way is called Heapifying.
+// In a priority queue, every i-th element is greater in value than every (2i+1)-th and (2i+2)th element.
+// Whenever a new element is enqueued/dequeued, priority queue shall arrange itself so that the abovementioned rule is not broken.
+// The process to arrange elements in this way is called Heapifying.
 
-typedef struct priority_queue {
-    DynamicArray* A;
-} PriorityQueue;
+#ifndef PRIORITY_QUEUE
+#define PRIORITY_QUEUE
 
-PriorityQueue* createPriorityQueue() {
-    PriorityQueue* q = (PriorityQueue*)malloc(sizeof(PriorityQueue));
-    q->A = createDynamicArray();
+typedef struct prioritized_type {
+    int8 priority;
+    void* value_ptr;
+} Prioritized_T;
+
+typedef Prioritized_T* PriorityQueue;
+
+PriorityQueue priority_queue_new() {
+    PriorityQueue q = __vec_new__(Prioritized_T);
     return q;
 }
 
-int swap(float* a, float* b) {
-    float temp = *a;
+void prioritized_type_swap(Prioritized_T* a, Prioritized_T* b) {
+    Prioritized_T temp = *a;
     *a = *b;
     *b = temp;
-    return 0;
 }
 
-int nq(PriorityQueue* q, float x) {
-    push(q->A, x);
-    int i = q->A->fill;
-    while(x >= *(q->A->array+(i-1)/2) && i > 0) {
-        *(q->A->array+i) = *(q->A->array+(i-1)/2);
-        *(q->A->array+(i-1)/2) = x;
+void prioritized_type_print(Prioritized_T prioritized_value) {
+    printf("(%p: %d)", prioritized_value.value_ptr, prioritized_value.priority);
+}
+
+void priority_queue_nq(PriorityQueue q, void* value_ptr, int8 priority) {
+    Prioritized_T x = { priority, value_ptr };
+    __vec_push__(q, x);
+    uint8 i = vec_len(q)-1;
+    while(i > 0 && priority >= q[(i-1)/2].priority) {
+        prioritized_type_swap(q+i, q+(i-1)/2);
         i = (i-1)/2;
     }
-    return 0;
 }
 
-float dq(PriorityQueue* q) {
-    swap(q->A->array, q->A->array + q->A->fill);
-    float v = pop(q->A, q->A->fill);
+Prioritized_T priority_queue_dq(PriorityQueue q) {
+    prioritized_type_swap(q+0, q + vec_len(q)-1);
+    Prioritized_T popped_value = __vec_pop__(Prioritized_T, q, -1);
     
-    int i = 0;
-    while(2*i+1 <= q->A->fill) {
-        int max_index;
-        if(2*i+2 > q->A->fill) { max_index = 2*i+1; }
-        else { max_index = *(q->A->array + 2*i+1) > *(q->A->array + 2*i+2) ? 2*i+1 : 2*i+2; }
-        if(*(q->A->array + max_index) > *(q->A->array + i)) { swap(q->A->array + max_index, q->A->array + i); }
-        i = max_index;
+    uint8 i = 0;
+    while(i < vec_len(q)) {
+        uint8 k = i;
+        if(2*i+1 < vec_len(q) && q[k].priority < q[2*i+1].priority) { k = 2*i+1; }
+        if(2*i+2 < vec_len(q) && q[k].priority < q[2*i+2].priority) { k = 2*i+2; }
+        if(k==i) { break; }
+        prioritized_type_swap(q+i, q+k);
+        i = k;
     }
-    return v;
+
+    return popped_value;
 }
+
+void priority_queue_free(PriorityQueue q) {
+    vec_free(q, NULL);
+}
+
+#endif

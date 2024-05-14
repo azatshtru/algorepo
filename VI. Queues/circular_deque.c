@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifndef CIRCULAR_QUEUE
+#define CIRCULAR_QUEUE
+
 typedef unsigned char uint8;
 typedef signed char int8;
 
@@ -84,3 +87,5 @@ uint8 queue_rear(CircularQueue* q) {
 }
 
 void queue_free(CircularQueue* q) { free(q->array); }
+
+#endif
