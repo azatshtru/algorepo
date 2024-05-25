@@ -39,7 +39,7 @@ void priority_queue_nq(PriorityQueue q, void* value_ptr, int8 priority) {
     }
 }
 
-Prioritized_T priority_queue_dq(PriorityQueue q) {
+void* priority_queue_dq(PriorityQueue q) {
     prioritized_type_swap(q+0, q + vec_len(q)-1);
     Prioritized_T popped_value = __vec_pop__(Prioritized_T, q, -1);
     
@@ -53,7 +53,7 @@ Prioritized_T priority_queue_dq(PriorityQueue q) {
         i = k;
     }
 
-    return popped_value;
+    return popped_value.value_ptr;
 }
 
 void priority_queue_free(PriorityQueue q) {

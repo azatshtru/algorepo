@@ -7,7 +7,10 @@
 
 typedef unsigned char uint8;
 typedef signed char int8;
+typedef unsigned int uint32;
+typedef int int32;
 typedef unsigned char boolean;
+
 
 #define TRUE 1;
 #define FALSE 0;
@@ -17,10 +20,20 @@ typedef union graph_node_value_type {
     void* value_ptr;
 } GraphNode_T;
 
+typedef struct neighbour_node_weighted_type {
+    struct graph_node* node;
+    int32 weight;
+} WeightedNeighbourNode;
+
+WeightedNeighbourNode weighted_neighbour_node(struct graph_node* ptr, int32 weight) {
+    WeightedNeighbourNode x = { ptr, weight };
+    return x;
+}
+
 typedef struct graph_node {
     char value;
     uint8 graph_index;
-    struct graph_node **neighbour_list;
+    WeightedNeighbourNode* neighbour_list;
 } GraphNode;
 
 typedef GraphNode* AdjacencyListGraph;
@@ -31,7 +44,7 @@ AdjacencyListGraph adjacency_list_graph_new() {
 }
 
 GraphNode* graph_node_new(AdjacencyListGraph graph, char value) {
-    GraphNode graph_node = { value, vec_len(graph), __vec_new__(GraphNode*) };
+    GraphNode graph_node = { value, vec_len(graph), __vec_new__(WeightedNeighbourNode) };
     __vec_push__(graph, graph_node);
     return graph+vec_len(graph)-1;
 }
@@ -39,7 +52,7 @@ GraphNode* graph_node_new(AdjacencyListGraph graph, char value) {
 // an adjacency matrix graph or a simple 2D array can be used to cache this.
 boolean graph_node_is_neighbour(GraphNode* node, GraphNode* neighbour) {
     for(uint8 i = 0; i < vec_len(node->neighbour_list); i++) {
-        if(node->neighbour_list[i]==neighbour) { return TRUE; }
+        if(node->neighbour_list[i].node==neighbour) { return TRUE; }
     }
     return FALSE;
 }
@@ -49,11 +62,12 @@ void graph_node_add_neighbours(GraphNode* graph_node, boolean is_reflective, int
     va_start(ap, neighbour_count);
     for(uint8 i = 0; i < neighbour_count; i++) {
         GraphNode* neighbour_node = va_arg(ap, GraphNode*);
+        int32 neighbour_weight = va_arg(ap, int32);
         if(!graph_node_is_neighbour(graph_node, neighbour_node)) {
-            __vec_push__(graph_node->neighbour_list, neighbour_node);
+            __vec_push__(graph_node->neighbour_list, weighted_neighbour_node(neighbour_node, neighbour_weight));
         }
         if(is_reflective && !graph_node_is_neighbour(neighbour_node, graph_node)) {
-            __vec_push__(neighbour_node->neighbour_list, graph_node);
+            __vec_push__(neighbour_node->neighbour_list, weighted_neighbour_node(graph_node, neighbour_weight));
         }
     }
     va_end(ap);
@@ -67,7 +81,7 @@ void graph_node_free(void* graph_node_voidptr) {
 void graph_node_print(GraphNode graph_node) {
     printf("graph_node!{ %c: ", graph_node.value);
     for(uint8 i = 0; i < vec_len(graph_node.neighbour_list); i++) {
-        printf("%c, ", graph_node.neighbour_list[i]->value);
+        printf("(%c, %d), ", graph_node.neighbour_list[i].node->value, graph_node.neighbour_list[i].weight);
     }
     printf("\b\b }");
 }

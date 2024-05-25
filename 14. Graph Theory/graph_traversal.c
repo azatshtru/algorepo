@@ -7,7 +7,7 @@ void _dfs(GraphNode* s, void (*callback)(GraphNode), unsigned int* visited) {
     *visited = *visited | (1<<(s->graph_index));
 
     callback(*s);
-    for(int i = 0; i < vec_len(s->neighbour_list); i++) { _dfs(s->neighbour_list[i], callback, visited); }
+    for(int i = 0; i < vec_len(s->neighbour_list); i++) { _dfs(s->neighbour_list[i].node, callback, visited); }
 }
 
 //O(n)
@@ -30,7 +30,7 @@ void _bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(Gra
         GraphNode s = graph[s_index]; // get the next node in queue from index.
         callback(s); // process the node.
         for(int i = 0; i < vec_len(s.neighbour_list); i++) { // add neighbours of the node to the queue if not already added.
-            GraphNode* u = s.neighbour_list[i]; // get the address of neighbour node.
+            GraphNode* u = s.neighbour_list[i].node; // get the address of neighbour node.
             if(visited[u->graph_index]) { continue; } // if node already in queue (i.e. visited[i]==1), then continue. 
             visited[u->graph_index] = 1; // set visited[i]=1 because node is about to be added to the queue.
             distance[u->graph_index] = distance[s_index] + 1; // the distance of this neighbour node is the distance of current node + 1
@@ -55,7 +55,7 @@ void _graph_connectivity_check(GraphNode* s, uint8* visited, uint8* node_count) 
     visited[s->graph_index] = 1;
     *node_count += 1;
     for(int i = 0; i < vec_len(s->neighbour_list); i++) {
-        _graph_connectivity_check(s->neighbour_list[i], visited, node_count);
+        _graph_connectivity_check(s->neighbour_list[i].node, visited, node_count);
     }
 }
 
@@ -78,7 +78,7 @@ boolean graph_cycle_check(GraphNode* s) {
     visited |= (1<<s->graph_index);
     uint8 cycle_flag = 0;
     for(int i = 0; i < vec_len(s->neighbour_list); i++) { 
-        cycle_flag += graph_cycle_check(s->neighbour_list[i]);
+        cycle_flag += graph_cycle_check(s->neighbour_list[i].node);
     }
     return cycle_flag;
 }
@@ -101,7 +101,7 @@ boolean graph_bipartiteness_check(AdjacencyListGraph graph) {
     while(!queue_is_empty(&q)) {
         GraphNode s = graph[queue_pop_front(&q)];
         for(int i = 0; i < vec_len(s.neighbour_list); i++) {
-            GraphNode* u = s.neighbour_list[i];
+            GraphNode* u = s.neighbour_list[i].node;
             uint8 u_index = u->graph_index;
             if(visited[u_index]) { 
                 if(colors[u_index] != !colors[s.graph_index]) {
