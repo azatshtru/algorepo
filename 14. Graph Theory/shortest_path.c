@@ -59,4 +59,7 @@ uint8 graph_dijkstra(AdjacencyListGraph graph, uint8 starting_node_index, uint8 
     return distance[destination_node_index];
 }
 
+//TODO: implement Floyd-Warshall algorithm
+uint8 graph_floyd_warshall(AdjacencyMatrixGraph graph, uint8 starting_node_index, uint8 destination_node_index);
+
 #endif
