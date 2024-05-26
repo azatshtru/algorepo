@@ -1,5 +1,6 @@
 #include "graph.c"
 #include "../VI. Queues/circular_deque.c"
+#include "../VI. Queues/priority_queue.c"
 
 #ifndef GRAPH_SHORTEST_PATH
 #define GRAPH_SHORTEST_PATH
@@ -29,6 +30,33 @@ uint8 graph_bellman_ford(EdgeListGraph graph, uint8 starting_node_index, uint8 d
 //TODO: implement SPFA algorithm
 uint8 graph_spfa(AdjacencyListGraph graph, uint8 starting_node_index, uint8 destination_node_index);
 
-//uint8 graph_dijkstra()
+uint8 graph_dijkstra(AdjacencyListGraph graph, uint8 starting_node_index, uint8 destination_node_index) {
+    int32 distance[vec_len(graph)];
+    boolean processed[vec_len(graph)];
+    PriorityQueue q = priority_queue_new();
+
+    for(int i = 0; i < vec_len(graph); i++) { 
+        distance[i] = INFINITY_8BIT;
+        processed[i] = FALSE;
+    }
+    distance[starting_node_index] = 0;
+    priority_queue_nq(q, &starting_node_index, 0);
+
+    while(vec_len(q)) {
+        uint8 a = *(uint8*)priority_queue_dq(q);
+        if(processed[a]) { continue; }
+        processed[a] = TRUE;
+        for(uint8 i = 0; i < vec_len(graph[a].neighbour_list); i++) {
+            GraphNode* neighbour = graph[a].neighbour_list[i].node;
+            int32 w = graph[a].neighbour_list[i].weight;
+            if(distance[a]+w < distance[neighbour->graph_index]) {
+                distance[neighbour->graph_index] = distance[a]+w;
+                priority_queue_nq(q, &neighbour->graph_index, -distance[neighbour->graph_index]);
+            }
+        }
+    }
+
+    return distance[destination_node_index];
+}
 
 #endif
