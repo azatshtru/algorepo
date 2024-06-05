@@ -30,11 +30,11 @@ void _bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(Gra
         GraphNode s = graph[s_index]; // get the next node in queue from index.
         callback(s); // process the node.
         for(int i = 0; i < vec_len(s.neighbour_list); i++) { // add neighbours of the node to the queue if not already added.
-            GraphNode* u = s.neighbour_list[i].node; // get the address of neighbour node.
-            if(visited[u->graph_index]) { continue; } // if node already in queue (i.e. visited[i]==1), then continue. 
-            visited[u->graph_index] = 1; // set visited[i]=1 because node is about to be added to the queue.
-            distance[u->graph_index] = distance[s_index] + 1; // the distance of this neighbour node is the distance of current node + 1
-            queue_push_rear(q, u->graph_index); // add the neighbour node's index to the queue
+            GraphNode u = *s.neighbour_list[i].node; // get the address of neighbour node.
+            if(visited[u.graph_index]) { continue; } // if node already in queue (i.e. visited[i]==1), then continue. 
+            visited[u.graph_index] = 1; // set visited[i]=1 because node is about to be added to the queue.
+            distance[u.graph_index] = distance[s_index] + 1; // the distance of this neighbour node is the distance of current node + 1
+            queue_push_rear(q, u.graph_index); // add the neighbour node's index to the queue
         }
     }
 }

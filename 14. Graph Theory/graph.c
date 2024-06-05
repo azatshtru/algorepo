@@ -12,8 +12,8 @@ typedef int int32;
 typedef unsigned char boolean;
 
 
-#define TRUE 1;
-#define FALSE 0;
+#define TRUE 1
+#define FALSE 0
 
 typedef union graph_node_value_type {
     char char_value;
