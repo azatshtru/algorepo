@@ -32,7 +32,17 @@ uint8 tree_children_node_count(GraphNode* root_node, GraphNode* query_node, uint
     return count[query_node->graph_index];
 }
 
-void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visited, GraphNode* prev_node, int32* alter_distance) {
+void tree_parent_nodes(GraphNode* node, GraphNode* prev_node, uint8* parent_node, uint8 tree_size) {
+    for(int i = 0; i < tree_size; i++) {
+        GraphNode* u = node->neighbour_list[i].node;
+        if(u != prev_node) {
+            parent_node[u->graph_index] = node->graph_index;
+            tree_parent_nodes(u, node, parent_node, tree_size);
+        }
+    }
+}
+
+void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visited, GraphNode* prev_node, int32* alter_distance, uint8* max_next_node) {
     if(visited[node->graph_index]) { return; }
     visited[node->graph_index] = TRUE;
     int32 max = 0;
@@ -44,7 +54,7 @@ void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visi
 
         if(u == prev_node) { continue; }
 
-        tree_furthest_leaf_distance(u, distance, visited, node, alter_distance);
+        tree_furthest_leaf_distance(u, distance, visited, node, alter_distance, NULL);
         if(distance[u->graph_index]+weight >= max) {
             altmax = max;
             max = distance[u->graph_index]+weight;
@@ -62,7 +72,7 @@ uint8 tree_longest_path_from_node(GraphNode* query_node, uint8 tree_size) {
     int32* distance = (int32*)malloc(sizeof(int32)*tree_size);
     boolean* visited = (boolean*)malloc(sizeof(boolean)*tree_size);
 
-    tree_furthest_leaf_distance(query_node, distance, visited, NULL, NULL);
+    tree_furthest_leaf_distance(query_node, distance, visited, NULL, NULL, NULL);
     int32 query_distance = distance[query_node->graph_index];
 
     free(distance);
@@ -76,7 +86,7 @@ uint8 tree_longest_path_through_node(GraphNode* query_node, uint8 tree_size) {
     int32* alter_distance = (int32*)malloc(sizeof(int32)*tree_size);
     boolean* visited = (boolean*)malloc(sizeof(boolean)*tree_size);
 
-    tree_furthest_leaf_distance(query_node, distance, visited, NULL, alter_distance);
+    tree_furthest_leaf_distance(query_node, distance, visited, NULL, alter_distance, NULL);
     int32 max_1 = distance[query_node->graph_index];
     int32 max_2 = alter_distance[query_node->graph_index];
 
@@ -87,5 +97,8 @@ uint8 tree_longest_path_through_node(GraphNode* query_node, uint8 tree_size) {
     return max_1+max_2;
 }
 
-uint8 tree_all_longest_paths(AdjacencyListGraph tree); 
+uint8 tree_all_longest_paths(AdjacencyListGraph tree) {
+
+} 
+
 uint8 tree_diameter(AdjacencyListGraph tree);
