@@ -32,12 +32,12 @@ uint8 tree_children_node_count(GraphNode* root_node, GraphNode* query_node, uint
     return count[query_node->graph_index];
 }
 
-void tree_parent_nodes(GraphNode* node, GraphNode* prev_node, uint8* parent_node, uint8 tree_size) {
-    for(int i = 0; i < tree_size; i++) {
+void tree_parent_nodes(GraphNode* node, GraphNode* prev_node, uint8* parent_node) {
+    for(int i = 0; i < vec_len(node->neighbour_list); i++) {
         GraphNode* u = node->neighbour_list[i].node;
         if(u != prev_node) {
             parent_node[u->graph_index] = node->graph_index;
-            tree_parent_nodes(u, node, parent_node, tree_size);
+            tree_parent_nodes(u, node, parent_node);
         }
     }
 }
@@ -47,6 +47,7 @@ void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visi
     visited[node->graph_index] = TRUE;
     int32 max = 0;
     int32 altmax = 0;
+    uint8 max_index = 0;
 
     for(int i = 0; i < vec_len(node->neighbour_list); i++) {
         GraphNode* u = node->neighbour_list[i].node;
@@ -54,10 +55,12 @@ void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visi
 
         if(u == prev_node) { continue; }
 
-        tree_furthest_leaf_distance(u, distance, visited, node, alter_distance, NULL);
+        tree_furthest_leaf_distance(u, distance, visited, node, alter_distance, max_next_node);
         if(distance[u->graph_index]+weight >= max) {
             altmax = max;
             max = distance[u->graph_index]+weight;
+            max_index = u->graph_index;
+            printf("maxindexnode: %d\n", max_index);
             continue;
         }
         if(distance[u->graph_index]+weight >= altmax) {
@@ -66,6 +69,7 @@ void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visi
     }
     distance[node->graph_index] = max;
     alter_distance[node->graph_index] = altmax;
+    max_next_node[node->graph_index] = max_index;
 }
 
 uint8 tree_longest_path_from_node(GraphNode* query_node, uint8 tree_size) {
@@ -97,8 +101,36 @@ uint8 tree_longest_path_through_node(GraphNode* query_node, uint8 tree_size) {
     return max_1+max_2;
 }
 
-uint8 tree_all_longest_paths(AdjacencyListGraph tree) {
+void tree_all_longest_paths(AdjacencyListGraph tree, int32* longest_path) {
+    uint8 tree_size = vec_len(tree);
+    int32* distance = (int32*)malloc(sizeof(int32)*tree_size);
+    int32* alter_distance = (int32*)malloc(sizeof(int32)*tree_size);
+    boolean* visited = (boolean*)malloc(sizeof(boolean)*tree_size);
+    uint8* max_next_node = (uint8*)malloc(sizeof(uint8)*tree_size);
+    uint8* parent_node = (uint8*)malloc(sizeof(uint8)*tree_size);
 
+    tree_furthest_leaf_distance(tree, distance, visited, NULL, alter_distance, max_next_node);
+    tree_parent_nodes(tree, NULL, parent_node);
+
+    for(int i = 1; i < tree_size; i++) {
+        if(max_next_node[parent_node[i]] == i && alter_distance[parent_node[i]] + 1 > distance[i]) { 
+            alter_distance[i] = distance[i];
+            distance[i] = alter_distance[parent_node[i]] + 1;
+            max_next_node[i] = parent_node[i];
+        } else if(max_next_node[parent_node[i]] != i && distance[parent_node[i]] + 1 > distance[i]) {
+            alter_distance[i] = distance[i];
+            distance[i] = distance[parent_node[i]] + 1;
+            max_next_node[i] = parent_node[i];
+        }
+    }
+
+    for(uint8 i = 0; i < tree_size; i++) { longest_path[i] = distance[i]; }
+
+    free(distance);
+    free(visited);
+    free(alter_distance);
+    free(max_next_node);
+    free(parent_node);
 } 
 
 uint8 tree_diameter(AdjacencyListGraph tree);
