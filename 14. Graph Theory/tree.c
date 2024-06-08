@@ -1,10 +1,10 @@
 #include "../VI. Queues/circular_deque.c"
-#include "graph.c"
+#include "graph_traversal.c"
 
 //A tree is a graph that has n nodes and n - 1 edges, ... 
 //each node has atmost 1 parent and there exist only unique paths between any two nodes.
 
-uint8 graph_is_tree(AdjacencyListGraph graph);
+boolean graph_is_tree(AdjacencyListGraph graph);
 
 void tree_dfs(GraphNode* current_node, GraphNode* prev_node, void (*callback)(GraphNode* s)) {
     callback(current_node);
@@ -42,7 +42,14 @@ void tree_parent_nodes(GraphNode* node, GraphNode* prev_node, uint8* parent_node
     }
 }
 
-void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visited, GraphNode* prev_node, int32* alter_distance, uint8* max_next_node) {
+void tree_furthest_leaf_distance(
+    GraphNode* node, 
+    int32* distance,
+    boolean* visited,
+    GraphNode* prev_node,
+    int32* alter_distance,
+    uint8* max_next_node) 
+{
     if(visited[node->graph_index]) { return; }
     visited[node->graph_index] = TRUE;
     int32 max = 0;
@@ -60,7 +67,6 @@ void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visi
             altmax = max;
             max = distance[u->graph_index]+weight;
             max_index = u->graph_index;
-            printf("maxindexnode: %d\n", max_index);
             continue;
         }
         if(distance[u->graph_index]+weight >= altmax) {
@@ -68,8 +74,8 @@ void tree_furthest_leaf_distance(GraphNode* node, int32* distance, boolean* visi
         }
     }
     distance[node->graph_index] = max;
-    alter_distance[node->graph_index] = altmax;
-    max_next_node[node->graph_index] = max_index;
+    if(alter_distance != NULL) { alter_distance[node->graph_index] = altmax; }
+    if(max_next_node != NULL) { max_next_node[node->graph_index] = max_index; }
 }
 
 uint8 tree_longest_path_from_node(GraphNode* query_node, uint8 tree_size) {
@@ -133,4 +139,26 @@ void tree_all_longest_paths(AdjacencyListGraph tree, int32* longest_path) {
     free(parent_node);
 } 
 
-uint8 tree_diameter(AdjacencyListGraph tree);
+uint8 tree_diameter(AdjacencyListGraph tree) {
+    uint8 tree_size = vec_len(tree);
+    int32* distance = (int32*)malloc(sizeof(int32)*tree_size);
+    boolean* visited = (boolean*)malloc(sizeof(boolean)*tree_size);
+    uint8* max_next_node = (uint8*)malloc(sizeof(uint8)*tree_size);
+
+    tree_furthest_leaf_distance(tree, distance, visited, NULL, NULL, max_next_node);
+    int i = 0;
+    while(max_next_node[i] != 0) { i = max_next_node[i]; }
+
+    memset(distance, 0, tree_size*sizeof(int32));
+    memset(visited, 0, tree_size*sizeof(boolean));
+    memset(max_next_node, 0, tree_size*sizeof(boolean));
+
+    tree_furthest_leaf_distance(tree+i, distance, visited, NULL, NULL, max_next_node);
+    int32 diameter = distance[i];
+
+    free(distance);
+    free(visited);
+    free(max_next_node);
+
+    return diameter;
+}
