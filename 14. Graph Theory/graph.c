@@ -103,6 +103,24 @@ EdgeListGraph edge_list_graph_new() {
     return graph;
 }
 
+void edge_list_dfs(GraphNode* node, EdgeListGraph edge_graph, uint8* visited) {
+    uint8 node_index = node->graph_index;
+    if(visited[node_index]) { return; }
+    for(int i = 0; i < vec_len(node->neighbour_list); i++) {
+        WeightedNeighbourNode u = node->neighbour_list[i];
+        graph_edge_new(edge_graph, node, u.node, u.weight, 0);
+        edge_list_dfs(u.node, edge_graph, visited);
+    }
+}
+
+EdgeListGraph edge_list_graph_from(AdjacencyListGraph adj_graph) {
+    EdgeListGraph edge_graph = edge_list_graph_new();
+    uint8 visited = (uint8*)malloc(sizeof(uint8));
+    edge_list_dfs(adj_graph, edge_graph, visited);
+    free(visited);
+    return edge_graph;
+}
+
 boolean graph_edge_exists(EdgeListGraph graph, GraphEdge* edge) {
     for(unsigned int i = 0; i < vec_len(graph)*sizeof(GraphEdge); i+=sizeof(GraphEdge)) {
         if(!memcmp(graph+i, edge, sizeof(GraphEdge))) { return TRUE; }

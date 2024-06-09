@@ -1,26 +1,29 @@
 #include "graph.c"
 #include "../VI. Queues/circular_deque.c"
 
+#ifndef GRAPH_TRAVERSAL
+#define GRAPH_TRAVERSAL
+
 //Takes neighbours of a graph node and traverses them recursively.
-void _dfs(GraphNode* s, void (*callback)(GraphNode), unsigned int* visited) {
+void _graph_dfs(GraphNode* s, void (*callback)(GraphNode), unsigned int* visited) {
     if(*visited&(1<<(s->graph_index))) { return; }
     *visited = *visited | (1<<(s->graph_index));
 
     callback(*s);
-    for(int i = 0; i < vec_len(s->neighbour_list); i++) { _dfs(s->neighbour_list[i].node, callback, visited); }
+    for(int i = 0; i < vec_len(s->neighbour_list); i++) { _graph_dfs(s->neighbour_list[i].node, callback, visited); }
 }
 
 //O(n)
-void dfs(GraphNode* s, void (*callback)(GraphNode)) {
+void graph_dfs(GraphNode* s, void (*callback)(GraphNode)) {
     unsigned int* visited = (unsigned int*)malloc(sizeof (unsigned int));
-    _dfs(s, callback, visited);
+    _graph_dfs(s, callback, visited);
     free(visited);
 }
 
 //Add the origin_node to a queue, process it and add its neighbours to the queue as well.
 //Sequentially, process every node on the queue, while adding its neighbours to the queue.
 //Once a node is processed, pop it off the queue.
-void _bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(GraphNode), uint8* visited, int* distance, CircularQueue* q) {
+void _graph_bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(GraphNode), uint8* visited, int* distance, CircularQueue* q) {
     uint8 x = origin_node->graph_index; // get the index of origin node
     distance[x] = 0; // set the distance of origin node to zero
     visited[x] = 1; // set visited of origin node to true 
@@ -40,12 +43,12 @@ void _bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(Gra
 }
 
 //O(n)
-void bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(GraphNode)) {
+void graph_bfs(AdjacencyListGraph graph, GraphNode* origin_node, void (*callback)(GraphNode)) {
     uint8 visited[vec_len(graph)];
     memset(visited, 0, vec_len(graph)*sizeof(uint8));
     int distance[vec_len(graph)];
     CircularQueue q = queue_new();
-    _bfs(graph, origin_node, callback, visited, distance, &q);
+    _graph_bfs(graph, origin_node, callback, visited, distance, &q);
     queue_free(&q);
 }
 
@@ -115,3 +118,5 @@ boolean graph_bipartiteness_check(AdjacencyListGraph graph) {
     }
     return 1;
 }
+
+#endif
