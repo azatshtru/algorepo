@@ -4,7 +4,9 @@
 //A tree is a graph that has n nodes and n - 1 edges, ... 
 //each node has atmost 1 parent and there exist only unique paths between any two nodes.
 
-boolean graph_is_tree(AdjacencyListGraph graph);
+boolean graph_is_tree(AdjacencyListGraph graph) {
+    return !graph_cycle_check(graph, NULL, 0);
+}
 
 void tree_dfs(GraphNode* current_node, GraphNode* prev_node, void (*callback)(GraphNode* s)) {
     callback(current_node);

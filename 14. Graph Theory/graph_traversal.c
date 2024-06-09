@@ -69,16 +69,15 @@ boolean graph_connectivity_check(AdjacencyListGraph graph) {
 }
 
 //Applications: Finding cycles
-boolean graph_cycle_check(GraphNode* s) {
-    static unsigned long int visited = 0;
+boolean graph_cycle_check(GraphNode* s, GraphNode* prev, uint32 visited) {
     if(visited&(1<<s->graph_index)) {
-        visited = 0;
         return 1;
     }
     visited |= (1<<s->graph_index);
     uint8 cycle_flag = 0;
     for(int i = 0; i < vec_len(s->neighbour_list); i++) { 
-        cycle_flag += graph_cycle_check(s->neighbour_list[i].node);
+        if(s->neighbour_list[i].node == prev) { continue; }
+        cycle_flag += graph_cycle_check(s->neighbour_list[i].node, s, visited);
     }
     return cycle_flag;
 }
