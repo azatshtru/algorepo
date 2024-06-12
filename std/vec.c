@@ -7,6 +7,8 @@
 
 typedef unsigned char uint8;
 typedef signed char int8;
+typedef unsigned int uint32;
+typedef int int32;
 typedef char byte;
 
 #define INIT_VEC_SIZE 8
@@ -60,18 +62,18 @@ void vec_free(void* array_ptr, void (*free_func)(void*)) {
 #define __vec_new__(type) (type*)vec_new(sizeof(type))
 
 #define __vec_push__(array_ptr, value) ({\
-Vec* v = vec_address_from_array((byte*)array_ptr);\
-if(v->len==v->cap) { array_ptr = (void*)vec_resize(v, v->cap*2)->array; }\
-array_ptr[vec_address_from_array(array_ptr)->len++] = value;\
+Vec* v = vec_address_from_array((byte*)(array_ptr));\
+if(v->len==v->cap) { (array_ptr) = (void*)vec_resize(v, v->cap*2)->array; }\
+(array_ptr)[vec_address_from_array((array_ptr))->len++] = value;\
 })
 
 #define __vec_pop__(type, array_ptr, popidx) ({\
-Vec* v = vec_address_from_array(array_ptr);\
+Vec* v = vec_address_from_array((array_ptr));\
 uint8 index = popidx<0?v->len+popidx:popidx;\
-type value = array_ptr[index];\
-for(int i = index; i < v->len-1; i++) { array_ptr[i] = array_ptr[i+1]; }\
+type value = (array_ptr)[index];\
+for(int i = index; i < v->len-1; i++) { (array_ptr)[i] = (array_ptr)[i+1]; }\
 --v->len;\
-if(v->cap >= INIT_VEC_SIZE*2 && v->len == v->cap/2) { array_ptr = (void*)vec_resize(v, v->cap/2)->array; }\
+if(v->cap >= INIT_VEC_SIZE*2 && v->len == v->cap/2) { (array_ptr) = (void*)vec_resize(v, v->cap/2)->array; }\
 value;\
 })
 
@@ -82,14 +84,14 @@ printf("\b\b ]\n");})
 
 #define __vec_print__(array_ptr, print_func) ({\
 printf("vec![ ");\
-for(int i = 0; i < vec_address_from_array(array_ptr)->len; i++) { print_func(array_ptr[i]); printf(", "); }\
+for(int i = 0; i < vec_address_from_array((array_ptr))->len; i++) { print_func((array_ptr)[i]); printf(", "); }\
 printf("\b\b ]\n");})
 
 uint8 vec_quicksort_partition(void* array_ptr, int8 lo, int8 hi, int8 (*cmp_func)(void*, void*)) {
-    uint8 size = vec_address_from_array(array_ptr)->size;
-    uint8 pivot = hi*size;
-    int8 index = (lo-1)*size;
-    for(uint8 i = lo*size; i < hi*size; i+=size) {
+    uint32 size = vec_address_from_array(array_ptr)->size;
+    uint32 pivot = hi*size;
+    int32 index = (lo-1)*size;
+    for(uint32 i = lo*size; i < hi*size; i+=size) {
         if(cmp_func(array_ptr+i, array_ptr+pivot) < 0) {
             index+=size;
             byte temp_value[size];

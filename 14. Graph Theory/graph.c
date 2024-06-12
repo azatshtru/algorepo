@@ -93,30 +93,36 @@ void adjacency_list_graph_free(AdjacencyListGraph graph) {
 typedef struct graph_edge {
     GraphNode* node_a;    
     GraphNode* node_b;
-    int8 weight;
+    int32 weight;
 } GraphEdge;
 
 typedef GraphEdge* EdgeListGraph;
+
+GraphEdge* graph_edge_new(EdgeListGraph graph, GraphNode* node_a, GraphNode* node_b, int32 weight, boolean is_reflective);
+void graph_edge_print(GraphEdge edge);
 
 EdgeListGraph edge_list_graph_new() {
     GraphEdge* graph = __vec_new__(GraphEdge);
     return graph;
 }
 
-void edge_list_dfs(GraphNode* node, EdgeListGraph edge_graph, uint8* visited) {
-    uint8 node_index = node->graph_index;
-    if(visited[node_index]) { return; }
+void edge_list_dfs(GraphNode* node, EdgeListGraph* edge_graph, uint8* visited) {
+    if(visited[node->graph_index]) { return; }
+    visited[node->graph_index] = 1;
+
     for(int i = 0; i < vec_len(node->neighbour_list); i++) {
         WeightedNeighbourNode u = node->neighbour_list[i];
-        graph_edge_new(edge_graph, node, u.node, u.weight, 0);
+        GraphEdge graph_edge = { node, u.node, u.weight };
+        __vec_push__(*edge_graph, graph_edge);
         edge_list_dfs(u.node, edge_graph, visited);
     }
 }
 
 EdgeListGraph edge_list_graph_from(AdjacencyListGraph adj_graph) {
     EdgeListGraph edge_graph = edge_list_graph_new();
-    uint8 visited = (uint8*)malloc(sizeof(uint8));
-    edge_list_dfs(adj_graph, edge_graph, visited);
+    uint8* visited = (uint8*)malloc(sizeof(uint8)*vec_len(adj_graph));
+    memset(visited, 0, sizeof(uint8)*vec_len(adj_graph));
+    edge_list_dfs(adj_graph, &edge_graph, visited);
     free(visited);
     return edge_graph;
 }
@@ -128,7 +134,7 @@ boolean graph_edge_exists(EdgeListGraph graph, GraphEdge* edge) {
     return FALSE;
 }
 
-GraphEdge* graph_edge_new(EdgeListGraph graph, GraphNode* node_a, GraphNode* node_b, int weight, boolean is_reflective) {
+GraphEdge* graph_edge_new(EdgeListGraph graph, GraphNode* node_a, GraphNode* node_b, int32 weight, boolean is_reflective) {
     GraphEdge graph_edge = { node_a, node_b, weight };
     if(!graph_edge_exists(graph, &graph_edge)) {
         __vec_push__(graph, graph_edge);
