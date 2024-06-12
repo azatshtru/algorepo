@@ -36,13 +36,13 @@ void disjoint_set_unite(DisjointSet* set_ptr, int32 a, int32 b) {
     DisjointSet set = *set_ptr;
     a = ds_find_rep(set, a);
     b = ds_find_rep(set, b);
-    if(set.size[a] <= set.size[b]) {
-        set_ptr->size[b] += set.size[a];
-        set_ptr->link[a] = b;
-    } else {
-        set_ptr->size[a] += set.size[b];
-        set_ptr->link[b] = a;
+    if(set.size[a] < set.size[b]) {
+        a = a ^ b;
+        b = a ^ b;
+        a = a ^ b;
     }
+    set_ptr->size[a] += set.size[b];
+    set_ptr->link[b] = a;
 }
 
 #endif
