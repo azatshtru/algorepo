@@ -1,5 +1,8 @@
 #include "graph.c"
 #include "../VI. Queues/circular_deque.c"
+#include "../VI. Queues/priority_queue.c"
+
+#define INFINITY_8BIT 127778
 
 #ifndef ACYCLIC_GRAPH
 #define ACYCLIC_GRAPH
@@ -36,14 +39,14 @@ uint8* acyclic_graph_sort_topologically(AdjacencyListGraph adj_graph) {
     return topological_order;
 }
 
-uint8 xdfs(AdjacencyListGraph adj_graph, uint8 base_node, uint8 current_node, uint8* paths, uint8* visited) {
+uint8 _acyclic_graph_number_of_paths(AdjacencyListGraph adj_graph, uint8 base_node, uint8 current_node, uint8* paths, uint8* visited) {
     if(visited[current_node]) { return paths[current_node]; }
     visited[current_node] = 1;
     if(current_node == base_node) { return 1; }
     uint8 pathsum = 0;
     for(int i = 0; i < vec_len(adj_graph[current_node].neighbour_list); i++) {
         GraphNode u = *(adj_graph[current_node].neighbour_list[i].node);
-        pathsum += xdfs(adj_graph, base_node, u.graph_index, paths, visited);
+        pathsum += _acyclic_graph_number_of_paths(adj_graph, base_node, u.graph_index, paths, visited);
     }
     paths[current_node] = pathsum;
     return pathsum;
@@ -58,9 +61,45 @@ uint8 acyclic_graph_number_of_paths(AdjacencyListGraph adj_graph, uint8 starting
     }
     paths[query_node_index] = 1;
 
-    xdfs(adj_graph, query_node_index, starting_node_index, paths, visited);
+    _acyclic_graph_number_of_paths(adj_graph, query_node_index, starting_node_index, paths, visited);
 
     return paths[starting_node_index];
+}
+
+void graph_dijkstra_acyclic_product(AdjacencyListGraph graph, uint8 starting_node_index, AdjacencyListGraph* acyclic_graph) {
+    int32 distance[vec_len(graph)];
+    boolean processed[vec_len(graph)];
+    uint8 acyclic_index_transform[vec_len(graph)];
+    PriorityQueue q = priority_queue_new();
+
+    for(int i = 0; i < vec_len(graph); i++) { 
+        distance[i] = INFINITY_8BIT;
+        processed[i] = FALSE;
+        acyclic_index_transform[i] = -1;
+    }
+    distance[starting_node_index] = 0;
+    priority_queue_nq(q, &starting_node_index, 0);
+    graph_node_new(*acyclic_graph, graph[starting_node_index].value);
+    acyclic_index_transform[starting_node_index] = 0;
+
+    while(vec_len(q)) {
+        uint8 a = *(uint8*)priority_queue_dq(q);
+        GraphNode* acyclic_source_node = (*acyclic_graph)+acyclic_index_transform[a];
+        if(processed[a]) { continue; }
+        processed[a] = TRUE;
+        for(uint8 i = 0; i < vec_len(graph[a].neighbour_list); i++) {
+            GraphNode* neighbour = graph[a].neighbour_list[i].node;
+            int32 w = graph[a].neighbour_list[i].weight;
+            if(distance[a]+w < distance[neighbour->graph_index]) {
+                distance[neighbour->graph_index] = distance[a]+w;
+                priority_queue_nq(q, &neighbour->graph_index, -distance[neighbour->graph_index]);
+
+                GraphNode* acyclic_node = graph_node_new(*acyclic_graph, neighbour->value);
+                acyclic_index_transform[neighbour->graph_index] = vec_len(*acyclic_graph)-1;
+                graph_node_add_neighbours(acyclic_source_node, FALSE, 1, acyclic_node, w);
+            }
+        }
+    }
 }
 
 #endif
