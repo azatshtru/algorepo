@@ -87,6 +87,11 @@ printf("vec![ ");\
 for(int i = 0; i < vec_address_from_array((array_ptr))->len; i++) { print_func((array_ptr)[i]); printf(", "); }\
 printf("\b\b ]\n");})
 
+void vec_clear(void* array_ptr) {
+    Vec* v = vec_address_from_array(array_ptr);
+    v->len = 0;
+}
+
 uint8 vec_quicksort_partition(void* array_ptr, int8 lo, int8 hi, int8 (*cmp_func)(void*, void*)) {
     uint32 size = vec_address_from_array(array_ptr)->size;
     uint32 pivot = hi*size;
