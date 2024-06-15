@@ -117,6 +117,10 @@ uint8 logb2(uint8 x) {
     return log; 
 }
 
+GraphNode* graph_succ(GraphNode* node) {
+    return node->neighbour_list[0].node;
+}
+
 uint8 _graph_precalculate_succ(AdjacencyListGraph* successor_graph, uint8 x, uint8 limit, uint8** succ) {
     succ[logb2(limit)][x] = limit == 1 ? (*successor_graph)[x].neighbour_list[0].node->graph_index 
         : _graph_precalculate_succ(successor_graph, _graph_precalculate_succ(successor_graph, x, limit/2, succ), limit/2, succ);
@@ -138,9 +142,31 @@ uint8 graph_kth_succsessor(uint8 x, uint8 k, uint8** succ) {
     return result;
 }
 
-void graph_floyd_tortoise_and_hair(AdjacencyListGraph* successor_graph, uint8* first_node_of_cycle, uint8 length_of_cycle) {
+void graph_floyd_tortoise_and_hair(AdjacencyListGraph* successor_graph, uint8* first_node_of_cycle, uint8* length_of_cycle) {
     //cycle detection
-    //uint8 a = graph_kth_succsessor()
+    GraphNode* a = graph_succ(*successor_graph);
+    GraphNode* b = graph_succ(graph_succ(*successor_graph));
+    while(a != b) {
+        a = graph_succ(a);
+        b = graph_succ(graph_succ(b));
+    }
+
+    //first node of cycle
+    a = *successor_graph;
+    while(a != b) {
+        a = graph_succ(a);
+        b = graph_succ(b);
+    }
+    *first_node_of_cycle = a->graph_index;
+
+    //length of cycle
+    b = graph_succ(a);
+    uint8 length = 1;
+    while (a != b) {
+        b = graph_succ(b);
+        ++length;
+    }
+    *length_of_cycle = length;
 }
 
 #endif
