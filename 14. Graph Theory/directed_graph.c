@@ -99,13 +99,48 @@ void graph_dijkstra_acyclic_product(AdjacencyListGraph graph, uint8 starting_nod
         }
     }
 
-    for(int i = 0; i < vec_len(graph); i++) { graph_node_new(*acyclic_graph, graph[i].value); }
+    for(int i = 0; i < vec_len(graph); i++) { graph_node_new(acyclic_graph, graph[i].value); }
     for(int i = 0; i < vec_len(graph); i++) {
         for(int j = 0; j < vec_len(prev_path_node[i]); j++) {
             graph_node_add_neighbours((*acyclic_graph)+prev_path_node[i][j], FALSE, 1, (*acyclic_graph)+i, 1);
         }
     }
     for(int i = 0; i < vec_len(graph); i++) { vec_free(prev_path_node[i], NULL); }
+}
+
+//Similar to dijkstra's acyclic product, all dynamic programming problems result in an acyclic graph where..
+//..each node represents a state and the edges represent a path taken from that state.
+
+uint8 logb2(uint8 x) {
+    uint8 log = 0;
+    while(x>>=1) {++log;}
+    return log; 
+}
+
+uint8 _graph_precalculate_succ(AdjacencyListGraph* successor_graph, uint8 x, uint8 limit, uint8** succ) {
+    succ[logb2(limit)][x] = limit == 1 ? (*successor_graph)[x].neighbour_list[0].node->graph_index 
+        : _graph_precalculate_succ(successor_graph, _graph_precalculate_succ(successor_graph, x, limit/2, succ), limit/2, succ);
+    return succ[logb2(limit)][x];
+}
+
+void graph_precalculate_succ(AdjacencyListGraph successor_graph, uint8 limit, uint8** succ) {
+    for(int i = 0; i < vec_len(successor_graph); i++) {
+        _graph_precalculate_succ(&successor_graph, i, limit, succ);
+    }
+}
+
+uint8 graph_kth_succsessor(uint8 x, uint8 k, uint8** succ) {
+    uint8 result = k;
+    while(k > 0) {
+        result = succ[logb2(k)][x];
+        k /= 2;
+    }
+    return result;
+}
+
+void graph_floyd_tortoise_and_hair(AdjacencyListGraph* successor_graph, uint8* first_node_of_cycle, uint8 length_of_cycle) {
+    //cycle detection
+    //uint8 a = graph_kth_succsessor()
 }
 
 #endif

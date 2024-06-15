@@ -43,10 +43,10 @@ AdjacencyListGraph adjacency_list_graph_new() {
     return graph;
 }
 
-GraphNode* graph_node_new(AdjacencyListGraph graph, char value) {
-    GraphNode graph_node = { value, vec_len(graph), __vec_new__(WeightedNeighbourNode) };
-    __vec_push__(graph, graph_node);
-    return graph+vec_len(graph)-1;
+GraphNode* graph_node_new(AdjacencyListGraph* graph, char value) {
+    GraphNode graph_node = { value, vec_len(*graph), __vec_new__(WeightedNeighbourNode) };
+    __vec_push__(*graph, graph_node);
+    return (*graph)+vec_len(*graph)-1;
 }
 
 // an adjacency matrix graph or a simple 2D array can be used to cache this.

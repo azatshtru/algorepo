@@ -11,7 +11,7 @@ typedef unsigned int uint32;
 typedef int int32;
 typedef char byte;
 
-#define INIT_VEC_SIZE 8
+#define INIT_VEC_SIZE 12
 
 typedef struct vec {
     uint8 cap;
