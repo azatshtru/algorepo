@@ -29,5 +29,6 @@ typedef unsigned int uint32;
 } while(0)
 
 void array_random_01(float* array_ptr, uint32 length);
+float array_sum_float(float* array_ptr, uint32 length);
 
 #endif

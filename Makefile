@@ -2,17 +2,25 @@ src := $(shell cd src && find . -name '*.c' -or -name '*.s')
 obj := $(addprefix obj/,$(src:.c=.o))
 headers := $(shell find headers -name '*.h')
 
+collection_dirs := common_collections
+collections = $(shell find $(collection_dirs) -name '*.o')
+collection_make := $(foreach word,$(collection_dirs),cd $(word) && $(MAKE))
+
+.PHONY: all clean run
+
 all: main
 
-main: $(obj) main.c $(headers)
-	gcc main.c $(obj) -o main
+main: $(obj) main.c $(headers) pre-build
+	gcc main.c $(obj) $(collections) -o main
+
+pre-build:
+	$(collection_make)
 
 obj/%.o: src/%.c
 	gcc $< -o $@ -c
 
-.PHONY: clean
 clean:
-	@rm -f main *.o obj/*.o
+	@rm -f main *.o obj/*.o $(collections)
 
 run: main
 	@./main

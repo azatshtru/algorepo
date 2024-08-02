@@ -1,10 +1,13 @@
 #include "headers/array_utils.h"
+#include "common_collections/include/vector.h"
 
 int main() {
-    printf("Hello, world!\n");
-    float a[8];
-    array_random_01(a, 8);
-    array_print_primitive(a, 8, "%.2f");
-    array_random_01(a, 8);
-    array_print_primitive(a, 8, "%.2f");
+    vector(int) v = vec_new(int);
+
+    vec_push(v, 6);
+    vec_push(v, 8);
+    vec_push(v, -8);
+    vec_print_primitive(v, "%d");
+
+    return 0;
 }
