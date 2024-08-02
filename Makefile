@@ -1,18 +1,18 @@
 src := $(shell cd src && find . -name '*.c' -or -name '*.s')
-obj := $(src:.c=.o)
-headers := $(shell cd headers && find . -name '*.h')
+obj := $(addprefix obj/,$(src:.c=.o))
+headers := $(shell find headers -name '*.h')
 
 all: main
 
-main: obj/$(obj) main.c
-	gcc main.c obj/$(obj) -o main
+main: $(obj) main.c $(headers)
+	gcc main.c $(obj) -o main
 
-obj/$(obj): src/$(src) headers/$(headers)
+obj/%.o: src/%.c
 	gcc $< -o $@ -c
 
 .PHONY: clean
 clean:
-	rm obj/$(obj) main
+	@rm -f main *.o obj/*.o
 
 run: main
 	@./main

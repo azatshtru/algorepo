@@ -28,4 +28,6 @@ typedef unsigned int uint32;
     printf("\b\b]\n");                                                  \
 } while(0)
 
+void array_random_01(float* array_ptr, uint32 length);
+
 #endif
