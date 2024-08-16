@@ -10,7 +10,7 @@ int main() {
     float numbers[12];
     array_random_01(numbers, 12);
     array_print_primitive(numbers, 12, "%.2f");
-    merge_sort(numbers, sizeof(float), 0, 11, cmp_float);
+    quicksort(numbers, sizeof(float), 0, 11, cmp_float);
     array_print_primitive(numbers, 12, "%.2f");
 
     return 0;

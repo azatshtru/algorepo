@@ -1,6 +1,5 @@
 #include <string.h>
 #include "../headers/sorting.h"
-#include "../headers/array_utils.h"
 
 void swap(void* a, void* b, uint32 size) {
     char temp[size];
@@ -69,3 +68,25 @@ void merge_sort(void* array, uint32 typesize, uint32 start, uint32 end, float(*c
     memcpy(array+(start*typesize), temp_merged, n);
 }
 
+int quicksort_partition(void* array_ptr, int typesize, int lo, int hi, float(*cmp_fn)(void*, void*)) {
+    int pivot = hi*typesize;
+    int index = (lo-1)*typesize;
+    for(int i = lo*typesize; i < hi*typesize; i+=typesize) {
+        if(cmp_fn(array_ptr+i, array_ptr+pivot) < 0) {
+            index+=typesize;
+            swap(array_ptr+i, array_ptr+index, typesize);
+        }
+    }
+    index+=typesize;
+    swap(array_ptr+pivot, array_ptr+index, typesize);
+    return index/typesize;
+}
+
+void quicksort(void* array_ptr, int typesize, int lo, int hi, float(*cmp_fn)(void*, void*)) {
+    if(lo >= hi || lo < 0) { 
+        return;
+    }
+    int index = quicksort_partition(array_ptr, typesize, lo, hi, cmp_fn);
+    quicksort(array_ptr, typesize, lo, index-1, cmp_fn);
+    quicksort(array_ptr, typesize, index+1, hi, cmp_fn);
+}
