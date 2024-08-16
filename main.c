@@ -13,6 +13,7 @@ int main() {
     array_random_01(numbers, 5);
 
     array_print_primitive(numbers, 5, "%.2f");
+    printf("%.2f, %.2f, %.2f", array_sum_float(numbers, 5), array_min_float(numbers, 5), array_max_float(numbers, 5));
 
     return 0;
 }

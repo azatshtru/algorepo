@@ -32,3 +32,11 @@ float array_min_float(float* array_ptr, uint32 length) {
     }
     return min;
 }
+
+float array_max_float(float* array_ptr, uint32 length) {
+    float max = array_ptr[0];
+    for(uint32 i = 1; i < length; i++) {
+        max = array_ptr[i] > max ? array_ptr[i] : max;
+    }
+    return max;
+}
