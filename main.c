@@ -1,19 +1,18 @@
 #include "headers/array_utils.h"
+#include "headers/sorting.h"
 #include "common_collections/include/vector.h"
 
+float cmp_float(void* a, void* b) {
+    return *((float*)a) - *((float*)b);
+}
+
 int main() {
-    vector(int) v = vec_new(int);
+    float numbers[12];
+    array_random_01(numbers, 12);
+    array_print_primitive(numbers, 12, "%.2f");
+    bubble_sort(numbers, sizeof(float), 12, cmp_float);
+    array_print_primitive(numbers, 12, "%.2f");
 
-    vec_push(v, 6);
-    vec_push(v, 8);
-    vec_push(v, -8);
-    vec_print_primitive(v, "%d");
-
-    float numbers[5];
-    array_random_01(numbers, 5);
-
-    array_print_primitive(numbers, 5, "%.2f");
-    printf("%.2f, %.2f, %.2f", array_sum_float(numbers, 5), array_min_float(numbers, 5), array_max_float(numbers, 5));
 
     return 0;
 }
