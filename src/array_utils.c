@@ -3,6 +3,9 @@
 #include "../headers/xrandom.h"
 #include "../headers/array_utils.h"
 
+// Array on stack using []
+// Array on heap using malloc
+
 void array_random_01(float* array_ptr, uint32 length) {
     random_init_seed();
     rand();
@@ -15,9 +18,17 @@ void array_random_01(float* array_ptr, uint32 length) {
 // Additionally, a flag can be used to keep track of properties of the entire array that are derived through individual analysis of elements.
 
 float array_sum_float(float* array_ptr, uint32 length) {
-    float sum = 0; // setting the flag
+    float sum = 0; // initializing the flag
     for(uint32 i = 0; i < length; i++) { // traversal
         sum += array_ptr[i]; // updating the flag
     }
     return sum;
+}
+
+float array_min_float(float* array_ptr, uint32 length) {
+    float min = array_ptr[0];
+    for(uint32 i = 1; i < length; i++) {
+        min = array_ptr[i] < min ? array_ptr[i] : min;
+    }
+    return min;
 }

@@ -5,6 +5,7 @@ headers := $(shell find include -name '*.h')
 .PHONY: all clean
 
 all: main
+	@:
 
 main: $(obj) $(headers)
 

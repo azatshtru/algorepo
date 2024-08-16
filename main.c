@@ -9,5 +9,10 @@ int main() {
     vec_push(v, -8);
     vec_print_primitive(v, "%d");
 
+    float numbers[5];
+    array_random_01(numbers, 5);
+
+    array_print_primitive(numbers, 5, "%.2f");
+
     return 0;
 }

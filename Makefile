@@ -6,15 +6,17 @@ collection_dirs := common_collections
 collections = $(shell find $(collection_dirs) -name '*.o')
 collection_make := $(foreach word,$(collection_dirs),cd $(word) && $(MAKE))
 
-.PHONY: all clean run
+.PHONY: all clean run pre-build
 
-all: main
+all: build
 
-main: $(obj) main.c $(headers) pre-build
+build: pre-build main
+
+main: $(obj) main.c $(headers)
 	gcc main.c $(obj) $(collections) -o main
 
 pre-build:
-	$(collection_make)
+	@$(collection_make)
 
 obj/%.o: src/%.c
 	gcc $< -o $@ -c
@@ -22,5 +24,5 @@ obj/%.o: src/%.c
 clean:
 	@rm -f main *.o obj/*.o $(collections)
 
-run: main
+run: build
 	@./main
