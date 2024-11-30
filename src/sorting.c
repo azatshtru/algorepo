@@ -24,7 +24,7 @@ void bubble_sort_float(float* array, uint32 length) {
     }
 }
 
-void bubble_sort(void* array, uint32 typesize, uint32 length, float(*cmp_fn)(void* a, void* b)) {
+void bubble_sort(void* array, uint32 typesize, uint32 length, float(*cmp_fn)(void*, void*)) {
     int flag = 0;
     for(int i = 0; i < (length-1); i++) {
         flag = 0;
@@ -40,7 +40,7 @@ void bubble_sort(void* array, uint32 typesize, uint32 length, float(*cmp_fn)(voi
     }
 }
 
-void merge_sort(void* array, uint32 typesize, uint32 start, uint32 end, float(*cmp_fn)(void* a, void* b)) {
+void merge_sort(void* array, uint32 typesize, uint32 start, uint32 end, float(*cmp_fn)(void*, void*)) {
     if(end<=start) {
         return;
     }

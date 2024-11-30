@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int close_to_zero(float epsilon) {
-    if(epsilon < 0.000001 && epsilon > -0.000001) {
+    if(epsilon < 0.00001 && epsilon > -0.00001) {
         return 1;
     }
     return 0;
