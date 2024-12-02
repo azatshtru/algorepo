@@ -1,25 +1,21 @@
-#include "headers/queue.h"
-#include <stdio.h>
+#include "common_collections/include/vector.h"
 
 int main() {
-    VecDeque(int) qi = queue_new(int);
+    vector(int) v = vec_new(int);
+    vec_push(v, 21);
+    vec_push(v, 5);
+    vec_push(v, 87);
+    vec_push(v, 7);
+    vec_push(v, 69);
+    vec_push(v, 400);
 
-    queue_push_front(qi, 5);
-    queue_push_front(qi, 15);
-    queue_push_back(qi, 69);
-    queue_push_front(qi, 24);
-    queue_push_front(qi, -46);
-    queue_push_back(qi, 12);
-    queue_push_back(qi, -6);
+    int a = vec_pop(v, -1);
+    int b = vec_pop(v, 2);
+    int c = vec_pop(v, 2);
 
-    int a = queue_pop_front(qi);
-    int b = queue_pop_back(qi);
-    int c = queue_pop_back(qi);
-    queue_push_front(qi, 61);
+    vec_print_primitive(v, "%d");
 
-    queue_print_primitive(qi, "%d");
-
-    queue_free(qi, NULL);
+    vec_free(v, NULL);
 
     printf("%d\n", a);
     printf("%d\n", b);

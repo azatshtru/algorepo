@@ -2,8 +2,9 @@
 
 void** vec_allocate(uint32 cap, uint32 type_size) {
     byte* data = malloc(cap * type_size * sizeof(byte));
+    byte* tmp = malloc(type_size * sizeof(byte));
     Vector* vec_ptr = malloc(sizeof(Vector));
-    Vector a = { data, type_size, 0, cap };
+    Vector a = { data, tmp, type_size, 0, cap };
     *vec_ptr = a;
     return (void**)vec_ptr;
 }
@@ -16,6 +17,7 @@ void vec_free(void* vec, void(*free_fn)(byte*)) {
         }
     }
     free(v->data);
+    free(v->tmp);
     free(vec);
 }
 
