@@ -1,7 +1,8 @@
 #include "headers/queue.h"
+#include <stdio.h>
 
 int main() {
-    Queue(int) qi = queue_new(int);
+    VecDeque(int) qi = queue_new(int);
 
     queue_push_front(qi, 5);
     queue_push_front(qi, 15);
@@ -11,15 +12,18 @@ int main() {
     queue_push_back(qi, 12);
     queue_push_back(qi, -6);
 
-    queue_zap_front(qi, NULL);
-    queue_zap_front(qi, NULL);
-    queue_zap_front(qi, NULL);
+    int a = queue_pop_front(qi);
+    int b = queue_pop_back(qi);
+    int c = queue_pop_back(qi);
     queue_push_front(qi, 61);
-    queue_zap_back(qi, NULL);
 
     queue_print_primitive(qi, "%d");
-    
+
     queue_free(qi, NULL);
+
+    printf("%d\n", a);
+    printf("%d\n", b);
+    printf("%d\n", c);
 
     return 0;
 }

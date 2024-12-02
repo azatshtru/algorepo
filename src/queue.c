@@ -2,8 +2,9 @@
 
 void** queue_allocate(uint32 cap, uint32 type_size) {
     char* data = malloc(cap * type_size * sizeof(char));
+    char* tmp = malloc(type_size * sizeof(char));
     Queue* q_ptr = malloc(sizeof(Queue));
-    Queue q = { data, type_size, 0, cap, 0, 0 };
+    Queue q = { data, tmp, type_size, 0, cap, 0, 0 };
     *q_ptr = q;
     return (void**)q_ptr;
 }
@@ -18,6 +19,7 @@ void queue_free(void* queue_ptr, void(*free_fn)(char*)) {
         }
     }
     free(q->data);
+    free(q->tmp);
     free(q);
 }
 

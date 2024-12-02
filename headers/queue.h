@@ -12,6 +12,7 @@ typedef unsigned int uint32;
 
 typedef struct queue {
     char* data;
+    char* tmp;
     uint32 type_size;
     uint32 len;
     uint32 cap;
@@ -26,8 +27,14 @@ void queue_check_and_resize(Queue* q);
 void queue_zap_front(void* queue_ptr, void(*free_fn)(char*));
 void queue_zap_back(void* queue_ptr, void(*free_fn)(char*));
 
-#define Queue(type) type **
+#define VecDeque(type) type **
 #define queue_new(type) (type **)queue_allocate(QUEUE_INIT_SIZE, sizeof(type))
+
+#define queue_front(queue_ptr) (*(queue_ptr))[positive_mod(((Queue*)(queue_ptr))->front - 1, ((Queue*)(queue_ptr))->cap)]
+#define queue_back(queue_ptr) (*(queue_ptr))[positive_mod(((Queue*)(queue_ptr))->back, ((Queue*)(queue_ptr))->cap)]
+
+#define queue_pop_front(queue_ptr) (**((queue_ptr)+1)=queue_front((queue_ptr)), queue_zap_front((queue_ptr), NULL), **((queue_ptr)+1))
+#define queue_pop_back(queue_ptr) (**((queue_ptr)+1)=queue_back((queue_ptr)), queue_zap_back((queue_ptr), NULL), **((queue_ptr)+1))
 
 #define queue_push_front(queue_ptr, value)                          \
     do {                                                            \
