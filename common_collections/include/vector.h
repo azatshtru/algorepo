@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define VEC_INIT_SIZE 8
+#define VEC_INIT_SIZE 1
 
 typedef unsigned int uint32;
 typedef unsigned char byte;
@@ -17,11 +17,11 @@ typedef struct _vector {
     uint32 cap;
 } Vector;
 
-void** vec_allocate(uint32 len, uint32 type_size);
+void** vec_allocate(uint32 cap, uint32 type_size);
 void** vec_from(uint32 len, ...);
 void vec_free(void* vec, void(*free_fn)(byte*));
 void vec_resize(Vector* vec, uint32 new_len);
-void vec_zap(void* vec, int index);
+void vec_zap(void* vec, int index, void(*free_fn)(byte*));
 
 #define vector(type) type **
 #define vec_new(type) (type**)vec_allocate(VEC_INIT_SIZE, sizeof(type))

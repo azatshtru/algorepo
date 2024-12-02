@@ -1,12 +1,4 @@
 #include "../headers/binary_search.h"
-#include <stdio.h>
-
-int close_to_zero(float epsilon) {
-    if(epsilon < 0.00001 && epsilon > -0.00001) {
-        return 1;
-    }
-    return 0;
-}
 
 int binary_search_r(void* array, int typesize, int length, void* value, float(*cmp_fn)(void*, void*)) {
     int a = 0;
