@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/hashset.h"
+#include "../headers/hashset.h"
 
 unsigned int hash_fnv1a(char* s, unsigned int length) {
     unsigned long int hash = FNV_OFFSET_BASIS;

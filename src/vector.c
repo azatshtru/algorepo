@@ -1,4 +1,4 @@
-#include "../include/vector.h"
+#include "../headers/vector.h"
 
 void** vec_allocate(uint32 cap, uint32 type_size) {
     byte* data = malloc(cap * type_size * sizeof(byte));
