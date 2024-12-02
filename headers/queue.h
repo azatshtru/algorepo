@@ -26,6 +26,9 @@ void queue_check_and_resize(Queue* q);
 void queue_zap_front(void* queue_ptr, void(*free_fn)(char*));
 void queue_zap_back(void* queue_ptr, void(*free_fn)(char*));
 
+#define Queue(type) type **
+#define queue_new(type) (type **)queue_allocate(QUEUE_INIT_SIZE, sizeof(type))
+
 #define queue_push_front(queue_ptr, value)                          \
     do {                                                            \
         Queue* __q__ = (Queue*)(queue_ptr);                         \

@@ -1,7 +1,7 @@
 #include "headers/queue.h"
 
 int main() {
-    int** qi = (int**)queue_allocate(QUEUE_INIT_SIZE, sizeof(int));
+    Queue(int) qi = queue_new(int);
 
     queue_push_front(qi, 5);
     queue_push_front(qi, 15);
