@@ -1,18 +1,32 @@
-src := $(shell cd src && find . -name '*.c' -or -name '*.s')
+src := $(notdir $(shell cd src && find . -name '*.c' -or -name '*.s'))
 obj := $(addprefix obj/,$(src:.c=.o))
 headers := $(shell find headers -name '*.h')
 
-all: main
+tests := $(shell cd tests && find . -name 'test*.c')
+tests := $(foreach test,$(tests),tests/$(notdir $(test)))
+compiled_tests := $(addprefix build/,$(basename $(tests)))
 
-main: $(obj) main.c $(headers)
-	gcc main.c $(obj) -o main
+.PHONY: all clean run test
+
+all: build/main
+
+build/main: $(obj) main.c $(headers)
+	gcc main.c $(obj) -o build/main
 
 obj/%.o: src/%.c
 	gcc $< -o $@ -c
 
-.PHONY: clean
 clean:
-	@rm -f main *.o obj/*.o
+	@rm -f build/main *.o obj/*.o build/tests/*
+	@echo cleaned.
 
-run: main
-	@./main
+run: build/main
+	@./build/main
+
+build/tests/%: tests/%.c $(obj)
+	gcc $< $(obj) -o $@
+
+test: $(compiled_tests)
+	@for x in $(compiled_tests); do \
+		./$$x; \
+	done

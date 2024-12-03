@@ -58,3 +58,6 @@ test
 
 .vscode/
 main
+
+build/
+obj/
