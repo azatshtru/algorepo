@@ -47,5 +47,5 @@ void vec_zap(void* vec, int _index, void(*free_fn)(byte*)) {
 int vec_cmp(void* v1_ptr, void* v2_ptr) {
     Vector* v1 = (Vector*)v1_ptr;
     Vector* v2 = (Vector*)v2_ptr;
-    return v1->len != v2->len && !memcmp(v1->data, v2->data, v1->len);
+    return v1->len == v2->len && !memcmp(v1->data, v2->data, v1->len);
 }

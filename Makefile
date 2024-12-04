@@ -13,7 +13,7 @@ all: build/main
 build/main: $(obj) main.c $(headers)
 	gcc main.c $(obj) -o build/main
 
-obj/%.o: src/%.c
+obj/%.o: src/%.c headers/%.h
 	gcc $< -o $@ -c
 
 clean:
@@ -23,7 +23,7 @@ clean:
 run: build/main
 	@./build/main
 
-build/tests/%: tests/%.c $(obj)
+build/tests/%: tests/%.c $(obj) tests/testutils.h
 	gcc $< $(obj) -o $@
 
 test: $(compiled_tests)
