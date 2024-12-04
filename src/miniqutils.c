@@ -5,7 +5,7 @@ int positive_mod(int a, int m) {
 }
 
 int close_to_zero(float epsilon) {
-    if(epsilon < 0.00001 && epsilon > -0.00001) {
+    if(epsilon < 1e-4 && epsilon > -1e-4) {
         return 1;
     }
     return 0;
