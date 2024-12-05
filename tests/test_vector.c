@@ -19,9 +19,11 @@ oj_test(test_vec_cmp_returns_true_for_same_vectors) {
     vec_push(v2, 58);
 
     int cmp = vec_cmp(v1, v2);
+
     vec_free(v1, NULL);
     vec_free(v2, NULL);
-    oj_asserteq_int(1, cmp);
+
+    oj_assert_eq_int(1, cmp);
 
     oj_fresh;
 }
@@ -43,9 +45,11 @@ oj_test(test_vec_cmp_returns_false_for_different_vectors) {
     vec_push(v2, 58);
 
     int cmp = vec_cmp(v1, v2);
+
     vec_free(v1, NULL);
     vec_free(v2, NULL);
-    oj_asserteq_int(0, cmp);
+
+    oj_assert_eq_int(0, cmp);
 
     oj_fresh;
 }
@@ -68,7 +72,7 @@ oj_test(test_vec_cmp_returns_false_for_different_length_vectors) {
     int cmp = vec_cmp(v1, v2);
     vec_free(v1, NULL);
     vec_free(v2, NULL);
-    oj_asserteq_int(0, cmp);
+    oj_assert_eq_int(0, cmp);
 
     oj_fresh;
 }

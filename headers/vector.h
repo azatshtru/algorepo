@@ -24,6 +24,7 @@ void vec_free(void* vec, void(*free_fn)(byte*));
 void vec_resize(Vector* vec, uint32 new_len);
 void vec_zap(void* vec, int index, void(*free_fn)(byte*));
 int vec_cmp(void* v1_ptr, void* v2_ptr);
+uint32 vec_len(void* vec);
 
 #define vector(type) type **
 #define vec_new(type) (type**)vec_allocate(VEC_INIT_SIZE, sizeof(type))

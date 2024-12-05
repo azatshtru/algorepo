@@ -49,3 +49,7 @@ int vec_cmp(void* v1_ptr, void* v2_ptr) {
     Vector* v2 = (Vector*)v2_ptr;
     return v1->len == v2->len && !memcmp(v1->data, v2->data, v1->len);
 }
+
+uint32 vec_len(void* vec) {
+    return ((Vector*)vec)->len;
+}

@@ -7,30 +7,39 @@
 #define oj_test(test) static int test(char* message)
 #define oj_prepare(suite) static int suite(int oj_tests_run, int oj_tests_passed, int oj_ignore_fresh)
 
-#define oj_assert(assertion)\
-    do {                    \
-        if (!(assertion)) { \
-            message = 0;    \
-            return 1;       \
-        }                   \
+#define oj_assert(assertion)    \
+    do {                        \
+        sprintf(message, "");   \
+        if (!(assertion)) {     \
+            return 1;           \
+        }                       \
     } while (0)
 
-#define oj_asserteq_int(expected, result)                                   \
+#define oj_assert_eq_int(expected, result)                                   \
     do {                                                                    \
+        sprintf(message, "");                                               \
         if(expected != result) {                                            \
             sprintf(message, "[Expected: %d, got: %d]", expected, result);  \
             return 1;                                                       \
         }                                                                   \
     } while(0)
 
-#define oj_asserteq_float(expected, result)                                 \
+#define oj_assert_eq_float(expected, result)                                 \
     do {                                                                    \
+        sprintf(message, "");                                               \
         float epsilon = expected - result;                                  \
         if(epsilon < -1e-4 || epsilon > 1e-4) {                             \
             sprintf(message, "[Expected: %f, got: %f]", expected, result);  \
             return 1;                                                       \
         }                                                                   \
     } while(0)
+
+#define oj_assert_eq_bytes(length, expected, result) do {                            \
+    sprintf(message, "");                                                           \
+    if(memcmp(expected, result, length)) {                                          \
+        return 1;                                                                   \
+    }                                                                               \
+} while(0)
 
 #define oj_run(test)                                                                                    \
     do {                                                                                                \
@@ -65,7 +74,7 @@
         printf("  ----------------------------------\n");                                                                   \
         printf("    %s \x1b[1m%d out of %d tests passed.\x1b[0m\n",                                                         \
                 oj_tests_passed == oj_tests_run ? "\U00002713" : "\U00002717", oj_tests_passed, oj_tests_run);              \
-        printf("    %s \x1b[1mOJ %.2f%% juicy!\x1b[0m\n",                                                                   \
+        printf("    %s \x1b[1mOJ %.0f%% juicy!\x1b[0m\n",                                                                   \
                 oj_tests_passed == oj_tests_run ? "\U00002713" : "\U00002717", (double)oj_tests_passed/oj_tests_run * 100); \
         printf("  ----------------------------------\n");                                                                   \
         printf("\n");                                                                                                       \
