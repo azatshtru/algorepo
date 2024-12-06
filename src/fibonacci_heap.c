@@ -1,21 +1,4 @@
-#include <stdlib.h>
-
-struct fibonacci_heap_node {
-    int key;
-    unsigned int degree;
-    char mark;
-
-    struct fibonacci_heap_node* parent;
-    struct fibonacci_heap_node* child;
-    struct fibonacci_heap_node* left;
-    struct fibonacci_heap_node* right;
-};
-
-typedef struct fibonacci_heap {
-    unsigned int n;
-    struct fibonacci_heap_node* min;
-    struct fibonacci_heap_node* root_list;
-} FibonacciHeap;
+#include "../headers/fibonacci_heap.h"
 
 struct fibonacci_heap_node* fibonacci_heap_node_new(int key) {
     struct fibonacci_heap_node* node_ptr = malloc(sizeof(struct fibonacci_heap_node));
@@ -34,7 +17,7 @@ struct fibonacci_heap_node* fibonacci_heap_min(FibonacciHeap* heap) {
 }
 
 void fibonacci_heap_merge_with_root_list(FibonacciHeap* heap, struct fibonacci_heap_node* node) {
-    if(heap->root_list != NULL) {
+    if(heap->root_list == NULL) {
         heap->root_list = node;
     } else {
         node->right = heap->root_list;
@@ -81,8 +64,8 @@ void fibonacci_heap_remove_from_root_list(FibonacciHeap* heap, struct fibonacci_
     node->right->left = node->left;
 }
 
-void fibonacci_heap_coagulate(FibonacciHeap* heap) {
-    
+void fibonacci_heap_consolidate(FibonacciHeap* heap) {
+        
 }
 
 struct fibonacci_heap_node* fibonacci_heap_extract_min(FibonacciHeap* heap) {
@@ -91,9 +74,10 @@ struct fibonacci_heap_node* fibonacci_heap_extract_min(FibonacciHeap* heap) {
         if(z->child != NULL) {
             struct fibonacci_heap_node* child = z->child;
             for(int i = 0; i < z->degree; i++) {
+                struct fibonacci_heap_node* next_sibling = child->right;
                 fibonacci_heap_merge_with_root_list(heap, child);
                 child->parent = NULL;
-                child = child->right;
+                child = next_sibling;
             }
         }
         fibonacci_heap_remove_from_root_list(heap, z);
@@ -103,7 +87,7 @@ struct fibonacci_heap_node* fibonacci_heap_extract_min(FibonacciHeap* heap) {
             heap->root_list = NULL;
         } else {
             heap->min = z->right;
-            fibonacci_heap_coagulate(heap);
+            fibonacci_heap_consolidate(heap);
         }
         --heap->n;
     }
