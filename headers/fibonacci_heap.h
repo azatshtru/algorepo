@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "miniqutils.h"
 
 struct fibonacci_heap_node {
     int key;
