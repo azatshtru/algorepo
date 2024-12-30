@@ -28,9 +28,10 @@ uint32 vec_len(void* vec);
 
 #define vector(type) type **
 #define vec_new(type) (type**)vec_allocate(VEC_INIT_SIZE, sizeof(type))
-#define vi(vec_ptr, _index) (*(vec_ptr))[(_index)]
+#define veci(vec_ptr, _index) (*(vec_ptr))[(_index)]
 #define vec_get(vec_ptr, _index) (*(vec_ptr))[(_index)]
 #define vec_set(vec_ptr, _index, value) (*(vec_ptr))[(_index)] = (value)
+
 
 #define vec_pop(vec, index) (**((vec)+1)=vi((vec), ((index) >= 0) ? (index) : (((Vector*)(vec))->len + (index))), vec_zap((vec), (index), NULL), **((vec)+1))
 
@@ -69,7 +70,7 @@ do {                                                \
 #define vec_insert(vec, _index, value)                        \
     do                                                        \
     {                                                         \
-        vec_push((vec), 0);                                   \
+        vec_push((vec), value);                               \
         Vector *__v__ = (Vector *)(vec);                      \
         memcpy(*(vec) + _index + 1,                           \
                *(vec) + _index,                               \
