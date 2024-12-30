@@ -33,7 +33,7 @@ uint32 vec_len(void* vec);
 #define vec_set(vec_ptr, _index, value) (*(vec_ptr))[(_index)] = (value)
 
 
-#define vec_pop(vec, index) (**((vec)+1)=vi((vec), ((index) >= 0) ? (index) : (((Vector*)(vec))->len + (index))), vec_zap((vec), (index), NULL), **((vec)+1))
+#define vec_pop(vec, index) (**((vec)+1)=vec_get((vec), ((index) >= 0) ? (index) : (((Vector*)(vec))->len + (index))), vec_zap((vec), (index), NULL), **((vec)+1))
 
 #define vec_print(vec, print_fn)                    \
 do {                                                \
