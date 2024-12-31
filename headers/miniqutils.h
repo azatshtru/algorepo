@@ -1,3 +1,8 @@
+#include <limits.h>
+
+float negative_infinity();
 int positive_mod(int a, int m);
 int close_to_zero(float epsilon);
 double natural_log(double x);
+
+#define I32_MIN -2147483648

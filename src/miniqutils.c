@@ -3,6 +3,15 @@
 #define EULER_CONSTANT 2.718281828459045235
 #define PI 3.14159265358979323846
 
+float negative_infinity() {
+    union {
+        int i;
+        float f;
+    } u;
+    u.i = 0xFF800000; // IEEE 754 representation of -Infinity for a 32-bit float
+    return u.f;
+}
+
 int positive_mod(int a, int m) {
     return (a % m + m) % m;
 }

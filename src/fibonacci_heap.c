@@ -87,17 +87,11 @@ void fibonacci_heap_merge_root_node_with_child_list(
 unsigned int fibonacci_heap_root_list_length(FibonacciHeap* heap) {
     struct fibonacci_heap_node* first = heap->root_list;
     struct fibonacci_heap_node* current = heap->root_list;
-    int flag = 0;
     unsigned int len = 0;
-    while(1) {
-        if(flag && current == first) {
-            break;
-        } else if(current == first) {
-            flag = 1;
-        }
+    do {
         ++len;
         current = current->right;
-    }
+    } while(current != first);
     return len;
 }
 
@@ -106,8 +100,8 @@ void fibonacci_heap_cdll_to_array(
     struct fibonacci_heap_node** array,
     unsigned int length
 ) {
-    struct fibonacci_heap_node* current;
-    for(int i = 0; i < length; i++) {
+    struct fibonacci_heap_node* current = head;
+    for(unsigned int i = 0; i < length; i++) {
         array[i] = current;
         current = current->right;
     }
@@ -116,6 +110,9 @@ void fibonacci_heap_cdll_to_array(
 void fibonacci_heap_consolidate(FibonacciHeap* heap) {
     int aux_len = (int)(natural_log(heap->n) * 2);
     struct fibonacci_heap_node* aux[aux_len];
+    for(int i = 0; i < aux_len; i++) {
+        aux[i] = NULL;
+    }
 
     unsigned int root_list_length = fibonacci_heap_root_list_length(heap);
     struct fibonacci_heap_node* root_nodes[root_list_length];
@@ -168,4 +165,69 @@ struct fibonacci_heap_node* fibonacci_heap_extract_min(FibonacciHeap* heap) {
         --heap->n;
     }
     return z;
+}
+
+void fibonacci_heap_decrease_key(FibonacciHeap* heap, struct fibonacci_heap_node* node, int key) {
+    if(key > node->key) {
+        return;
+    }
+    node->key = key;
+    struct fibonacci_heap_node* parent = node->parent;
+    if(parent != NULL && node->key < parent->key) {
+        fibonacci_heap_cut(heap, node, parent);
+        fibonacci_heap_cascading_cut(heap, parent);
+    }
+    if(node->key < heap->min->key) {
+        heap->min = node;
+    }
+}
+
+void fibonacci_heap_cut(FibonacciHeap* heap, struct fibonacci_heap_node* node, struct fibonacci_heap_node* parent) {
+    fibonacci_heap_remove_from_child_list(heap, parent, node);
+    parent->degree -= 1;
+    fibonacci_heap_merge_with_root_list(heap, node);
+    node->parent = NULL;
+    node->mark = 0;
+}
+
+void fibonacci_heap_cascading_cut(FibonacciHeap* heap, struct fibonacci_heap_node* node) {
+    struct fibonacci_heap_node* parent = node->parent;
+    if(parent != NULL) {
+        if(node->mark == 0) {
+            node->mark = 1;
+        } else {
+            fibonacci_heap_cut(heap, node, parent);
+            fibonacci_heap_cascading_cut(heap, parent);
+        }
+    }
+}
+
+void fibonacci_heap_remove_from_child_list(FibonacciHeap* heap, struct fibonacci_heap_node* parent, struct fibonacci_heap_node* node) {
+    if(parent->child == parent->child->right) {
+        parent->child = NULL;
+    } else if(parent->child == node) {
+        parent->child = node->right;
+        node->right->parent = parent;
+    }
+    node->left->right = node->right;
+    node->right->left = node->left;
+}
+
+struct fibonacci_heap_node* fibonacci_heap_delete(FibonacciHeap* heap, struct fibonacci_heap_node* node) {
+    fibonacci_heap_decrease_key(heap, node, I32_MIN);
+    return fibonacci_heap_extract_min(heap);
+}
+
+void fibonacci_heap_traverse_and_print_keys(struct fibonacci_heap_node* node, int depth) {
+    if(node == NULL) { return; }
+    struct fibonacci_heap_node* first = node;
+    struct fibonacci_heap_node* current = node;
+    do {
+        for(int i = 0; i < depth; i++) {
+            printf("|->");
+        }
+        printf("%d\n", current->key);
+        fibonacci_heap_traverse_and_print_keys(current->child, depth+1);
+        current = current->right;
+    } while(current != first);
 }

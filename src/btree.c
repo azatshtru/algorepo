@@ -57,9 +57,9 @@ void btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
     for(int j = 0; j < t; j++) {
         vec_zap(node->keys, -1, NULL); 
     }
+
     // vec_resize((Vector*)split_node.keys, t-1);
     // memcpy(split_node.keys, *(node->keys), t-1 * ((Vector*)split_node.keys)->type_size);
-    //
     // vec_resize((Vector*)node->keys, t-1);
 
 
