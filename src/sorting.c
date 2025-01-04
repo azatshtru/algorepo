@@ -1,12 +1,4 @@
-#include <string.h>
 #include "../headers/sorting.h"
-
-void swap(void* a, void* b, uint32 size) {
-    char temp[size];
-    memcpy(temp, a, size);
-    memcpy(a, b, size);
-    memcpy(b, temp, size);
-}
 
 void bubble_sort_float(float* array, uint32 length) {
     int flag = 0;

@@ -20,9 +20,9 @@ typedef struct _vector {
 
 void* vec_allocate(uint32 cap, uint32 type_size);
 void* vec_from(uint32 len, ...);
-void vec_free(void* vec, void(*free_fn)(byte*));
+void vec_free(void* vec, void(*free_fn)(void*));
 void vec_resize(Vector* vec, uint32 new_len);
-void vec_zap(void* vec, int index, void(*free_fn)(byte*));
+void vec_zap(void* vec, int index, void(*free_fn)(void*));
 int vec_cmp(void* v1_ptr, void* v2_ptr);
 uint32 vec_len(void* vec);
 

@@ -3,6 +3,13 @@
 #define EULER_CONSTANT 2.718281828459045235
 #define PI 3.14159265358979323846
 
+void swap(void* a, void* b, unsigned int size) {
+    char temp[size];
+    memcpy(temp, a, size);
+    memcpy(a, b, size);
+    memcpy(b, temp, size);
+}
+
 float negative_infinity() {
     union {
         int i;

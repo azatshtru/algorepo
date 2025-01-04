@@ -9,7 +9,7 @@ void* vec_allocate(uint32 cap, uint32 type_size) {
     return (void*)vec_ptr;
 }
 
-void vec_free(void* vec, void(*free_fn)(byte*)) {
+void vec_free(void* vec, void(*free_fn)(void*)) {
     Vector* v = (Vector*)vec;
     if(free_fn) {
         for(int i = 0; i < v->len * v->type_size; i+=v->type_size) {
@@ -30,7 +30,7 @@ void vec_resize(Vector* vec, uint32 new_len) {
     vec->cap = new_len;
 }
 
-void vec_zap(void* vec, int _index, void(*free_fn)(byte*)) {
+void vec_zap(void* vec, int _index, void(*free_fn)(void*)) {
     Vector* v = (Vector*)vec;
     uint32 index = (_index >= 0) ? _index : (v->len + _index);
     if(free_fn) {

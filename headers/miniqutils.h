@@ -1,5 +1,7 @@
 #include <limits.h>
+#include <string.h>
 
+void swap(void* a, void* b, unsigned int size);
 float negative_infinity();
 int positive_mod(int a, int m);
 int close_to_zero(float epsilon);
