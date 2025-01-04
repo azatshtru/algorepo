@@ -39,8 +39,8 @@
         }                                                                   \
     } while(0)
 
-#define oj_assert_eq_bytes(length, expected, result) do {                           \
-    sprintf(message, " ");                                                          \
+#define oj_assert_eq_bytes(length, expected, result, description) do {              \
+    sprintf(message, "%s (%s, line %d)", description, __FILE__, __LINE__);          \
     if(memcmp(expected, result, length)) {                                          \
         return 1;                                                                   \
     }                                                                               \
