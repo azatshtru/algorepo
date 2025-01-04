@@ -8,9 +8,9 @@
 #define oj_test(test) static int test(char* message)
 #define oj_prepare(suite) static int suite(int oj_tests_run, int oj_tests_passed, int oj_ignore_fresh)
 
-#define oj_assert(assertion)    \
+#define oj_assert(assertion, description)    \
     do {                        \
-        sprintf(message, " ");   \
+        sprintf(message, "%s (%s, line %d)", description, __FILE__, __LINE__);   \
         if (!(assertion)) {     \
             return 1;           \
         }                       \
@@ -18,7 +18,10 @@
 
 #define oj_assert_eq_int(expected, result)                                  \
     do {                                                                    \
-        sprintf(message, "[Expected: %d, got: %d]", expected, result);      \
+        sprintf(message, "[Expected: %d, got: %d], in %s at line %d", expected, result, __FILE__, __LINE__);      \
+        if(result != result && expected == expected) {                      \
+            return 1;                                                       \
+        }                                                                   \
         if(expected != result) {                                            \
             return 1;                                                       \
         }                                                                   \
@@ -26,7 +29,7 @@
 
 #define oj_assert_eq_float(expected, result)                                \
     do {                                                                    \
-        sprintf(message, "[Expected: %lf, got: %lf]", expected, result);    \
+        sprintf(message, "[Expected: %lf, got: %lf], in %s at line %d", expected, result, __FILE__, __LINE__);      \
         double epsilon = expected - result;                                 \
         if(result != result && expected == expected) {                      \
             return 1;                                                       \
@@ -50,7 +53,6 @@
         if(test_result && !oj_ignore_fresh) {                                                           \
             printf("\x1b[1;32m    FRESH! \x1b[0m");                                                     \
             printf(#test);                                                                              \
-            if(message) { printf("\x1b[35m %s \x1b[0m", message); }                                     \
             printf("\n");                                                                               \
         } else if(!test_result) {                                                                       \
             printf("\x1b[1;31m    ROTTEN \x1b[0m");                                                     \

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "testutils.h"
+#include "orange_juice.h"
 #include "../headers/vector.h"
 
 oj_test(test_vec_cmp_returns_true_for_same_vectors) {

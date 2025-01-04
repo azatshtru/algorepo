@@ -23,7 +23,7 @@ clean:
 run: build/main
 	@./build/main
 
-build/tests/%: tests/%.c $(obj) tests/testutils.h
+build/tests/%: tests/%.c $(obj) tests/orange_juice.h
 	gcc $< $(obj) -o $@
 
 test: $(compiled_tests)

@@ -18,8 +18,8 @@ typedef struct _vector {
     uint32 cap;
 } Vector;
 
-void** vec_allocate(uint32 cap, uint32 type_size);
-void** vec_from(uint32 len, ...);
+void* vec_allocate(uint32 cap, uint32 type_size);
+void* vec_from(uint32 len, ...);
 void vec_free(void* vec, void(*free_fn)(byte*));
 void vec_resize(Vector* vec, uint32 new_len);
 void vec_zap(void* vec, int index, void(*free_fn)(byte*));
