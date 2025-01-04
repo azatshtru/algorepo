@@ -34,4 +34,11 @@ void red_black_tree_right_rotate(RedBlackTree* tree, RedBlackTreeNode* node);
 void red_black_tree_insert(RedBlackTree* tree, int key);
 void red_black_tree_insert_fixup(RedBlackTree* tree, RedBlackTreeNode* node);
 
+RedBlackTreeNode* red_black_tree_minimum(RedBlackTree* tree, RedBlackTreeNode* node);
+RedBlackTreeNode* red_black_tree_search(RedBlackTree* tree, int key);
+
+int red_black_tree_delete(RedBlackTree* tree, int key);
+void red_black_tree_transplant(RedBlackTree* tree, RedBlackTreeNode* host, RedBlackTreeNode* graft);
+void red_black_tree_delete_fixup(RedBlackTree* tree, RedBlackTreeNode* sibling);
+
 #endif

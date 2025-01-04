@@ -133,3 +133,134 @@ void red_black_tree_insert_fixup(RedBlackTree* tree, RedBlackTreeNode* node) {
     }
     tree->root->color = BLACK;
 }
+
+RedBlackTreeNode* red_black_tree_minimum(RedBlackTree* tree, RedBlackTreeNode* node) {
+    while(node->left != tree->nil) {
+        node = node->left;
+    }
+    return node;
+}
+
+RedBlackTreeNode* red_black_tree_search(RedBlackTree* tree, int key) {
+    RedBlackTreeNode* node = tree->root;
+    while(node != tree->nil && key != node->key) {
+        if(key < node->key) {
+            node = node->left;
+        } else {
+            node = node->right;
+        }
+    }
+    return node;
+}
+
+int red_black_tree_delete(RedBlackTree* tree, int key) {
+    RedBlackTreeNode* deleted = red_black_tree_search(tree, key);
+
+    if(deleted == tree->nil) {
+        return -1;
+    }
+
+    RedBlackTreeNode* successor = deleted; // the in-order successor
+    Color deleted_original_color = successor->color;
+
+    RedBlackTreeNode* node; 
+
+    if(deleted->left == tree->nil) {
+        node = deleted->right;
+        red_black_tree_transplant(tree, deleted, deleted->right);
+    } else if(deleted->right == tree->nil) {
+        node = deleted->left;
+        red_black_tree_transplant(tree, deleted, deleted->left);
+    } else {
+        successor = red_black_tree_minimum(tree, deleted->right);
+        deleted_original_color = successor->color;
+        node = successor->right;
+        
+        if(successor->parent == deleted) {
+            node->parent = successor;
+        } else {
+            red_black_tree_transplant(tree, successor, successor->right);
+            successor->right = deleted->right;
+            successor->right->parent = successor;
+        }
+        red_black_tree_transplant(tree, deleted, successor);
+        successor->left = deleted->left;
+        successor->left->parent = successor; 
+        successor->color = deleted->color;
+    }
+    
+    if(deleted_original_color == BLACK) {
+        red_black_tree_delete_fixup(tree, node);
+    }
+    return 0;
+}
+
+void red_black_tree_delete_fixup(RedBlackTree* tree, RedBlackTreeNode* node) {
+    while(node != tree->root && node->color == BLACK) {
+        if(node == node->parent->left) {
+            RedBlackTreeNode* sibling = node->parent->right;
+            // sibling is red
+            if(sibling->color == RED) {
+                sibling->color = BLACK;
+                node->parent->color = RED;
+                red_black_tree_left_rotate(tree, node->parent);
+                sibling = node->parent->right;
+            }
+            // sibling and both its children are black
+            if(sibling->left->color == BLACK && sibling->right->color == BLACK) {
+                sibling->color = RED;
+                node = node->parent; 
+            } else {
+                // sibling and its same side child is black, and its opposite side child is red
+                if(sibling->right->color == BLACK) {
+                    sibling->left->color = BLACK;
+                    sibling->color = RED;
+                    red_black_tree_right_rotate(tree, sibling);
+                    sibling = node->parent->right;
+                }
+                // sibling is black and its same side child is red
+                sibling->color = node->parent->color;
+                node->parent->color = BLACK;
+                sibling->right->color = BLACK;
+                red_black_tree_left_rotate(tree, node->parent);
+                node = tree->root;
+            }
+        } else {
+            RedBlackTreeNode* sibling = node->parent->left;
+            if(sibling->color == RED) {
+                sibling->color = BLACK;
+                node->parent->color = RED;
+                red_black_tree_right_rotate(tree, node->parent);
+                sibling = node->parent->left;
+            }
+            if(sibling->right->color == BLACK && sibling->left->color == BLACK) {
+                sibling->color = RED;
+                node = node->parent; 
+            } else {
+                if(sibling->left->color == BLACK) {
+                    sibling->right->color = BLACK;
+                    sibling->color = RED;
+                    red_black_tree_left_rotate(tree, sibling);
+                    sibling = node->parent->left;
+                }
+                sibling->color = node->parent->color;
+                node->parent->color = BLACK;
+                sibling->left->color = BLACK;
+                red_black_tree_right_rotate(tree, node->parent);
+                node = tree->root;
+            }
+        }
+    }
+    node->color = BLACK;
+}
+
+void red_black_tree_transplant(RedBlackTree* tree, RedBlackTreeNode* host, RedBlackTreeNode* graft) {
+    if(host->parent == NULL) {
+        tree->root = graft;
+    } else if(host == host->parent->left) {
+        host->parent->left = graft;
+    } else {
+        host->parent->right = graft;
+    }
+    graft->parent = host->parent;
+}
