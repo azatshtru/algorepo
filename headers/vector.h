@@ -28,7 +28,7 @@ uint32 vec_len(void* vec);
 
 #define vector(type) type **
 #define vec_new(type) (type**)vec_allocate(VEC_INIT_SIZE, sizeof(type))
-#define veci(vec_ptr, _index) (*(vec_ptr))[(_index)]
+#define vi(vec_ptr, _index) (*(vec_ptr))[(_index)]
 #define vec_get(vec_ptr, _index) (*(vec_ptr))[(_index)]
 #define vec_set(vec_ptr, _index, value) (*(vec_ptr))[(_index)] = (value)
 
@@ -39,7 +39,7 @@ uint32 vec_len(void* vec);
 do {                                                \
     printf("vec![");                                \
     for(int i = 0; i < ((Vector*)(vec))->len; i++) {\
-        print_fn((vi(vec, i)));                     \
+        print_fn((vec_get(vec, i)));                     \
         printf(", ");                               \
     }                                               \
     printf("\b\b]\n");                              \
@@ -49,7 +49,7 @@ do {                                                \
 do {                                                \
     printf("vec![");                                \
     for(int i = 0; i < ((Vector*)(vec))->len; i++) {\
-        printf((identifier), (vi(vec, i)));         \
+        printf((identifier), (vec_get(vec, i)));         \
         printf(", ");                               \
     }                                               \
     printf("\b\b]\n");                              \

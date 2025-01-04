@@ -24,8 +24,8 @@ oj_test(priority_queue_is_empty_when_nothing_is_pushed) {
 oj_test(priority_queue_enqueue_42) {
     PriorityQueue(int) pq = priority_queue_new(int, int_identity);
     priority_queue_nq(pq, 42);
-    oj_assert_eq_int(0, priority_queue_len(pq));
-    oj_assert_eq_int(1, priority_queue_is_empty(pq));
+    int result = priority_queue_get(pq, 0);
+    oj_assert_eq_int(42, result);
     priority_queue_free(pq, NULL);
     oj_fresh;
 }
@@ -37,8 +37,15 @@ oj_prepare(priority_queue_setup_tests) {
     oj_fresh;
 }
 
+oj_prepare(priority_queue_io_tests) {
+    oj_run(priority_queue_enqueue_42);
+    oj_report;
+    oj_fresh;
+}
+
 
 int main() {
     oj_blend(priority_queue_setup_tests, 0);
+    oj_blend(priority_queue_io_tests, 0);
     return 0;
 }
