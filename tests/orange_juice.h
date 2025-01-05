@@ -18,20 +18,24 @@
 
 #define oj_assert_eq_int(expected, result)                                  \
     do {                                                                    \
-        sprintf(message, "[Expected: %d, got: %d], in %s at line %d", expected, result, __FILE__, __LINE__);      \
-        if(result != result && expected == expected) {                      \
+        int __xpct__ = expected;                                            \
+        int __rslt__ = result;                                              \
+        sprintf(message, "[Expected: %d, got: %d], in %s at line %d", __xpct__, __rslt__, __FILE__, __LINE__);      \
+        if(__rslt__ != __rslt__ && __xpct__ == __xpct__) {                      \
             return 1;                                                       \
         }                                                                   \
-        if(expected != result) {                                            \
+        if(__xpct__ != __rslt__) {                                            \
             return 1;                                                       \
         }                                                                   \
     } while(0)
 
 #define oj_assert_eq_float(expected, result)                                \
     do {                                                                    \
-        sprintf(message, "[Expected: %lf, got: %lf], in %s at line %d", expected, result, __FILE__, __LINE__);      \
-        double epsilon = expected - result;                                 \
-        if(result != result && expected == expected) {                      \
+        float __xpct__ = expected;                                            \
+        float __rslt__ = result;                                              \
+        sprintf(message, "[Expected: %lf, got: %lf], in %s at line %d", __xpct__, __rslt__, __FILE__, __LINE__);    \
+        double epsilon = __xpct__ - __rslt__;                                 \
+        if(__rslt__ != __rslt__ && __xpct__ == __xpct__) {                  \
             return 1;                                                       \
         }                                                                   \
         if(epsilon < -1e-4 || epsilon > 1e-4) {                             \

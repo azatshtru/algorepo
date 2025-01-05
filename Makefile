@@ -2,7 +2,9 @@ src := $(notdir $(shell cd src && find . -name '*.c' -or -name '*.s'))
 obj := $(addprefix obj/,$(src:.c=.o))
 headers := $(shell find headers -name '*.h')
 
-tests := $(shell cd tests && find . -name 'test*.c')
+TESTFILT = *
+
+tests := $(shell cd tests && find . -name '$(TESTFILT)test*.c')
 tests := $(foreach test,$(tests),tests/$(notdir $(test)))
 compiled_tests := $(addprefix build/,$(basename $(tests)))
 
