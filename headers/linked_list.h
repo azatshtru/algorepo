@@ -1,3 +1,8 @@
+#include "miniqutils.h"
+
+#ifndef LINKED_LIST
+#define LINKED_LIST
+
 typedef struct linked_list_node {
   struct linked_list_node* prev;
   struct linked_list_node* next;
@@ -12,3 +17,5 @@ void ll_insert(llnode* a, llnode* x, llnode* b);
 void ll_insert_before(llnode* head, llnode* x);
 void ll_insert_after(llnode* head, llnode* x);
 void llnode_free(llnode* node);
+
+#endif

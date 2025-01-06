@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include "miniqutils.h"
 
+#ifndef FIBONACCI_HEAP
+#define FIBONACCI_HEAP
+
 struct fibonacci_heap_node {
     int key;
     unsigned int degree;
@@ -51,3 +54,5 @@ void fibonacci_heap_remove_from_child_list(
 );
 struct fibonacci_heap_node* fibonacci_heap_delete(FibonacciHeap* heap, struct fibonacci_heap_node* node);
 void fibonacci_heap_traverse_and_print_keys(struct fibonacci_heap_node* node, int depth);
+
+#endif
