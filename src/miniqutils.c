@@ -10,6 +10,10 @@ void swap(void* a, void* b, unsigned int size) {
     memcpy(b, temp, size);
 }
 
+int cantor_pairing(int a, int b) {
+    return ((a+b)*(a+b+1))/2 + b;
+}
+
 float negative_infinity() {
     union {
         int i;

@@ -53,3 +53,13 @@ int vec_cmp(void* v1_ptr, void* v2_ptr) {
 uint32 vec_len(void* vec) {
     return ((Vector*)vec)->len;
 }
+
+int vec_shush_index(void* vec, void* value_ptr) {
+    Vector* v = (Vector*)vec;
+    for(int i = 0; i < v->len; i++) {
+        if(!memcmp(v->data+i*v->type_size, v->tmp, v->type_size)) {
+            return i;
+        }
+    }
+    return -1;
+}

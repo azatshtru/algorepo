@@ -40,6 +40,7 @@ void hashset_shush_remove(void* hashset_ptr, void* value_ptr);
 unsigned int hashset_shush_contains(void* hashset_ptr, void* value_ptr);
 unsigned int hashset_compute_resize(struct hashset* hashset);
 void hashset_resize_rehash(struct hashset* hashset, unsigned int new_cardinality);
+unsigned int hashset_len(void* hashset);
 
 #define hashset_new(type, hash_fn, cmp_fn) hashset_allocate(sizeof(type), hash_fn, cmp_fn);
 #define hashset_insert(hashset_ptr, value) (**((hashset_ptr)+2)=(value), hashset_chqnsrt(hashset_ptr, *((hashset_ptr)+2)))

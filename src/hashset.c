@@ -133,3 +133,7 @@ void hashset_resize_rehash(struct hashset* hashset, unsigned int new_cardinality
     free(old_data);
     free(old_data_states);
 }
+
+unsigned int hashset_len(void* hashset) {
+    return ((struct hashset*)hashset)->len;
+}
