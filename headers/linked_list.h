@@ -10,7 +10,7 @@ typedef struct linked_list_node {
 
 /* based on linux kernel implementation of linked list */
 
-#define llnode_container(type, ptr, member_name) (type*)(ptr - (unsigned long)(&(((type*)0)->member_name)))
+#define llnode_container(type, ptr, member_name) ((type*)(ptr - (unsigned long)(&(((type*)0)->member_name))))
 
 void llnode_new(llnode* head);
 void ll_insert(llnode* a, llnode* x, llnode* b);

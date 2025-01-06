@@ -10,9 +10,10 @@ oj_test(graph_allocates) {
 
 oj_test(graph_vertex_allocates) {
     struct graph g = graph_new();
-    struct vertex* v = graph_add_vertex(&g);
-    oj_assert(v != NULL, "vertex didn't allocate properly");
-    oj_assert(v->neighbors != NULL, "neighbors vectors didn't allocate properly");
+    struct vertex vertex;
+    graph_add_vertex(&g, &vertex);
+    oj_assert(&vertex != NULL, "vertex didn't allocate properly");
+    oj_assert(vertex.neighbors != NULL, "neighbors vectors didn't allocate properly");
     oj_fresh;
 }
 

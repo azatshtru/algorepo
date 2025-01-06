@@ -66,3 +66,8 @@ void queue_zap_back(void* queue_ptr, void(*free_fn)(char*)) {
     --q->len;
     queue_check_and_resize(q);
 }
+
+int queue_is_empty(void* queue_ptr) {
+    Queue* q = (Queue*)queue_ptr;
+    return q->len == 0;
+}

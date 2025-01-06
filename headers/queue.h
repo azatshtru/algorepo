@@ -26,6 +26,7 @@ void queue_resize(Queue* queue_ptr, uint32 new_len);
 void queue_check_and_resize(Queue* q);
 void queue_zap_front(void* queue_ptr, void(*free_fn)(char*));
 void queue_zap_back(void* queue_ptr, void(*free_fn)(char*));
+int queue_is_empty(void* queue_ptr);
 
 #define VecDeque(type) type **
 #define queue_new(type) (type **)queue_allocate(QUEUE_INIT_SIZE, sizeof(type))
