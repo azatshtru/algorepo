@@ -137,3 +137,10 @@ void hashset_resize_rehash(struct hashset* hashset, unsigned int new_cardinality
 unsigned int hashset_len(void* hashset) {
     return ((struct hashset*)hashset)->len;
 }
+
+int hashset_lazy_iterate(void* hashset_ptr, int index) {
+    struct hashset* hashset = (struct hashset*)hashset_ptr;
+    if(index >= hashset->cardinality) { return -1; }
+    while(hashset->data_states[++index] != 2 && index < hashset->cardinality) {}
+    return index;
+}

@@ -31,4 +31,26 @@ unsigned int graph_dijkstra(struct graph* graph, unsigned int s, unsigned int e)
     return distance[e];
 }
 
+unsigned int graph_bellman_ford(struct graph* graph, unsigned int s, unsigned int e) {
+    int vertex_len = graph_vertices_len(graph);
+    int distance[vertex_len+1];
+    for(int i = 1; i <= vertex_len; i++) {
+        distance[i] = INT32_MAX;
+    }
+    distance[s] = 0;
+
+     //This is because the order in which iteration happens might not always be from max to least unless the edges are sorted in reverse order according to their weights
+    for(int i = 1; i <= vertex_len-1; i++) {
+        int j = -1;
+        while((j = hashset_lazy_iterate(graph->edges, j)) != -1) {
+            struct edge* edge = (*graph->edges)[j];
+            int a = edge->from->i;
+            int b = edge->to->i;
+            int w = weighted_edge_weight(edge);
+            distance[b] = distance[b] < distance[a]+w ? distance[b] : distance[a]+w;
+        }
+    }
+
+    return distance[e];
+}
 
