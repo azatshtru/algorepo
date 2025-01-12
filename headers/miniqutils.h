@@ -4,6 +4,8 @@
 #ifndef MINIQUTILS
 #define MINIQUTILS
 
+void memzero(void* array, int len);
+int power(int base, int exponent);
 void swap(void* a, void* b, unsigned int size);
 int cantor_pairing(int a, int b);
 float negative_infinity();

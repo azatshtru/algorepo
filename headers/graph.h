@@ -32,7 +32,7 @@ unsigned int graph_edges_len(struct graph* graph);
 
 void graph_add_vertex(struct graph* graph, struct vertex* v);
 void graph_remove_vertex(struct graph* graph, struct vertex* x);
-struct edge* graph_add_edge(struct graph* graph, struct vertex* from, struct vertex* to);
+void graph_add_edge(struct graph* graph, struct edge* edge, struct vertex* from, struct vertex* to);
 void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* to);
 
 struct vertex* graph_vertex_by_index(struct graph* graph, int index);
@@ -47,7 +47,7 @@ struct vertex_int {
     struct vertex v;
 };
 
-struct vertex_int vertex_int_new(int value);
+struct vertex_int vertex_int_new(struct graph* graph, int value);
 int vertex_int_value(struct vertex* v);
 
 struct weighted_edge {
@@ -55,7 +55,7 @@ struct weighted_edge {
     struct edge edge;
 };
 
-struct weighted_edge weighted_edge_new(int weight);
+struct weighted_edge weighted_edge_new(struct graph* graph, int weight, struct vertex* from, struct vertex* to);
 int weighted_edge_weight(struct edge* edge);
 
 

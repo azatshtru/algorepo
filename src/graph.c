@@ -30,13 +30,11 @@ int graph_edge_cmp(void* edge1, void* edge2) {
     return a->from->i == b->from->i && a->to->i == b->to->i;
 }
 
-struct edge* graph_add_edge(struct graph* graph, struct vertex* from, struct vertex* to) {
-    struct edge* edge = malloc(sizeof(struct edge));
+void graph_add_edge(struct graph* graph, struct edge* edge, struct vertex* from, struct vertex* to) {
     edge->from = from;
     edge->to = to;
     hashset_insert(graph->edges, edge);
     vec_push(from->neighbors, to);
-    return edge;
 }
 
 void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* to) {
@@ -54,7 +52,6 @@ unsigned int graph_vertex_identity(struct graph* graph) {
 }
 
 void graph_add_vertex(struct graph* graph, struct vertex* v) {
-    v = malloc(sizeof(struct vertex));
     int identity = graph_vertex_identity(graph);
     v->neighbors = vec_new(struct vertex*);
     v->i = identity;
@@ -103,9 +100,10 @@ vector(struct vertex*) graph_vertex_neighbors(struct vertex* x) {
     return x->neighbors;
 }
 
-struct vertex_int vertex_int_new(int value) {
+struct vertex_int vertex_int_new(struct graph* graph, int value) {
     struct vertex_int v;
     v.value = value;
+    graph_add_vertex(graph, &v.v);
     return v;
 }
 
@@ -113,9 +111,10 @@ int vertex_int_value(struct vertex* v) {
     return container_from_ptr(struct vertex_int, v, v)->value;
 }
 
-struct weighted_edge weighted_edge_new(int weight) {
+struct weighted_edge weighted_edge_new(struct graph* graph, int weight, struct vertex* from, struct vertex* to) {
     struct weighted_edge edge;
     edge.weight = weight;
+    graph_add_edge(graph, &edge.edge, from, to);
     return edge;
 }
 

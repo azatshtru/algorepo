@@ -26,6 +26,11 @@ oj_test(ln_negative_3) {
     oj_fresh;
 }
 
+oj_test(four_to_the_power_10) {
+    oj_assert_eq_int(1048576, power(4, 10));
+    oj_fresh;
+}
+
 oj_prepare(natural_log_tests) {
     oj_run(ln_5);
     oj_run(ln_1);
@@ -36,8 +41,15 @@ oj_prepare(natural_log_tests) {
     oj_fresh;
 }
 
+oj_prepare(exponentiation_tests) {
+    oj_run(four_to_the_power_10);
+    oj_report;
+    oj_fresh;
+}
+
 int main() {
     oj_blend(natural_log_tests, 0);
+    oj_blend(exponentiation_tests, 0);
     return 0;
 }
 

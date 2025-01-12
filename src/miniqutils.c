@@ -3,6 +3,18 @@
 #define EULER_CONSTANT 2.718281828459045235
 #define PI 3.14159265358979323846
 
+void memzero(void* array, int len) {
+    memset(array, 0, len);
+}
+
+int power(int base, int exponent) {
+    int x = 1;
+    for(int i = 0; i < exponent; i++) {
+        x *= base;
+    }
+    return x;
+}
+
 void swap(void* a, void* b, unsigned int size) {
     char temp[size];
     memcpy(temp, a, size);

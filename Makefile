@@ -3,10 +3,11 @@ obj := $(addprefix obj/,$(src:.c=.o))
 headers := $(shell find headers -name '*.h')
 
 TESTFILT = *
-
 tests := $(shell cd tests && find . -name '$(TESTFILT)test*.c')
 tests := $(foreach test,$(tests),tests/$(notdir $(test)))
 compiled_tests := $(addprefix build/,$(basename $(tests)))
+
+examples := examples/dynamic_programming_counting_tilings.c
 
 .PHONY: all clean run test
 
@@ -24,6 +25,10 @@ clean:
 
 run: build/main
 	@./build/main
+
+example: $(examples) $(obj) tests/orange_juice.h
+	gcc $< $(obj) -o example
+	./example
 
 build/tests/%: tests/%.c $(obj) tests/orange_juice.h
 	gcc $< $(obj) -o $@
