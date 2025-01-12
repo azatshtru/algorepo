@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "../headers/miniqutils.h"
 
+/// O(n4^{2m}) implementation
+
 // < left tile piece
 // > right tile piece
 // ^ up tile piece
@@ -12,21 +14,6 @@ int tilings_row_print(char* row, int dim_x) {
         printf("%c, ", row[x]);
     }
     printf("\n");
-    return 0;
-}
-
-int tilings_permute_rows(int last, char* row, int dim_x, int x) {
-    for(int i = 0; i < 4; i++) {
-        if(x == 0 && tilepiece[i] == '>') { continue; }
-        if(x == dim_x - 1 && tilepiece[i] == '<') { continue; }
-        if(x > 0 && row[x - 1] == '<' && tilepiece[i] != '>') { continue; }
-        if(x > 0 && row[x - 1] != '<' && tilepiece[i] == '>') { continue; }
-        row[x] = tilepiece[i];
-        if(x < dim_x - 1) {
-            //tilings_permute_rows(row, states, dim_x, x+1);
-            continue;
-        }
-    }
     return 0;
 }
 
