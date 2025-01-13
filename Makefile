@@ -1,6 +1,8 @@
 src := $(notdir $(wildcard src/*.c))
-obj := $(addprefix obj/,$(src:.c=.o))
+obj := $(addprefix build/obj/,$(src:.c=.o))
 headers := $(wildcard headers/*.h)
+
+dependencies := $(addprefix build/dependencies/,$(src:.c=.d))
 
 TESTFILT = *
 tests := $(addprefix build/,$(basename $(wildcard tests/*.c)))
@@ -14,23 +16,30 @@ all: build/main
 build/main: $(obj) main.c
 	gcc main.c $(obj) -o build/main
 
-obj/%.o: src/%.c $(headers)
+build/dependencies/%.d: src/%.c
+	gcc -MM -MT build/obj/$*.o $< -MF $@
+
+build/obj/%.o: src/%.c
 	gcc $< -o $@ -c
-
-clean:
-	@rm -f build/main *.o obj/*.o build/tests/* build/examples/*
-	@echo cleaned.
-
-run: build/main
-	@./build/main
 
 examples: $(examples) $(obj) tests/orange_juice.h
 
 build/examples/%: examples/%.c $(obj) tests/orange_juice.h $(headers)
 	gcc $< $(obj) -o $@
 
-build/tests/%: tests/%.c $(obj) tests/orange_juice.h
+build/tests/%: tests/%.c $(obj) tests/orange_juice.h $(headers)
 	gcc $< $(obj) -o $@
 
 test: $(tests)
-	$(foreach x,$(tests),./$(x);)
+	@$(foreach x,$(tests),./$(x);)
+
+-include $(dependencies)
+
+clean:
+	@rm -f build/obj/*.o build/tests/* build/examples/* build/main* build/dependencies/*
+	@echo cleaned.
+
+run: build/main
+	@echo
+	@./build/main
+

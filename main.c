@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "headers/btree.h"
-#include "headers/vector.h"
 
 int main() {
 
