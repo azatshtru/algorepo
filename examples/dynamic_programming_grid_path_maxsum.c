@@ -16,3 +16,7 @@ int grid_path_max_sum(int* grid, int n) {
     }
     return grid[n*n];
 }
+
+int main() {
+    return 0;
+}

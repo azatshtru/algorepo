@@ -38,3 +38,7 @@ int total_coin_combinations(int* coins, int pocketsize, int n) {
     }
     return count[n];
 }
+
+int main() {
+    return 0;
+}

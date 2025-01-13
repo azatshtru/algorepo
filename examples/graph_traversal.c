@@ -36,3 +36,7 @@ void graph_depth_first_search(struct graph* graph, struct vertex* s, unsigned in
         graph_depth_first_search(graph, vec_get(graph_vertex_neighbors(s), i), visited);
     }
 }
+
+int main() {
+    return 0;
+}
