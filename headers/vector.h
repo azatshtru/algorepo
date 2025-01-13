@@ -75,9 +75,9 @@ do {                                                \
     {                                                         \
         vec_push((vec), value);                               \
         Vector *__v__ = (Vector *)(vec);                      \
-        memcpy(*(vec) + _index + 1,                           \
-               *(vec) + _index,                               \
-               __v__->type_size * (__v__->len - _index - 1)); \
+        for(int i = __v__->len - 1; i > _index; i--) {      \
+            (*(vec))[i] = (*(vec))[i-1];                  \
+        }                                                   \
         (*(vec))[_index] = (value);                           \
     } while (0)
 

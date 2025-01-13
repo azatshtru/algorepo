@@ -49,18 +49,18 @@ void btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
 
     // create a new split_node and add it to parent's list of children.
     struct btree_node* split_node = btree_node_new(node->is_leaf);
+
     vec_insert(parent_node->children, i+1, split_node);
 
     // insert the median of the full child node into parent node
     vec_insert(parent_node->keys, i, vec_get(node->keys, t-1));
 
+
     // split apart child node's keys into itself & split_node
     for(int j = t; j < 2*t-1; j++) {
-        vec_push(split_node->keys, vec_get(node->keys, j)); 
+        vec_push(split_node->keys, vec_pop(node->keys, t)); 
     }
-    for(int j = 0; j < t; j++) {
-        vec_zap(node->keys, -1, NULL); 
-    }
+    vec_zap(node->keys, -1, NULL); 
 
     // vec_resize((Vector*)split_node.keys, t-1);
     // memcpy(split_node.keys, *(node->keys), t-1 * ((Vector*)split_node.keys)->type_size);
@@ -70,11 +70,9 @@ void btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
     // if child is not a leaf, we reassign child's children to itself & split_node.
     if(!node->is_leaf) {
         for(int j = t; j < 2*t; j++) {
-            vec_push(split_node->children, vec_get(node->children, j)); 
+            vec_push(split_node->children, vec_pop(node->children, t)); 
         }
-        for(int j = 0; j < t+1; j++) {
-            vec_zap(node->children, -1, NULL); 
-        }
+        vec_zap(node->children, -1, NULL); 
     }
 }
 
@@ -273,15 +271,21 @@ void btree_delete(BTree* btree, struct btree_node* node, int key) {
 
 void btree_traverse_and_print_keys(BTree* btree) {
     VecDeque(struct btree_node*) q = queue_new(struct btree_node*);
+    VecDeque(int) levels = queue_new(int);
     queue_push_back(q, btree->root);
+    queue_push_back(levels, 0);
 
     while(!queue_is_empty(q)) {
         struct btree_node* node = queue_pop_front(q);
+        int level = queue_pop_front(levels);
+        printf("level: %d: ", level);
         vec_print_primitive(node->keys, "%d");
         if(node->is_leaf) { continue; }
         for(int i = 0; i < vec_len(node->children); i++) {
             queue_push_back(q, vec_get(node->children, i));
+            queue_push_back(levels, level+1);
         }
     }
     queue_free(q, NULL);
+    queue_free(levels, NULL);
 }

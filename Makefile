@@ -1,6 +1,6 @@
 src := $(notdir $(wildcard src/*.c))
 obj := $(addprefix obj/,$(src:.c=.o))
-headers := $(notdir $(wildcard 'headers/*.h'))
+headers := $(wildcard headers/*.h)
 
 TESTFILT = *
 tests := $(addprefix build/,$(basename $(wildcard tests/*.c)))
@@ -11,10 +11,10 @@ examples = $(addprefix build/,$(basename $(wildcard examples/*.c)))
 
 all: build/main
 
-build/main: $(obj) main.c $(headers)
+build/main: $(obj) main.c
 	gcc main.c $(obj) -o build/main
 
-obj/%.o: src/%.c headers/%.h
+obj/%.o: src/%.c $(headers)
 	gcc $< -o $@ -c
 
 clean:

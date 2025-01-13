@@ -1,20 +1,35 @@
 #include <stdio.h>
 #include "headers/btree.h"
+#include "headers/vector.h"
 
 int main() {
+
     BTree tree = btree_new(3);
-    btree_insert(&tree, 1);
-    btree_insert(&tree, 2);
-    btree_insert(&tree, 3);
-    btree_insert(&tree, 4);
+    btree_insert(&tree, 977);
+    btree_insert(&tree, 408);
+    btree_insert(&tree, 849);
+    btree_insert(&tree, 628);
+    btree_insert(&tree, 276);
+    btree_insert(&tree, 379);
+    btree_insert(&tree, 500);
+    btree_insert(&tree, 708);
     btree_insert(&tree, 5);
-    btree_insert(&tree, 6);
-    btree_insert(&tree, 7);
-    btree_insert(&tree, 8);
-    btree_insert(&tree, 9);
-    btree_insert(&tree, 10);
-    btree_insert(&tree, 11);
-    btree_insert(&tree, 12);
+    btree_insert(&tree, 589);
+    btree_insert(&tree, 788);
+    btree_insert(&tree, 525);
+    btree_insert(&tree, 132);
+    btree_insert(&tree, 604);
+    btree_insert(&tree, 675);
+    btree_insert(&tree, 759);
+    btree_insert(&tree, 575);
+    btree_insert(&tree, 860);
+    btree_insert(&tree, 740);
+    btree_insert(&tree, 715);
+    btree_insert(&tree, 184);
+    btree_insert(&tree, 604);
+    btree_insert(&tree, 29);
+
     btree_traverse_and_print_keys(&tree);
+    
     return 0;
 }

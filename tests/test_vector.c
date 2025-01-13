@@ -103,6 +103,7 @@ oj_test(vec_contains_returns_true_if_element_is_present) {
     oj_fresh;
 }
 
+
 oj_prepare(vector_index_tests) {
     oj_run(vec_index_returns_index_of_element);
     oj_run(vec_contains_returns_true_if_element_is_present);
