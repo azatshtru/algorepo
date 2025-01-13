@@ -3,11 +3,9 @@ obj := $(addprefix obj/,$(src:.c=.o))
 headers := $(shell find headers -name '*.h')
 
 TESTFILT = *
-tests := $(shell cd tests && find . -name '$(TESTFILT)test*.c')
-tests := $(foreach test,$(tests),tests/$(notdir $(test)))
-compiled_tests := $(addprefix build/,$(basename $(tests)))
+tests := $(addprefix build/,$(basename $(wildcard tests/*.c)))
 
-examples := examples/dynamic_programming_counting_tilings.c
+examples = $(addprefix build/,$(basename $(wildcard examples/*.c)))
 
 .PHONY: all clean run test
 
@@ -27,13 +25,15 @@ run: build/main
 	@./build/main
 
 example: $(examples) $(obj) tests/orange_juice.h
-	gcc $< $(obj) -o example
-	./example
+	./build/examples/$(example)
+
+build/examples/%: examples/%.c $(obj) tests/orange_juice.h
+	gcc $< $(obj) -o $@
 
 build/tests/%: tests/%.c $(obj) tests/orange_juice.h
 	gcc $< $(obj) -o $@
 
-test: $(compiled_tests)
-	@for x in $(compiled_tests); do \
+test: $(tests)
+	@for x in $(tests); do \
 		./$$x; \
 	done

@@ -11,6 +11,7 @@ void* priority_queue_allocate(uint32 type_size, int(*priority)(void*)) {
 void priority_queue_free(void* q_ptr, void(*free_fn)(void*)) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
     vec_free(q->v, free_fn);
+    vec_free(q->proxy_priority, NULL);
     free(q);
 }
 
@@ -26,7 +27,7 @@ int priority_queue_is_empty(void* q_ptr) {
 int priority_queue_priority(void* q_ptr, int index) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
     if(q->priority == NULL) {
-        return (*q->proxy_priority)[index];
+        return vec_get(q->proxy_priority, index);
     }
     return q->priority(q->v->data + index*q->v->type_size);
 }
@@ -56,5 +57,5 @@ void priority_queue_swap(void* q_ptr, int a, int b) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
     int typesize = q->v->type_size;
     swap(q->v->data + a*typesize, q->v->data + b*typesize, typesize);
-    swap(q->proxy_priority[a], q->proxy_priority[b], sizeof(int));
+    swap(*q->proxy_priority + a, *q->proxy_priority + b, sizeof(int));
 }

@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include "vector.h"
+#include "queue.h"
 
 #ifndef BTREE
 #define BTREE
 
 struct btree_node {
     vector(int) keys;
-    vector(struct btree_node) children;
+    vector(struct btree_node*) children;
     int is_leaf;
 };
 
@@ -17,6 +18,7 @@ typedef struct btree {
 
 BTree btree_new(int degree);
 int btree_init(struct btree* btree, int degree);
+struct btree_node* btree_node_new(int is_leaf);
 int btree_node_init(struct btree_node* node_ptr, int is_leaf);
 
 struct btree_node* btree_search(struct btree btree, int key, struct btree_node* node);
@@ -31,5 +33,7 @@ int btree_delete_predecessor(BTree* btree, struct btree_node* node);
 int btree_delete_successor(BTree* btree, struct btree_node* node);
 void btree_delete_merge(BTree* btree, struct btree_node* node, int i, int j);
 void btree_delete_sibling(BTree* btree, struct btree_node* node, int i, int j);
+
+void btree_traverse_and_print_keys(BTree* btree);
 
 #endif
