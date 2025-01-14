@@ -48,24 +48,20 @@ void btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
     struct btree_node* node = vec_get(parent_node->children, i);
 
     // create a new split_node and add it to parent's list of children.
-    struct btree_node* split_node = btree_node_new(node->is_leaf);
+    struct btree_node* split_node = malloc(sizeof(struct btree_node*));
 
     vec_insert(parent_node->children, i+1, split_node);
 
     // insert the median of the full child node into parent node
     vec_insert(parent_node->keys, i, vec_get(node->keys, t-1));
 
+    btree_node_init(split_node, node->is_leaf);
 
     // split apart child node's keys into itself & split_node
     for(int j = t; j < 2*t-1; j++) {
         vec_push(split_node->keys, vec_pop(node->keys, t)); 
     }
     vec_zap(node->keys, -1, NULL); 
-
-    // vec_resize((Vector*)split_node.keys, t-1);
-    // memcpy(split_node.keys, *(node->keys), t-1 * ((Vector*)split_node.keys)->type_size);
-    // vec_resize((Vector*)node->keys, t-1);
-
 
     // if child is not a leaf, we reassign child's children to itself & split_node.
     if(!node->is_leaf) {

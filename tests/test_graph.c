@@ -17,6 +17,10 @@ oj_test(graph_vertex_allocates) {
     oj_fresh;
 }
 
+oj_test(graph_add_int_vertex) {
+    oj_fresh;
+}
+
 oj_prepare(graph_setup_tests) {
     oj_run(graph_allocates);
     oj_run(graph_vertex_allocates);

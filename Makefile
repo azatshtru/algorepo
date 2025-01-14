@@ -5,7 +5,7 @@ headers := $(wildcard headers/*.h)
 dependencies := $(addprefix build/dependencies/,$(src:.c=.d))
 
 TESTFILT = *
-tests := $(addprefix build/,$(basename $(wildcard tests/*.c)))
+tests := $(addprefix build/,$(basename $(wildcard tests/$(TESTFILT)test*.c)))
 
 examples = $(addprefix build/,$(basename $(wildcard examples/*.c)))
 
