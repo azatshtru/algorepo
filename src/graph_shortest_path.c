@@ -18,8 +18,8 @@ unsigned int graph_dijkstra(struct graph* graph, unsigned int s, unsigned int e)
         if(processed[index]) { continue; }
         processed[index] = 1;
         struct vertex* current = graph_vertex_by_index(graph, index);
-        for(int i = 0; i < graph_vertex_neighbors_len(current); i++) {
-            struct vertex* neighbour = vec_get(graph_vertex_neighbors(current), i);
+        for(int i = 0; i < graph_vertex_out_degree(current); i++) {
+            struct vertex* neighbour = vec_get(current->out, i);
             int weight = weighted_edge_weight(graph_edge_by_from_to(graph, current, neighbour));
             if(distance[index]+weight < distance[neighbour->i]) {
                 distance[neighbour->i] = distance[index]+weight;

@@ -17,8 +17,8 @@ void graph_breadth_first_search(struct graph* graph, struct vertex* origin) {
 
         printf("BFS: %d\n", vertex_int_value(s));
 
-        for(int i = 0; i < vec_len(s->neighbors); i++) {
-            struct vertex* u = vec_get(graph_vertex_neighbors(s), i);
+        for(int i = 0; i < vec_len(s->out); i++) {
+            struct vertex* u = vec_get(s->out, i);
             if(visited[u->i]) { continue; }
             visited[u->i] = 1;
             distance[u->i] = distance[index] + 1;
@@ -32,8 +32,8 @@ void graph_depth_first_search(struct graph* graph, struct vertex* s, unsigned in
     visited[s->i] = 1;
 
     printf("DFS: %d\n", vertex_int_value(s));
-    for(int i = 0; i < graph_vertex_neighbors_len(s); i++) {
-        graph_depth_first_search(graph, vec_get(graph_vertex_neighbors(s), i), visited);
+    for(int i = 0; i < graph_vertex_out_degree(s); i++) {
+        graph_depth_first_search(graph, vec_get(s->out, i), visited);
     }
 }
 

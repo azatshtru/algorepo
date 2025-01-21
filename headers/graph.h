@@ -6,7 +6,8 @@
 #include "miniqutils.h"
 
 struct vertex {
-    vector(struct vertex*) neighbors;
+    vector(struct vertex*) out;
+    vector(struct vertex*) in;
     unsigned int i;
 };
 
@@ -30,32 +31,32 @@ int graph_edge_cmp(void* edge1, void* edge2);
 unsigned int graph_vertices_len(struct graph* graph);
 unsigned int graph_edges_len(struct graph* graph);
 
-void graph_add_vertex(struct graph* graph, struct vertex* v);
+struct vertex* graph_add_vertex(struct graph* graph);
 void graph_remove_vertex(struct graph* graph, struct vertex* x);
-void graph_add_edge(struct graph* graph, struct edge* edge, struct vertex* from, struct vertex* to);
+struct edge* graph_add_edge(struct graph* graph, struct vertex* from, struct vertex* to);
 void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* to);
 
 struct vertex* graph_vertex_by_index(struct graph* graph, int index);
 struct edge* graph_edge_by_from_to(struct graph* graph, struct vertex* from, struct vertex* to);
 
-int graph_vertex_adjacent(struct vertex* x, struct vertex* y);
-int graph_vertex_neighbors_len(struct vertex* x);
-vector(struct vertex*) graph_vertex_neighbors(struct vertex* x);
+int graph_vertex_adjacent(struct graph* graph, struct vertex* x, struct vertex* y);
+int graph_vertex_out_degree(struct vertex* x);
+int graph_vertex_in_degree(struct vertex* x);
 
 struct vertex_int {
     int value;
-    struct vertex v;
+    struct vertex* v;
 };
 
-struct vertex_int vertex_int_new(struct graph* graph, int value);
+struct vertex_int vertex_int_init(struct graph* graph, int value);
 int vertex_int_value(struct vertex* v);
 
 struct weighted_edge {
     int weight;
-    struct edge edge;
+    struct edge* edge;
 };
 
-struct weighted_edge weighted_edge_new(struct graph* graph, int weight, struct vertex* from, struct vertex* to);
+struct weighted_edge weighted_edge_init(struct graph* graph, int weight, struct vertex* from, struct vertex* to);
 int weighted_edge_weight(struct edge* edge);
 
 

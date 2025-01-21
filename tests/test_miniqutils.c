@@ -31,6 +31,16 @@ oj_test(four_to_the_power_10) {
     oj_fresh;
 }
 
+oj_test(canton_pairing_of_2_and_3_returns_18) {
+    oj_assert_eq_int(18, cantor_pairing(2, 3));
+    oj_fresh;
+}
+
+oj_test(canton_pairing_of_5_and_8_returns_99) {
+    oj_assert_eq_int(99, cantor_pairing(5, 8));
+    oj_fresh;
+}
+
 oj_prepare(natural_log_tests) {
     oj_run(ln_5);
     oj_run(ln_1);
@@ -47,9 +57,17 @@ oj_prepare(exponentiation_tests) {
     oj_fresh;
 }
 
+oj_prepare(cantor_pairing_tests) {
+    oj_run(canton_pairing_of_2_and_3_returns_18);
+    oj_run(canton_pairing_of_5_and_8_returns_99);
+    oj_report;
+    oj_fresh;
+}
+
 int main() {
     oj_blend(natural_log_tests, 0);
     oj_blend(exponentiation_tests, 0);
+    oj_blend(cantor_pairing_tests, 0);
     return 0;
 }
 
