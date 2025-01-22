@@ -6,11 +6,18 @@ dependencies := $(addprefix build/dependencies/,$(src:.c=.d))
 
 tests := $(addprefix build/,$(basename $(wildcard tests/test*.c)))
 
-examples = $(addprefix build/,$(basename $(wildcard examples/*.c)))
+examples := $(addprefix build/,$(basename $(wildcard examples/*.c)))
 
-.PHONY: all clean run test
+directories := build build/dependencies build/examples build/obj build/tests src tests headers examples docs
 
-all: build/main
+.PHONY: all clean run test setup
+
+all: setup build/main $(examples)
+
+setup: $(directories)
+
+$(directories):
+	mkdir -p $@
 
 build/main: $(obj) main.c
 	gcc main.c $(obj) -o build/main
@@ -21,27 +28,25 @@ build/dependencies/%.d: src/%.c
 build/obj/%.o: src/%.c
 	gcc $< -o $@ -c
 
-examples: $(examples) $(obj) tests/orange_juice.h
-
 build/examples/%: examples/%.c $(obj) tests/orange_juice.h $(headers)
 	gcc $< $(obj) -o $@
 
 build/tests/%: tests/%.c $(obj) tests/orange_juice.h $(headers)
 	gcc $< $(obj) -o $@
 
-test: $(tests)
+test: setup $(tests)
 	@$(foreach x,$(tests),./$(x);)
 
-test_%: build/tests/test_%
-	./$<
-
--include $(dependencies)
+test_%: setup build/tests/test_%
+	@./build/tests/$@
 
 clean:
 	@rm -f build/obj/*.o build/tests/* build/examples/* build/main* build/dependencies/*
+	@rm -rf build
 	@echo cleaned.
 
-run: build/main
+run: setup build/main
 	@echo
 	@./build/main
 
+-include $(dependencies)
