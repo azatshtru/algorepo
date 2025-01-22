@@ -48,7 +48,7 @@ struct vertex_int {
     struct vertex v;
 };
 
-struct vertex_int vertex_int_new(struct graph* graph, int value);
+void vertex_int_init(struct vertex_int* v, struct graph* graph, int value);
 int vertex_int_value(struct vertex* v);
 
 struct weighted_edge {
@@ -56,7 +56,12 @@ struct weighted_edge {
     struct edge edge;
 };
 
-struct weighted_edge weighted_edge_new(struct graph* graph, int weight, struct vertex* from, struct vertex* to);
+void weighted_edge_init(
+    struct weighted_edge* edge,
+    struct graph* graph,
+    int weight,
+    struct vertex* from, struct vertex* to
+);
 int weighted_edge_weight(struct edge* edge);
 
 #endif

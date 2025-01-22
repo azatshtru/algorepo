@@ -115,22 +115,23 @@ int graph_vertex_in_degree(struct vertex* x) {
     return vec_len(x->in);
 }
 
-struct vertex_int vertex_int_new(struct graph* graph, int value) {
-    struct vertex_int v;
-    v.value = value;
-    graph_add_vertex(graph, &v.v);
-    return v;
+void vertex_int_init(struct vertex_int* v, struct graph* graph, int value) {
+    v->value = value;
+    graph_add_vertex(graph, &v->v);
 }
 
 int vertex_int_value(struct vertex* vertex) {
     return container_of(vertex, struct vertex_int, v)->value;
 }
 
-struct weighted_edge weighted_edge_new(struct graph* graph, int weight, struct vertex* from, struct vertex* to) {
-    struct weighted_edge edge;
-    edge.weight = weight;
-    graph_add_edge(graph, &edge.edge, from, to);
-    return edge;
+void weighted_edge_init(
+    struct weighted_edge* edge,
+    struct graph* graph,
+    int weight,
+    struct vertex* from, struct vertex* to
+) {
+    edge->weight = weight;
+    graph_add_edge(graph, &edge->edge, from, to);
 }
 
 int weighted_edge_weight(struct edge* edge) {

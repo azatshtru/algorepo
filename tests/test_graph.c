@@ -414,7 +414,8 @@ oj_test(test_graph_degree_queries) {
 
 oj_test(test_graph_add_vertex_int) {
     struct graph g = graph_new();
-    struct vertex_int v = vertex_int_new(&g, 5);
+    struct vertex_int v;
+    vertex_int_init(&v, &g, 5);
     oj_assert_eq_int(v.value, 5);
     graph_free(&g);
     oj_fresh;
@@ -422,7 +423,8 @@ oj_test(test_graph_add_vertex_int) {
 
 oj_test(vertex_int_value_should_return_value_of_vertex_int) {
     struct graph g = graph_new();
-    struct vertex_int v = vertex_int_new(&g, 42);
+    struct vertex_int v;
+    vertex_int_init(&v, &g, 42);
     int result = vertex_int_value(&v.v);
     oj_assert_eq_int(42, result);
 
@@ -432,9 +434,12 @@ oj_test(vertex_int_value_should_return_value_of_vertex_int) {
 
 oj_test(test_graph_add_weighted_edge) {
     struct graph g = graph_new();
-    struct vertex_int v1 = vertex_int_new(&g, 5);
-    struct vertex_int v2 = vertex_int_new(&g, 42);
-    struct weighted_edge e = weighted_edge_new(&g, 6, &v1.v, &v2.v);
+    struct vertex_int v1;
+    vertex_int_init(&v1, &g, 5);
+    struct vertex_int v2;
+    vertex_int_init(&v2, &g, 42);
+    struct weighted_edge e;
+    weighted_edge_init(&e, &g, 6, &v1.v, &v2.v);
     oj_assert_eq_int(5, vertex_int_value(e.edge.from));
     oj_assert_eq_int(42, vertex_int_value(e.edge.to));
     oj_assert_eq_int(6, e.weight);
@@ -444,9 +449,12 @@ oj_test(test_graph_add_weighted_edge) {
 
 oj_test(weighted_edge_weight_should_return_weight_of_edge) {
     struct graph g = graph_new();
-    struct vertex_int v1 = vertex_int_new(&g, 5);
-    struct vertex_int v2 = vertex_int_new(&g, 42);
-    struct weighted_edge e = weighted_edge_new(&g, 100, &v1.v, &v2.v);
+    struct vertex_int v1;
+    vertex_int_init(&v1, &g, 5);
+    struct vertex_int v2;
+    vertex_int_init(&v2, &g, 42);
+    struct weighted_edge e;
+    weighted_edge_init(&e, &g, 100, &v1.v, &v2.v);
     oj_assert_eq_int(100, weighted_edge_weight(&e.edge));
     graph_free(&g);
     oj_fresh;
