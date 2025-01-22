@@ -11,7 +11,7 @@ struct graph graph_new() {
 void graph_free(struct graph* graph) {
     for(int i = 0; i < vec_len(graph->vertices); i++) {
         if(vec_contains(graph->freelist, i)) { continue; }
-        struct vertex* v = graph_vertex_from_id(graph, i);
+        struct vertex* v = graph_vertex_from_i(graph, i);
         graph_remove_vertex(graph, v);
     }
     hashset_free(graph->edges, NULL);
@@ -34,14 +34,13 @@ void print_vertex_neighbor_i(struct vertex* v) {
     printf("%d\n", v->i);
 }
 
-struct edge* graph_add_edge(struct graph* graph, struct vertex* from, struct vertex* to) {
-    struct edge* edge = malloc(sizeof(struct edge));
+void graph_add_edge(struct graph* graph, struct edge* edge, struct vertex* from, struct vertex* to) {
     edge->from = from;
     edge->to = to;
+    if(graph_edge_between(graph, from, to)) { return; }
     vec_push(from->out, to);
     vec_push(to->in, from);
     hashset_insert(graph->edges, edge);
-    return edge;
 }
 
 void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* to) {
@@ -50,7 +49,6 @@ void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* 
         hashset_remove(graph->edges, edge);
         vec_zap(from->out, vec_index(from->out, to), NULL);
         vec_zap(to->in, vec_index(to->in, from), NULL);
-        free(edge);
     }
 }
 
@@ -61,8 +59,7 @@ unsigned int graph_vertex_identity(struct graph* graph) {
     return graph_vertices_len(graph);
 }
 
-struct vertex* graph_add_vertex(struct graph* graph) {
-    struct vertex* v = malloc(sizeof(struct vertex));
+void graph_add_vertex(struct graph* graph, struct vertex* v) {
     int identity = graph_vertex_identity(graph);
     v->in = vec_new(struct vertex*);
     v->out = vec_new(struct vertex*);
@@ -72,11 +69,9 @@ struct vertex* graph_add_vertex(struct graph* graph) {
     } else {
         vec_set(graph->vertices, identity, v);
     }
-    return v;
 }
 
 void graph_remove_vertex(struct graph* graph, struct vertex* v) {
-    if(vec_contains(graph->freelist, v->i)) { return; }
     for(int i = vec_len(v->out) - 1; i >= 0; i--) {
         struct vertex* u = vec_get(v->out, i);
         graph_remove_edge(graph, v, u);
@@ -88,11 +83,11 @@ void graph_remove_vertex(struct graph* graph, struct vertex* v) {
     vec_push(graph->freelist, v->i);
     vec_free(v->out, NULL);
     vec_free(v->in, NULL);
-    free(v);
+    vec_set(graph->vertices, v->i, NULL);
 }
 
-struct vertex* graph_vertex_from_id(struct graph* graph, int index) {
-    return vec_get(graph->vertices, index);
+struct vertex* graph_vertex_from_i(struct graph* graph, int index) {
+    return vec_contains(graph->freelist, index) ? NULL : vec_get(graph->vertices, index);
 }
 
 struct edge* graph_edge_between(struct graph* graph, struct vertex* from, struct vertex* to) {
@@ -120,25 +115,25 @@ int graph_vertex_in_degree(struct vertex* x) {
     return vec_len(x->in);
 }
 
-struct vertex_int vertex_int_init(struct graph* graph, int value) {
+struct vertex_int vertex_int_new(struct graph* graph, int value) {
     struct vertex_int v;
     v.value = value;
-    v.v = graph_add_vertex(graph);
+    graph_add_vertex(graph, &v.v);
     return v;
 }
 
-int vertex_int_value(struct vertex* v) {
-    return container_from_ptr(struct vertex_int, v, v)->value;
+int vertex_int_value(struct vertex* vertex) {
+    return container_of(vertex, struct vertex_int, v)->value;
 }
 
-struct weighted_edge weighted_edge_init(struct graph* graph, int weight, struct vertex* from, struct vertex* to) {
+struct weighted_edge weighted_edge_new(struct graph* graph, int weight, struct vertex* from, struct vertex* to) {
     struct weighted_edge edge;
     edge.weight = weight;
-    graph_add_edge(graph, from, to);
+    graph_add_edge(graph, &edge.edge, from, to);
     return edge;
 }
 
 int weighted_edge_weight(struct edge* edge) {
-    return container_from_ptr(struct weighted_edge, edge, edge)->weight;
+    return container_of(edge, struct weighted_edge, edge)->weight;
 }
 

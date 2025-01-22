@@ -17,7 +17,7 @@ unsigned int graph_dijkstra(struct graph* graph, unsigned int s, unsigned int e)
         int index = priority_queue_dq(q);
         if(processed[index]) { continue; }
         processed[index] = 1;
-        struct vertex* current = graph_vertex_from_id(graph, index);
+        struct vertex* current = graph_vertex_from_i(graph, index);
         for(int i = 0; i < graph_vertex_out_degree(current); i++) {
             struct vertex* neighbour = vec_get(current->out, i);
             int weight = weighted_edge_weight(graph_edge_between(graph, current, neighbour));

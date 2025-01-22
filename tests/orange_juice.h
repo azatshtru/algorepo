@@ -50,6 +50,16 @@
     }                                                                               \
 } while(0)
 
+#define oj_assert_eq_pointer(expected, result) do {                                                             \
+    void* __xpct__ = expected;                                                                                  \
+    void* __rslt__ = result;                                                                                    \
+    sprintf(message, "[Expected: %p (%lu), got: %p (%lu)], in %s at line %d", __xpct__, (unsigned long)__xpct__, __rslt__, (unsigned long)__rslt__, __FILE__, __LINE__);      \
+    if(__xpct__ != __rslt__) {                                                                                  \
+        return 1;                                                                                               \
+    }                                                                                                           \
+} while(0)
+
+
 #define oj_run(test)                                                                                    \
     do {                                                                                                \
         char message[128];                                                                              \

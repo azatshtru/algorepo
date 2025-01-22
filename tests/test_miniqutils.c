@@ -41,6 +41,26 @@ oj_test(canton_pairing_of_5_and_8_returns_99) {
     oj_fresh;
 }
 
+struct point2d {
+    int x;
+    int y;
+};
+
+oj_test(container_of_returns_the_pointer_to_struct) {
+    struct point2d point = { 3, 4 };
+    struct point2d* result1 = container_of(&point.x, struct point2d, x);
+    struct point2d* result2 = container_of(&point.y, struct point2d, y);
+    oj_assert_eq_pointer(&point, result1);
+    oj_assert_eq_pointer(&point, result2);
+    oj_fresh;
+}
+
+oj_prepare(container_of_tests) {
+    oj_run(container_of_returns_the_pointer_to_struct);
+    oj_report;
+    oj_fresh;
+}
+
 oj_prepare(natural_log_tests) {
     oj_run(ln_5);
     oj_run(ln_1);
@@ -68,6 +88,7 @@ int main() {
     oj_blend(natural_log_tests, 0);
     oj_blend(exponentiation_tests, 0);
     oj_blend(cantor_pairing_tests, 0);
+    oj_blend(container_of_tests, 0);
     return 0;
 }
 
