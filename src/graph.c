@@ -11,7 +11,7 @@ struct graph graph_new() {
 void graph_free(struct graph* graph) {
     for(int i = 0; i < vec_len(graph->vertices); i++) {
         if(vec_contains(graph->freelist, i)) { continue; }
-        struct vertex* v = graph_vertex_by_index(graph, i);
+        struct vertex* v = graph_vertex_from_id(graph, i);
         graph_remove_vertex(graph, v);
     }
     hashset_free(graph->edges, NULL);
@@ -45,7 +45,7 @@ struct edge* graph_add_edge(struct graph* graph, struct vertex* from, struct ver
 }
 
 void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* to) {
-    struct edge* edge = graph_edge_by_from_to(graph, from, to);
+    struct edge* edge = graph_edge_between(graph, from, to);
     if(edge != NULL) {
         hashset_remove(graph->edges, edge);
         vec_zap(from->out, vec_index(from->out, to), NULL);
@@ -76,6 +76,7 @@ struct vertex* graph_add_vertex(struct graph* graph) {
 }
 
 void graph_remove_vertex(struct graph* graph, struct vertex* v) {
+    if(vec_contains(graph->freelist, v->i)) { return; }
     for(int i = vec_len(v->out) - 1; i >= 0; i--) {
         struct vertex* u = vec_get(v->out, i);
         graph_remove_edge(graph, v, u);
@@ -90,11 +91,11 @@ void graph_remove_vertex(struct graph* graph, struct vertex* v) {
     free(v);
 }
 
-struct vertex* graph_vertex_by_index(struct graph* graph, int index) {
+struct vertex* graph_vertex_from_id(struct graph* graph, int index) {
     return vec_get(graph->vertices, index);
 }
 
-struct edge* graph_edge_by_from_to(struct graph* graph, struct vertex* from, struct vertex* to) {
+struct edge* graph_edge_between(struct graph* graph, struct vertex* from, struct vertex* to) {
     struct edge edge_key = { from, to };
     return hashset_contains(graph->edges, &edge_key) ? hashset_get(graph->edges, &edge_key) : NULL;
 }
@@ -108,7 +109,7 @@ unsigned int graph_edges_len(struct graph* graph) {
 }
 
 int graph_vertex_adjacent(struct graph* graph, struct vertex* x, struct vertex* y) {
-    return graph_edge_by_from_to(graph, x, y) || graph_edge_by_from_to(graph, y, x);
+    return graph_edge_between(graph, x, y) || graph_edge_between(graph, y, x);
 }
 
 int graph_vertex_out_degree(struct vertex* x) {

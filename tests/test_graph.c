@@ -121,24 +121,41 @@ oj_test(graph_length_queries_after_mutation) {
     struct vertex* v1 = graph_add_vertex(&g);
     struct vertex* v2 = graph_add_vertex(&g);
     struct vertex* v3 = graph_add_vertex(&g);
+    struct vertex* v4 = graph_add_vertex(&g);
     struct edge* e1 = graph_add_edge(&g, v1, v2);
     struct edge* e2 = graph_add_edge(&g, v2, v1);
     struct edge* e3 = graph_add_edge(&g, v3, v1);
     struct edge* e4 = graph_add_edge(&g, v1, v2);
-    oj_assert_eq_int(3, graph_vertices_len(&g));
-    oj_assert_eq_int(3, graph_edges_len(&g));
+    struct edge* e5 = graph_add_edge(&g, v2, v4);
+    oj_assert_eq_int(4, graph_vertices_len(&g));
+    oj_assert_eq_int(4, graph_edges_len(&g));
 
     graph_remove_edge(&g, v1, v2);
-    oj_assert_eq_int(2, graph_edges_len(&g));
+    oj_assert_eq_int(3, graph_edges_len(&g));
 
     graph_remove_vertex(&g, v1);
-    oj_assert_eq_int(2, graph_vertices_len(&g));
-    oj_assert_eq_int(0, graph_edges_len(&g));
-
-    struct edge* e5 = graph_add_edge(&g, v2, v3);
+    oj_assert_eq_int(3, graph_vertices_len(&g));
     oj_assert_eq_int(1, graph_edges_len(&g));
 
+    struct edge* e6 = graph_add_edge(&g, v2, v3);
+    struct edge* e7 = graph_add_edge(&g, v4, v3);
+    oj_assert_eq_int(3, graph_edges_len(&g));
+
+    graph_remove_vertex(&g, v2);
+    oj_assert_eq_int(1, graph_edges_len(&g));
+
+    graph_remove_edge(&g, v3, v4);
+    oj_assert_eq_int(1, graph_edges_len(&g));
+
+    graph_remove_vertex(&g, v3);
+    graph_remove_vertex(&g, v3);
+    oj_assert_eq_int(0, graph_edges_len(&g));
+
     graph_free(&g);
+    oj_fresh;
+}
+
+oj_test(test_graph_vertex_id_queries) {
     oj_fresh;
 }
 
@@ -162,6 +179,7 @@ oj_prepare(graph_setup_tests) {
 oj_prepare(graph_query_tests) {
     oj_run(graph_length_queries_return_number_of_vertices_and_edges);
     oj_run(graph_length_queries_after_mutation);
+    oj_run(test_graph_vertex_id_queries);
     oj_report;
     oj_fresh;
 }

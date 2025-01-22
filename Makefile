@@ -4,8 +4,7 @@ headers := $(wildcard headers/*.h)
 
 dependencies := $(addprefix build/dependencies/,$(src:.c=.d))
 
-TESTFILT = *
-tests := $(addprefix build/,$(basename $(wildcard tests/$(TESTFILT)test*.c)))
+tests := $(addprefix build/,$(basename $(wildcard tests/test*.c)))
 
 examples = $(addprefix build/,$(basename $(wildcard examples/*.c)))
 
@@ -32,6 +31,9 @@ build/tests/%: tests/%.c $(obj) tests/orange_juice.h $(headers)
 
 test: $(tests)
 	@$(foreach x,$(tests),./$(x);)
+
+test_%: build/tests/test_%
+	./$<
 
 -include $(dependencies)
 

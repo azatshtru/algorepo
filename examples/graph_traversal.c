@@ -13,7 +13,7 @@ void graph_breadth_first_search(struct graph* graph, struct vertex* origin) {
 
     while(!queue_is_empty(queue)) {
         int index = queue_pop_front(queue);
-        struct vertex* s = graph_vertex_by_index(graph, index);
+        struct vertex* s = graph_vertex_from_id(graph, index);
 
         printf("BFS: %d\n", vertex_int_value(s));
 

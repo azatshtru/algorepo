@@ -36,8 +36,8 @@ void graph_remove_vertex(struct graph* graph, struct vertex* x);
 struct edge* graph_add_edge(struct graph* graph, struct vertex* from, struct vertex* to);
 void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* to);
 
-struct vertex* graph_vertex_by_index(struct graph* graph, int index);
-struct edge* graph_edge_by_from_to(struct graph* graph, struct vertex* from, struct vertex* to);
+struct vertex* graph_vertex_from_id(struct graph* graph, int index);
+struct edge* graph_edge_between(struct graph* graph, struct vertex* from, struct vertex* to);
 
 int graph_vertex_adjacent(struct graph* graph, struct vertex* x, struct vertex* y);
 int graph_vertex_out_degree(struct vertex* x);
