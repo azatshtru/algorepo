@@ -24,7 +24,7 @@ int btree_node_init(struct btree_node* node_ptr, int is_leaf);
 struct btree_node* btree_search(struct btree btree, int key, struct btree_node* node);
 
 void btree_split_child(struct btree* btree, struct btree_node* x, int i);
-void btree_shush_insert(struct btree* btree, struct btree_node* x, int key);
+void btree_into_non_full(struct btree* btree, struct btree_node* x, int key);
 void btree_insert(struct btree* btree, int key);
 
 void btree_delete(struct btree* btree, struct btree_node* node, int key);

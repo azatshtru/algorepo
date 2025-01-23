@@ -49,13 +49,13 @@ void btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
 
     // create a new split_node and add it to parent's list of children.
     struct btree_node* split_node = malloc(sizeof(struct btree_node*));
+    btree_node_init(split_node, node->is_leaf);
 
     vec_insert(parent_node->children, i+1, split_node);
 
     // insert the median of the full child node into parent node
     vec_insert(parent_node->keys, i, vec_get(node->keys, t-1));
 
-    btree_node_init(split_node, node->is_leaf);
 
     // split apart child node's keys into itself & split_node
     for(int j = t; j < 2*t-1; j++) {
@@ -72,7 +72,7 @@ void btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
     }
 }
 
-void btree_shush_insert(BTree* btree, struct btree_node* node, int key) {
+void btree_into_non_full(BTree* btree, struct btree_node* node, int key) {
     int t = btree->degree;
     int i = vec_len(node->keys) - 1;
 
@@ -92,7 +92,7 @@ void btree_shush_insert(BTree* btree, struct btree_node* node, int key) {
                 i++;
             }
         }
-        btree_shush_insert(btree, vec_get(node->children, i), key);
+        btree_into_non_full(btree, vec_get(node->children, i), key);
     }
 }
 
@@ -108,9 +108,9 @@ void btree_insert(struct btree* btree, int key) {
         vec_insert(new_root->children, 0, root);
 
         btree_split_child(btree, new_root, 0);
-        btree_shush_insert(btree, new_root, key);
+        btree_into_non_full(btree, new_root, key);
     } else {
-        btree_shush_insert(btree, root, key);
+        btree_into_non_full(btree, root, key);
     }
 }
 
