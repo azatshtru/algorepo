@@ -24,7 +24,7 @@ int disjoint_set_int_find(DisjointSetInt* set, int v) {
     return set->parent[v] = disjoint_set_int_find(set, set->parent[v]);    
 }
 
-void disjoint_set_int_union(DisjointSetInt* set, int a, int b) {
+int disjoint_set_int_union(DisjointSetInt* set, int a, int b) {
     a = disjoint_set_int_find(set, a);
     b = disjoint_set_int_find(set, b);
     if(a != b) {
@@ -35,5 +35,7 @@ void disjoint_set_int_union(DisjointSetInt* set, int a, int b) {
         }
         set->parent[b] = a;
         set->size[a] += set->size[b];
+        return 1;
     }
+    return 0;
 }

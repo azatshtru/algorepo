@@ -108,8 +108,8 @@ void graph_dijkstra_acyclic_product(AdjacencyListGraph graph, uint8 starting_nod
     for(int i = 0; i < vec_len(graph); i++) { vec_free(prev_path_node[i], NULL); }
 }
 
-//Similar to dijkstra's acyclic product, all dynamic programming problems result in an acyclic graph where..
-//..each node represents a state and the edges represent a path taken from that state.
+//Similar to dijkstra's acyclic product, all dynamic programming problems result in an acyclic graph where
+//each node represents a state and the edges represent a path taken from that state.
 
 uint8 logb2(uint8 x) {
     uint8 log = 0;

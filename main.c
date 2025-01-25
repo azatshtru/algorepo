@@ -15,7 +15,7 @@ int main() {
     };
 
     for(int i = 0; i < 100; i++) {
-        btree_insert(&tree, i);
+        btree_insert(&tree, testkeys[i]);
     }
 
     btree_levelwise_traverse_and_print_keys(&tree);

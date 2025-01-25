@@ -135,8 +135,7 @@ oj_test(test_btree_insert_100_keys_increasing_order) {
     oj_fresh;
 }
 
-oj_test(test_btree_insert_100_random_keys) {
-    BTree btree = btree_new(3); 
+void test_setup_btree_with_100_random_keys(BTree* btree) {
     int keys[100] = {
         808, 623, 687, 746, 715, 948, 200, 110, 322, 7, 488,
         698, 852, 798, 156, 267, 908, 964, 429, 358, 70, 788, 900, 802, 881,
@@ -149,8 +148,13 @@ oj_test(test_btree_insert_100_random_keys) {
     };
 
     for(int i = 0; i < 100; i++) {
-        btree_insert(&btree, keys[i]);
+        btree_insert(btree, keys[i]);
     }
+}
+
+oj_test(test_btree_insert_100_random_keys) {
+    BTree btree = btree_new(3); 
+    test_setup_btree_with_100_random_keys(&btree);
 
     oj_assert_eq_int(1, test_btree_node_values(btree.root, 1, 623));
     struct btree_node* l1n0 = btree_node_child_at_index(btree.root, 0);
@@ -523,6 +527,8 @@ oj_test(btree_split_child_splits_the_ith_child_and_returns_the_split_node) {
     btree_node_insert_key(node, 31);
     btree_node_insert_key(node, 6);
 
+    oj_assert_eq_int(1, btree_node_is_full(node, 3));
+
     struct btree_node* n1 = btree_node_new(1);
     struct btree_node* n2 = btree_node_new(1);
     struct btree_node* n3 = btree_node_new(1);
@@ -553,6 +559,40 @@ oj_test(btree_split_child_splits_the_ith_child_and_returns_the_split_node) {
     oj_assert_eq_pointer(n5, btree_node_child_at_index(split_node, 1));
     oj_assert_eq_pointer(n6, btree_node_child_at_index(split_node, 2));
 
+    oj_fresh;
+}
+
+oj_test(test_btree_search_returns_the_node_that_contains_the_given_key) {
+    BTree btree = btree_new(3);
+    test_setup_btree_with_100_random_keys(&btree);
+
+    struct btree_node* n1 = btree_search(&btree, 737, btree.root);
+    oj_assert_eq_int(1, btree_node_contains_key(n1, 737));
+
+    struct btree_node* n2 = btree_search(&btree, 59, btree.root);
+    oj_assert_eq_int(1, btree_node_contains_key(n2, 59));
+
+    struct btree_node* n3 = btree_search(&btree, 852, btree.root);
+    oj_assert_eq_int(1, btree_node_contains_key(n3, 852));
+
+    oj_fresh;
+}
+
+oj_test(test_btree_search_returns_null_if_the_key_is_not_found) {
+    BTree btree = btree_new(3);
+    test_setup_btree_with_100_random_keys(&btree);
+
+    oj_assert_eq_pointer(NULL, btree_search(&btree, 736, btree.root));
+    oj_assert_eq_pointer(NULL, btree_search(&btree, 371, btree.root));
+    oj_assert_eq_pointer(NULL, btree_search(&btree, 37, btree.root));
+
+    oj_fresh;
+}
+
+oj_prepare(btree_search_tests) {
+    oj_run(test_btree_search_returns_the_node_that_contains_the_given_key);
+    oj_run(test_btree_search_returns_null_if_the_key_is_not_found);
+    oj_report;
     oj_fresh;
 }
 
@@ -603,6 +643,7 @@ int main() {
     oj_blend(btree_node_queries_tests, 0);
     oj_blend(btree_node_mutation_tests, 0);
     oj_blend(btree_setup_tests, 0);
+    oj_blend(btree_search_tests, 0);
     oj_blend(btree_insertion_tests, 0);
     oj_blend(btree_split_tests, 0);
     return 0;

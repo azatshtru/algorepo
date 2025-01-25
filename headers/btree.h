@@ -20,6 +20,7 @@ struct btree_node* btree_node_new(int is_leaf);
 int btree_node_init(struct btree_node* node_ptr, int is_leaf);
 
 int btree_node_is_empty(struct btree_node* node);
+int btree_node_is_full(struct btree_node* node, int degree);
 
 void btree_node_split_children(struct btree_node* node, struct btree_node* split_node, int degree);
 int btree_node_split_keys(struct btree_node* node, struct btree_node* split_node, int degree);
@@ -46,7 +47,7 @@ int btree_init(struct btree* btree, int degree);
 int btree_split_full_node(struct btree* btree, struct btree_node* node, struct btree_node* split_node);
 struct btree_node* btree_split_child(struct btree* btree, struct btree_node* x, int i);
 
-struct btree_node* btree_search(struct btree btree, int key, struct btree_node* node);
+struct btree_node* btree_search(struct btree* btree, int key, struct btree_node* node);
 
 void btree_insert_into_non_full(struct btree* btree, struct btree_node* x, int key);
 void btree_insert(struct btree* btree, int key);

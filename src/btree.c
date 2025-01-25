@@ -31,6 +31,10 @@ int btree_node_is_empty(struct btree_node* node) {
     return vec_len(node->keys) == 0;
 }
 
+int btree_node_is_full(struct btree_node* node, int degree) {
+    return vec_len(node->keys) == 2 * degree - 1;
+}
+
 int btree_node_index_by_key(struct btree_node* node, int key) {
     int l = 0;
     int r = vec_len(node->keys) - 1;
@@ -132,62 +136,48 @@ struct btree_node* btree_split_child(BTree* btree, struct btree_node* parent_nod
     return split_node;
 }
 
-struct btree_node* btree_search(BTree btree, int key, struct btree_node* node) {
+struct btree_node* btree_search(BTree* btree, int key, struct btree_node* node) {
     if(node == NULL) {
-        node = btree.root;
+        node = btree->root;
     }
-    int i = 0;
-    while(i < vec_len(node->keys) && key > vec_get(node->keys, i)) { i++; }
-    if(i < vec_len(node->keys) && key == vec_get(node->keys, i)) {
+    int i = btree_node_index_by_key(node, key);
+    if(btree_node_contains_key(node, key)) {
         return node;
     } else if (node->is_leaf) {
         return NULL;
     } else {
-        return btree_search(btree, key, vec_get(node->children, i));
+        return btree_search(btree, key, btree_node_child_at_index(node, i));
     }
 }
 
 
 void btree_insert_into_non_full(BTree* btree, struct btree_node* node, int key) {
-    int t = btree->degree;
-    int i = vec_len(node->keys) - 1;
-
     if(node->is_leaf) {
-        vec_push(node->keys, -1);
-        while(i >= 0 && key < vec_get(node->keys, i)) {
-            vec_set(node->keys, i+1, vec_get(node->keys, i));
-            --i;
-        }
-        vec_set(node->keys, i+1, key);
-    } else {
-        while(i >= 0 && key < vec_get(node->keys, i)) { --i; }
-        i++;
-        if(vec_len(vec_get(node->children, i)->keys) == 2*t-1) {
-            btree_split_child(btree, node, i);
-            if(key > vec_get(node->keys, i)) {
-                i++;
-            }
-        }
-        btree_insert_into_non_full(btree, vec_get(node->children, i), key);
+        btree_node_insert_key(node, key);
+        return;
     }
+
+    int i = btree_node_index_by_key(node, key) + btree_node_contains_key(node, key);
+    if(btree_node_is_full(btree_node_child_at_index(node, i), btree->degree)) {
+        btree_split_child(btree, node, i);
+        i += key > btree_node_key_by_index(node, i);
+    }
+    btree_insert_into_non_full(btree, btree_node_child_at_index(node, i), key);
 }
 
 void btree_insert(struct btree* btree, int key) {
-    int t = btree->degree;
     struct btree_node* root = btree->root;
 
-    if(vec_len(root->keys) == 2*t-1) {
+    if(btree_node_is_full(root, btree->degree)) {
         struct btree_node* new_root = btree_node_new(0);
-
         btree->root = new_root;
-
-        vec_insert(new_root->children, 0, root);
+        btree_node_insert_child(new_root, 0, root);
 
         btree_split_child(btree, new_root, 0);
-        btree_insert_into_non_full(btree, new_root, key);
-    } else {
-        btree_insert_into_non_full(btree, root, key);
+        root = new_root;
     }
+
+    btree_insert_into_non_full(btree, root, key);
 }
 
 int btree_delete_predecessor(BTree* btree, struct btree_node* node) {

@@ -12,6 +12,6 @@ DisjointSetInt disjoint_set_int_new(int max_size);
 void disjoint_set_int_free(DisjointSetInt* set);
 void disjoint_set_int_insert(DisjointSetInt* set, int v);
 int disjoint_set_int_find(DisjointSetInt* set, int v);
-void disjoint_set_int_union(DisjointSetInt* set, int a, int b);
+int disjoint_set_int_union(DisjointSetInt* set, int a, int b);
 
 #endif
