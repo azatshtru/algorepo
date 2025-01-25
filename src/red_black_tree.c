@@ -264,3 +264,16 @@ void red_black_tree_transplant(RedBlackTree* tree, RedBlackTreeNode* host, RedBl
     }
     graft->parent = host->parent;
 }
+
+void red_black_tree_traverse_and_print(RedBlackTree* tree) {
+    VecDeque(struct red_black_tree_node*) q = queue_new(struct red_black_tree_node*);
+    queue_push_back(q, tree->root);
+
+    while(!queue_is_empty(q)) {
+        struct red_black_tree_node* node = queue_pop_front(q);
+        printf("%d\n", node->key);
+        queue_push_back(q, node->left);
+        queue_push_back(q, node->right);
+    }
+    queue_free(q, NULL);
+}

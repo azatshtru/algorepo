@@ -341,7 +341,7 @@ void btree_delete(BTree* btree, struct btree_node* node, int key) {
     }
 }
 
-void btree_traverse_and_print_keys(BTree* btree) {
+void btree_levelwise_traverse_and_print_keys(BTree* btree) {
     VecDeque(struct btree_node*) q = queue_new(struct btree_node*);
     VecDeque(int) levels = queue_new(int);
     queue_push_back(q, btree->root);

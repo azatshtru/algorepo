@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../headers/miniqutils.h"
+#include "../headers/queue.h"
 
 #ifndef RED_BLACK_TREES
 #define RED_BLACK_TREES
