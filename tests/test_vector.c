@@ -103,6 +103,81 @@ oj_test(vec_contains_returns_true_if_element_is_present) {
     oj_fresh;
 }
 
+oj_test(test_vec_insert_in_middle) {
+    vector(int) v = vec_new(int);
+    vec_push(v, 31);
+    vec_push(v, 97);
+    vec_push(v, 85);
+    vec_push(v, 43);
+    vec_push(v, 7);
+    vec_insert(v, 2, 55);
+    vec_insert(v, 0, 9);
+    vec_insert(v, 3, 73);
+
+    oj_assert_eq_int(9, vec_get(v, 0));
+    oj_assert_eq_int(55, vec_get(v, 4));
+    oj_assert_eq_int(73, vec_get(v, 3));
+
+    oj_assert_eq_int(85, vec_get(v, 5));
+    oj_assert_eq_int(43, vec_get(v, 6));
+    oj_assert_eq_int(7, vec_get(v, 7));
+
+    vec_free(v, NULL);
+    oj_fresh;
+}
+
+oj_test(test_vec_insert_at_resize) {
+    vector(int) v = vec_new(int);
+    vec_insert(v, 0, 31);
+    vec_insert(v, 1, 97);
+    vec_insert(v, 2, 85);
+    vec_push(v, 9);
+    vec_push(v, 44);
+    vec_push(v, 17);
+    vec_push(v, 71);
+    vec_push(v, 73);
+
+    oj_assert_eq_int(8, ((Vector*)v)->cap);
+    vec_insert(v, 8, 42);
+    oj_assert_eq_int(16, ((Vector*)v)->cap);
+    vec_insert(v, 9, 101);
+    oj_assert_eq_int(16, ((Vector*)v)->cap);
+
+    oj_assert_eq_int(31, vec_get(v, 0));
+    oj_assert_eq_int(97, vec_get(v, 1));
+    oj_assert_eq_int(85, vec_get(v, 2));
+    oj_assert_eq_int(9, vec_get(v, 3));
+
+    oj_assert_eq_int(44, vec_get(v, 4));
+
+    oj_assert_eq_int(42, vec_get(v, 8));
+
+    oj_assert_eq_int(101, vec_get(v, 9));
+
+    vec_free(v, NULL);
+    oj_fresh;
+}
+
+oj_test(test_vec_insert_at_index_greater_than_vector_length) {
+    vector(int) v = vec_new(int);
+    oj_assert_eq_int(0, vec_len(v));
+
+    vec_insert(v, 1, 31);
+    vec_insert(v, 2, 97);
+    vec_insert(v, 3, 85);
+
+    oj_assert_eq_int(0, vec_len(v));
+
+    oj_fresh;
+}
+
+oj_prepare(vector_insert_tests) {
+    oj_run(test_vec_insert_in_middle);
+    oj_run(test_vec_insert_at_resize);
+    oj_run(test_vec_insert_at_index_greater_than_vector_length);
+    oj_report;
+    oj_fresh;
+}
 
 oj_prepare(vector_index_tests) {
     oj_run(vec_index_returns_index_of_element);
@@ -123,5 +198,6 @@ oj_prepare(vector_equality_tests) {
 int main() {
     oj_blend(vector_equality_tests, 0);
     oj_blend(vector_index_tests, 0);
+    oj_blend(vector_insert_tests, 0);
     return 0;
 }

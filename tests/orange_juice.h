@@ -14,7 +14,7 @@
         if (!(assertion)) {     \
             return 1;           \
         }                       \
-    } while (0)
+    } while(0)
 
 #define oj_assert_eq_int(expected, result)                                  \
     do {                                                                    \
@@ -98,5 +98,10 @@
         printf("  ----------------------------------\n");                                                                   \
         printf("\n");                                                                                                       \
     } while(0)
+
+#define oj_rotten do {  \
+    sprintf(message, "(%s, line %d)", __FILE__, __LINE__);   \
+    return 1;                                                               \
+} while(0)
 
 #endif

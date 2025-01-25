@@ -74,8 +74,9 @@ do {                                                \
 #define vec_insert(vec, _index, value)                        \
     do                                                        \
     {                                                         \
-        vec_push((vec), value);                               \
         Vector *__v__ = (Vector *)(vec);                      \
+        if(_index > __v__->len) { break; }                      \
+        vec_push((vec), value);                               \
         memmove(*(vec) + _index + 1,                                 \
                 *(vec) + _index,                                     \
                 __v__->type_size * (__v__->len - _index - 1)\

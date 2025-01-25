@@ -27,6 +27,111 @@ int btree_node_init(struct btree_node* node_ptr, int is_leaf) {
     return 0;
 }
 
+int btree_node_is_empty(struct btree_node* node) {
+    return vec_len(node->keys) == 0;
+}
+
+int btree_node_index_by_key(struct btree_node* node, int key) {
+    int l = 0;
+    int r = vec_len(node->keys) - 1;
+
+    while(l <= r) {
+        int m = (l + r)/2;
+        if(vec_get(node->keys, m) < key) {
+            l = m + 1; 
+        } else if(vec_get(node->keys, m) > key) {
+            r = m - 1;
+        } else {
+            return m;
+        }
+    }
+
+    return l;
+}
+
+int btree_node_key_by_index(struct btree_node* node, int index) {
+    return vec_get(node->keys, index);
+}
+
+struct btree_node* btree_node_child_after_key(struct btree_node* node, int key) {
+    return vec_get(node->children, btree_node_index_by_key(node, key) + 1);
+}
+
+struct btree_node* btree_node_child_at_index(struct btree_node* node, int index) {
+    return vec_get(node->children, index);
+}
+
+struct btree_node* btree_node_first_child(struct btree_node* node) {
+    return vec_get(node->children, 0);
+}
+
+int btree_node_contains_key(struct btree_node* node, int key) {
+    int index = btree_node_index_by_key(node, key);
+    return btree_node_key_by_index(node, index) == key;
+}
+
+void btree_node_push_child(struct btree_node* node, struct btree_node* child_node) {
+    vec_push(node->children, child_node);
+}
+
+void btree_node_insert_child(struct btree_node* node, int index, struct btree_node* child_node) {
+    vec_insert(node->children, index, child_node);
+}
+
+void btree_node_insert_key(struct btree_node* node, int key) {
+    vec_insert(node->keys, btree_node_index_by_key(node, key), key);
+}
+
+int btree_node_remove_key(struct btree_node* node, int key) {
+    int index = btree_node_index_by_key(node, key);
+    if(btree_node_key_by_index(node, index) != key) {
+        return -1;
+    }
+    return vec_pop(node->keys, index);
+}
+
+void btree_node_split_children(struct btree_node* node, struct btree_node* split_node, int degree) {
+    for(int i = 0; i < degree; i++) {
+        btree_node_push_child(split_node, btree_node_child_at_index(node, i + degree));
+    }
+    for(int i = 0; i < degree; i++) {
+        vec_pop(node->children, -1);
+    }
+}
+
+int btree_node_split_keys(struct btree_node* node, struct btree_node* split_node, int degree) {
+    int split_key = vec_get(node->keys, degree-1);
+    for(int i = 0; i < degree-1; i++) {
+        vec_push(split_node->keys, vec_get(node->keys, i + degree));
+    }
+    for(int i = 0; i < degree; i++) {
+        vec_pop(node->keys, -1);
+    }
+
+    return split_key;
+}
+
+int btree_split_full_node(struct btree* btree, struct btree_node* node, struct btree_node* split_node) {
+    int split_key = btree_node_split_keys(node, split_node, btree->degree);
+    if(!node->is_leaf) {
+        btree_node_split_children(node, split_node, btree->degree);
+    }
+    return split_key;
+}
+
+struct btree_node* btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
+    struct btree_node* node = btree_node_child_at_index(parent_node, i);
+    struct btree_node* split_node = btree_node_new(node->is_leaf);
+
+    btree_node_insert_child(parent_node, i+1, split_node);
+
+    int split_key = btree_split_full_node(btree, node, split_node);
+
+    btree_node_insert_key(parent_node, split_key);
+
+    return split_node;
+}
+
 struct btree_node* btree_search(BTree btree, int key, struct btree_node* node) {
     if(node == NULL) {
         node = btree.root;
@@ -42,37 +147,8 @@ struct btree_node* btree_search(BTree btree, int key, struct btree_node* node) {
     }
 }
 
-void btree_split_child(BTree* btree, struct btree_node* parent_node, int i) {
-    int t = btree->degree;
-    // get the full child of parent node.
-    struct btree_node* node = vec_get(parent_node->children, i);
 
-    // create a new split_node and add it to parent's list of children.
-    struct btree_node* split_node = malloc(sizeof(struct btree_node*));
-    btree_node_init(split_node, node->is_leaf);
-
-    vec_insert(parent_node->children, i+1, split_node);
-
-    // insert the median of the full child node into parent node
-    vec_insert(parent_node->keys, i, vec_get(node->keys, t-1));
-
-
-    // split apart child node's keys into itself & split_node
-    for(int j = t; j < 2*t-1; j++) {
-        vec_push(split_node->keys, vec_pop(node->keys, t)); 
-    }
-    vec_zap(node->keys, -1, NULL); 
-
-    // if child is not a leaf, we reassign child's children to itself & split_node.
-    if(!node->is_leaf) {
-        for(int j = t; j < 2*t; j++) {
-            vec_push(split_node->children, vec_pop(node->children, t)); 
-        }
-        vec_zap(node->children, -1, NULL); 
-    }
-}
-
-void btree_into_non_full(BTree* btree, struct btree_node* node, int key) {
+void btree_insert_into_non_full(BTree* btree, struct btree_node* node, int key) {
     int t = btree->degree;
     int i = vec_len(node->keys) - 1;
 
@@ -92,7 +168,7 @@ void btree_into_non_full(BTree* btree, struct btree_node* node, int key) {
                 i++;
             }
         }
-        btree_into_non_full(btree, vec_get(node->children, i), key);
+        btree_insert_into_non_full(btree, vec_get(node->children, i), key);
     }
 }
 
@@ -108,9 +184,9 @@ void btree_insert(struct btree* btree, int key) {
         vec_insert(new_root->children, 0, root);
 
         btree_split_child(btree, new_root, 0);
-        btree_into_non_full(btree, new_root, key);
+        btree_insert_into_non_full(btree, new_root, key);
     } else {
-        btree_into_non_full(btree, root, key);
+        btree_insert_into_non_full(btree, root, key);
     }
 }
 
