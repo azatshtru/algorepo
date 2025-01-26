@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "headers/btree.h"
+#include "headers/red_black_tree.h"
 
 int main() {
-    BTree tree = btree_new(3); 
+    RedBlackTree tree = red_black_tree_new(); 
     int testkeys[100] = {
         808, 623, 687, 746, 715, 948, 200, 110, 322, 7, 488,
         698, 852, 798, 156, 267, 908, 964, 429, 358, 70, 788, 900, 802, 881,
@@ -15,9 +16,19 @@ int main() {
     };
 
     for(int i = 0; i < 100; i++) {
-        btree_insert(&tree, testkeys[i]);
+        red_black_tree_insert(&tree, testkeys[i]);
     }
 
-    btree_levelwise_traverse_and_print_keys(&tree);
+    red_black_tree_levelwise_traverse_and_print_keys(&tree);
+
+    int deletelist[10] = {110, 852, 197, 105, 616, 674, 216, 380, 311, 7};
+
+    for(int i = 0; i < 10; i++) {
+        red_black_tree_delete(&tree, deletelist[i]);
+    }
+
+    printf("\n");
+    red_black_tree_levelwise_traverse_and_print_keys(&tree);
+
     return 0;
 }
