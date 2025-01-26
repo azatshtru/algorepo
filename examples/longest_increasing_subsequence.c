@@ -33,3 +33,7 @@ int longest_increasing_subsequence(int* array, int len) {
     }
     return vec_len(subsequence);
 }
+
+int main() {
+    return 0;
+}

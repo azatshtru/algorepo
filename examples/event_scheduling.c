@@ -32,3 +32,7 @@ int event_scheduling(struct event* events, int len) {
     }
     return count;
 }
+
+int main() {
+    return 0;
+}

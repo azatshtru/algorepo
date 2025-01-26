@@ -26,3 +26,7 @@ int max_score_tasks_and_deadlines(struct task* tasks, int len) {
     }
     return score;
 }
+
+int main() {
+    return 0;
+}

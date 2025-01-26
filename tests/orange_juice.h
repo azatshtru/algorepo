@@ -18,9 +18,9 @@
 
 #define oj_assert_eq_int(expected, result)                                  \
     do {                                                                    \
-        int __xpct__ = expected;                                            \
-        int __rslt__ = result;                                              \
-        sprintf(message, "[Expected: %d, got: %d], in %s at line %d", __xpct__, __rslt__, __FILE__, __LINE__);      \
+        long __xpct__ = expected;                                            \
+        long __rslt__ = result;                                              \
+        sprintf(message, "[Expected: %ld, got: %ld], in %s at line %d", __xpct__, __rslt__, __FILE__, __LINE__);      \
         if(__rslt__ != __rslt__ && __xpct__ == __xpct__) {                      \
             return 1;                                                       \
         }                                                                   \
