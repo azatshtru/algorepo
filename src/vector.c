@@ -30,7 +30,7 @@ void vec_resize(Vector* vec, uint32 new_len) {
     vec->cap = new_len;
 }
 
-void vec_zap(void* vec, int _index, void(*free_fn)(void*)) {
+int vec_zap(void* vec, int _index, void(*free_fn)(void*)) {
     Vector* v = (Vector*)vec;
     uint32 index = (_index >= 0) ? _index : (v->len + _index);
     if(free_fn) {
@@ -42,6 +42,7 @@ void vec_zap(void* vec, int _index, void(*free_fn)(void*)) {
     if (v->cap >= VEC_INIT_SIZE * 2 && v->len <= v->cap / 2) {
         vec_resize(v, v->len);
     }
+    return 0;
 }
 
 int vec_cmp(void* v1_ptr, void* v2_ptr) {

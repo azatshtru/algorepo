@@ -22,7 +22,7 @@ void* vec_allocate(uint32 cap, uint32 type_size);
 void* vec_from(uint32 len, ...);
 void vec_free(void* vec, void(*free_fn)(void*));
 void vec_resize(Vector* vec, uint32 new_len);
-void vec_zap(void* vec, int index, void(*free_fn)(void*));
+int vec_zap(void* vec, int index, void(*free_fn)(void*));
 int vec_cmp(void* v1_ptr, void* v2_ptr);
 uint32 vec_len(void* vec);
 int vec_shush_index(void* vec, void* value_ptr);
@@ -37,13 +37,13 @@ int vec_shush_index(void* vec, void* value_ptr);
 #define vec_index(vec, value) (**((vec)+1)=value, vec_shush_index(vec, *((vec)+1)))
 #define vec_contains(vec, value) (**((vec)+1)=value, -1 != vec_shush_index(vec, *((vec)+1)))
 
-#define vec_pop(vec, index) (**((vec)+1)=vec_get((vec), ((index) >= 0) ? (index) : (((Vector*)(vec))->len + (index))), vec_zap((vec), (index), NULL), **((vec)+1))
+#define vec_pop(vec, index) (**((vec)+1)=vec_get((vec), (index >= 0) ? (index) : (((Vector*)(vec))->len + (index))), vec_zap((vec), (index), NULL), **((vec)+1))
 
 #define vec_print(vec, print_fn)                    \
 do {                                                \
     printf("vec![");                                \
     for(int i = 0; i < ((Vector*)(vec))->len; i++) {\
-        print_fn((vec_get(vec, i)));                     \
+        print_fn((vec_get(vec, i)));                \
         printf(", ");                               \
     }                                               \
     printf("\b\b]\n");                              \
@@ -53,7 +53,7 @@ do {                                                \
 do {                                                \
     printf("vec![");                                \
     for(int i = 0; i < ((Vector*)(vec))->len; i++) {\
-        printf((identifier), (vec_get(vec, i)));         \
+        printf((identifier), (vec_get(vec, i)));    \
         printf(", ");                               \
     }                                               \
     printf("\b\b]\n");                              \
@@ -75,13 +75,14 @@ do {                                                \
     do                                                        \
     {                                                         \
         Vector *__v__ = (Vector *)(vec);                      \
-        if(_index > __v__->len) { break; }                      \
-        vec_push((vec), value);                               \
-        memmove(*(vec) + _index + 1,                                 \
-                *(vec) + _index,                                     \
-                __v__->type_size * (__v__->len - _index - 1)\
-        );                                                  \
-        (*(vec))[_index] = (value);                           \
+        if(_index > __v__->len) { break; }                    \
+        **((vec)+1) = value;                                  \
+        vec_push((vec), **((vec)+1));                         \
+        memmove(*(vec) + _index + 1,                          \
+                *(vec) + _index,                              \
+                __v__->type_size * (__v__->len - _index - 1)    \
+        );                                                      \
+        (*(vec))[_index] = **((vec)+1);                         \
     } while (0)
 
 #endif

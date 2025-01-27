@@ -589,6 +589,93 @@ oj_test(test_btree_search_returns_null_if_the_key_is_not_found) {
     oj_fresh;
 }
 
+oj_test(btree_delete_10_keys_from_random_100_keys) {
+    BTree btree = btree_new(3); 
+    test_setup_btree_with_100_random_keys(&btree);
+    
+    int keys_to_be_deleted[10] = {110, 852, 197, 105, 616, 674, 216, 380, 311, 7};
+
+    for(int i = 0; i < 10; i++) {
+        btree_delete(&btree, btree.root, keys_to_be_deleted[i]);
+    }
+
+    oj_assert_eq_int(1, test_btree_node_values(btree.root, 4, 180, 358, 623, 762));
+
+    struct btree_node* l1n0 = btree_node_child_at_index(btree.root, 0);
+    struct btree_node* l1n1 = btree_node_child_at_index(btree.root, 1);
+    struct btree_node* l1n2 = btree_node_child_at_index(btree.root, 2);
+    struct btree_node* l1n3 = btree_node_child_at_index(btree.root, 3);
+    struct btree_node* l1n4 = btree_node_child_at_index(btree.root, 4);
+
+    oj_assert_eq_int(1, test_btree_node_values(l1n0, 3, 70, 121, 156));
+    oj_assert_eq_int(1, test_btree_node_values(l1n1, 3, 200, 267, 322));
+    oj_assert_eq_int(1, test_btree_node_values(l1n2, 3, 429, 529, 600));
+    oj_assert_eq_int(1, test_btree_node_values(l1n3, 2, 687, 715));
+    oj_assert_eq_int(1, test_btree_node_values(l1n4, 5, 788, 808, 847, 908, 963));
+
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n0, 0), 2, 25, 59));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n0, 1), 2, 81, 96));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n0, 2), 2, 128, 136));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n0, 3), 3, 157, 164, 173));
+
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n1, 0), 4, 186, 187, 189, 191));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n1, 1), 4, 203, 212, 222, 253));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n1, 2), 2, 287, 309));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n1, 3), 4, 322, 328, 333, 351));
+
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n2, 0), 4, 370, 382, 390, 401));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n2, 1), 5, 470, 488, 496, 498, 504));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n2, 2), 5, 561, 562, 564, 577, 592));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n2, 3), 3, 603, 621, 622));
+
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n3, 0), 3, 627, 661, 671));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n3, 1), 3, 695, 696, 698));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n3, 2), 5, 721, 731, 737, 739, 746));
+
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n4, 0), 2, 765, 778));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n4, 1), 2, 798, 802));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n4, 2), 4, 816, 824, 834, 843));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n4, 3), 2, 881, 900));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n4, 4), 5, 917, 924, 934, 948, 963));
+    oj_assert_eq_int(1, test_btree_node_values(btree_node_child_at_index(l1n4, 5), 4, 964, 968, 974, 997));
+
+    // Level 0: 180 358 623 762
+    // 
+    // Level 1: 70 121 156
+    // Level 1: 200 267 322
+    // Level 1: 429 529 600
+    // Level 1: 687 715
+    // Level 1: 788 808 847 908 963
+    // 
+    // Level 2: 25 59
+    // Level 2: 81 96
+    // Level 2: 128 136
+    // Level 2: 157 164 173
+    // 
+    // Level 2: 186 187 189 191
+    // Level 2: 203 212 222 253
+    // Level 2: 287 309
+    // Level 2: 322 328 333 351
+    // 
+    // Level 2: 370 382 390 401
+    // Level 2: 470 488 496 498 504
+    // Level 2: 561 562 564 577 592
+    // Level 2: 603 621 622
+    // 
+    // Level 2: 627 661 671
+    // Level 2: 695 696 698
+    // Level 2: 721 731 737 739 746
+    // 
+    // Level 2: 765 778
+    // Level 2: 798 802
+    // Level 2: 816 824 834 843
+    // Level 2: 881 900
+    // Level 2: 917 924 934 948 963
+    // Level 2: 964 968 974 997
+
+    oj_fresh;
+}
+
 oj_prepare(btree_search_tests) {
     oj_run(test_btree_search_returns_the_node_that_contains_the_given_key);
     oj_run(test_btree_search_returns_null_if_the_key_is_not_found);
@@ -600,6 +687,12 @@ oj_prepare(btree_insertion_tests) {
     oj_run(btree_insert_5_keys_into_root);
     oj_run(test_btree_insert_100_random_keys);
     oj_run(test_btree_insert_100_keys_increasing_order);
+    oj_report;
+    oj_fresh;
+}
+
+oj_prepare(btree_deletion_tests) {
+    oj_run(btree_delete_10_keys_from_random_100_keys);
     oj_report;
     oj_fresh;
 }
@@ -646,5 +739,6 @@ int main() {
     oj_blend(btree_search_tests, 0);
     oj_blend(btree_insertion_tests, 0);
     oj_blend(btree_split_tests, 0);
+    oj_blend(btree_deletion_tests, 0);
     return 0;
 }

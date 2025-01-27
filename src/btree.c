@@ -222,8 +222,8 @@ void btree_delete_merge(BTree* btree, struct btree_node* node, int i, int j) {
             vec_push(cnode->children, vec_pop(rsnode->children, -1));
         }
         new = cnode;
-        vec_zap(node->keys, i, NULL);
-        vec_zap(node->children, j, NULL);
+        vec_pop(node->keys, i);
+        vec_pop(node->children, j);
     } else {
         struct btree_node* lsnode = vec_get(node->children, j);
         vec_push(lsnode->keys, vec_get(node->keys, j));
@@ -237,8 +237,8 @@ void btree_delete_merge(BTree* btree, struct btree_node* node, int i, int j) {
             vec_push(lsnode->children, vec_pop(cnode->children, -1));
         }
         new = lsnode;
-        vec_zap(node->keys, j, NULL);
-        vec_zap(node->children, i, NULL);
+        vec_pop(node->keys, j);
+        vec_pop(node->children, i);
     }
 
     if(node == btree->root && vec_len(node->keys) == 0) {
@@ -254,15 +254,15 @@ void btree_delete_sibling(BTree* btree, struct btree_node* node, int i, int j) {
         vec_set(node->keys, i, vec_get(rsnode->keys, 0));
         if(vec_len(rsnode->children) > 0) {
             vec_push(cnode->children, vec_get(rsnode->children, 0));
-            vec_zap(rsnode->children, 0, NULL);
+            vec_pop(rsnode->children, 0);
         }
-        vec_zap(rsnode->keys, 0, NULL);
+        vec_pop(rsnode->keys, 0);
     } else {
         struct btree_node* lsnode = vec_get(node->children, j);
         vec_insert(cnode->keys, 0, vec_get(node->keys, i - 1));
         vec_set(node->keys, i - 1, vec_pop(lsnode->keys, -1));
         if(vec_len(lsnode->children) > 0) {
-            vec_insert(cnode->children, 0, vec_pop(lsnode->children, -1));
+            vec_insert(cnode->children, 0, vec_pop(lsnode->children, vec_len(lsnode->children)-1));
         }
     }
 }
@@ -271,7 +271,7 @@ void btree_delete_internal_node(BTree* btree, struct btree_node* node, int key, 
     int t = btree->degree;
     if(node->is_leaf) {
         if(vec_get(node->keys, i) == key) {
-            vec_zap(node->keys, i, NULL);
+            vec_pop(node->keys, i);
         }
         return;
     }
@@ -294,12 +294,12 @@ void btree_delete(BTree* btree, struct btree_node* node, int key) {
     
     while(i < vec_len(node->keys) && key > vec_get(node->keys, i)) {
         i++;
-        if(node->is_leaf) {
-            if(i < vec_len(node->keys) && key == vec_get(node->keys, i)) {
-                vec_zap(node->keys, i, NULL);
-            }
-            return;
+    }
+    if(node->is_leaf) {
+        if(i < vec_len(node->keys) && key == vec_get(node->keys, i)) {
+            vec_pop(node->keys, i);
         }
+        return;
     }
     if(i < vec_len(node->keys) && vec_get(node->keys, i) == key) {
         return btree_delete_internal_node(btree, node, key, i);
