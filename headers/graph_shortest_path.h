@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "graph.h"
 #include "priority_queue.h"
 

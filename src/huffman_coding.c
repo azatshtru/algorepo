@@ -35,13 +35,6 @@ struct huffman_tree_node* huffman_tree(char* cstr, int len) {
 
     PriorityQueue(struct huffman_tree_node*) tree = priority_queue_new(struct huffman_tree_node*);
 
-    for(int i = 0; i < HUFFMAN_ENCODING_TABLE_SIZE; i++) {
-        if(nodes[i].frequency) {
-            print_node(nodes + i);
-        }
-    }
-    printf("\n");
-
     for(int i = 1; i < HUFFMAN_ENCODING_TABLE_SIZE; i++) {
         if(nodes[i].frequency > 0) {
             struct huffman_tree_node* leaf = huffman_tree_node_new(i, 1, nodes[i].frequency, NULL, NULL);
@@ -49,18 +42,12 @@ struct huffman_tree_node* huffman_tree(char* cstr, int len) {
         }
     }
 
-
-
-
-
     while(priority_queue_len(tree) > 1) {
         struct huffman_tree_node* left = priority_queue_dq(tree);
         struct huffman_tree_node* right = priority_queue_dq(tree);
         struct huffman_tree_node* internal = huffman_tree_node_new(0, 0, left->frequency + right->frequency, left, right);
         priority_queue_nq(tree, internal, left->frequency + right->frequency);
-        print_priorities("chelp", tree);
     }
-
 
     struct huffman_tree_node* root = priority_queue_dq(tree);
 

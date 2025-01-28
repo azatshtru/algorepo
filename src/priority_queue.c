@@ -1,14 +1,5 @@
 #include "../headers/priority_queue.h"
 
-void print_priorities(char* label, void* q_ptr) {
-    struct priority_queue* q = (struct priority_queue*)q_ptr;
-    printf("%s: [ ", label);
-    for(int i = 0; i < q->len; i++) {
-        printf("%d, ", q->priority[i]);
-    }
-    printf("\b\b ]\n");
-}
-
 void* priority_queue_allocate(unsigned int cap, unsigned long typesize) {
     struct priority_queue* q = malloc(sizeof(struct priority_queue));
     q->data = malloc(PRIORITY_QUEUE_INIT_SIZE * typesize);
@@ -38,18 +29,15 @@ void priority_queue_resize(void* q_ptr, int new_len) {
     int len = q->len > new_len ? new_len : q->len;
 
 
-    int* prior = malloc(new_len * sizeof(int));
-    memmove(prior, q->priority, len * sizeof(int));
+    int* priority = malloc(new_len * sizeof(int));
+    memmove(priority, q->priority, len * sizeof(int));
     char* data = malloc(new_len * q->typesize);
     memmove(data, q->data, len * q->typesize);
 
-    // free(q->data);
     q->data = data;
-
-
-    // free(q->priority);
-    q->priority = prior;
-    print_priorities("after", q);
+    q->priority = priority;
+    free(q->data);
+    free(q->priority);
 
     q->cap = new_len;
 }
