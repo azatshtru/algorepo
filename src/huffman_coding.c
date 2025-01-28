@@ -1,10 +1,6 @@
 #include "../headers/huffman_coding.h"
 #include <stdio.h>
 
-void print_node(struct huffman_tree_node* node) {
-    printf("(%c, %d)", node->symbol, node->frequency);
-}
-
 int huffman_tree_node_priority(void* node_ptr) {
     struct huffman_tree_node* node = *((struct huffman_tree_node**)node_ptr);
     return node->frequency;
@@ -76,11 +72,4 @@ void huffman_encoding(struct huffman_prefix_table* prefix_table, char* cstr, int
     struct huffman_tree_node* root = huffman_tree(cstr, len);
     huffman_encoding_prefix_codes(prefix_table, root, 0);
     free(root);
-}
-
-void huffman_encoding_print_bits_as_string(struct huffman_prefix_table* prefix_table, char* cstr, int len) {
-    for(int i = 0; i < len; i++) {
-        printf("%d ", prefix_table->table[cstr[i]]);
-    }
-    printf("\n");
 }
