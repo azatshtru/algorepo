@@ -55,6 +55,26 @@ oj_test(container_of_returns_the_pointer_to_struct) {
     oj_fresh;
 }
 
+oj_test(swaping_2_points) {
+    struct point2d point1 = { 3, 4 };
+    struct point2d point2 = { 5, 0 };
+
+    swap(&point1, &point2, sizeof(struct point2d));
+
+    oj_assert_eq_int(5, point1.x);
+    oj_assert_eq_int(0, point1.y);
+    oj_assert_eq_int(3, point2.x);
+    oj_assert_eq_int(4, point2.y);
+
+    oj_fresh;
+}
+
+oj_prepare(swap_tests) {
+    oj_run(swaping_2_points);
+    oj_report;
+    oj_fresh;
+}
+
 oj_prepare(container_of_tests) {
     oj_run(container_of_returns_the_pointer_to_struct);
     oj_report;
@@ -89,6 +109,7 @@ int main() {
     oj_blend(exponentiation_tests, 0);
     oj_blend(cantor_pairing_tests, 0);
     oj_blend(container_of_tests, 0);
+    oj_blend(swap_tests, 0);
     return 0;
 }
 

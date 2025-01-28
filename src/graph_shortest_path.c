@@ -4,14 +4,14 @@ unsigned int graph_dijkstra(struct graph* graph, unsigned int s, unsigned int e)
     int distance[graph_vertices_len(graph)];
     int processed[graph_vertices_len(graph)];
 
-    PriorityQueue(int) q = priority_queue_new(int, 0);
+    PriorityQueue(int) q = priority_queue_new(int);
 
     for(int i = 0; i < vec_len(graph); i++) { 
         distance[i] = INT32_MAX;
         processed[i] = 0;
     }
     distance[s] = 0;
-    priority_queue_nqx(q, 0, 0);
+    priority_queue_nq(q, 0, 0);
 
     while(priority_queue_len(q)) {
         int index = priority_queue_dq(q);
@@ -23,7 +23,7 @@ unsigned int graph_dijkstra(struct graph* graph, unsigned int s, unsigned int e)
             int weight = weighted_edge_weight(graph_edge_between(graph, current, neighbour));
             if(distance[index]+weight < distance[neighbour->i]) {
                 distance[neighbour->i] = distance[index]+weight;
-                priority_queue_nqx(q, neighbour->i, -distance[neighbour->i]);
+                priority_queue_nq(q, neighbour->i, -distance[neighbour->i]);
             }
         }
     }

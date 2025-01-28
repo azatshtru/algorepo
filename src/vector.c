@@ -24,7 +24,7 @@ void vec_free(void* vec, void(*free_fn)(void*)) {
 void vec_resize(Vector* vec, uint32 new_len) {
     uint32 len = vec->len > new_len ? new_len : vec->len;
     byte* data = malloc(new_len * vec->type_size * sizeof(byte));
-    memcpy(data, vec->data, len*vec->type_size);
+    memmove(data, vec->data, len*vec->type_size);
     free(vec->data);
     vec->data = data;
     vec->cap = new_len;
@@ -37,7 +37,7 @@ int vec_zap(void* vec, int _index, void(*free_fn)(void*)) {
         free_fn(v->data + index * v->type_size);
     }
     uint32 copy_length = v->type_size * (v->len - index - 1);
-    memcpy(v->data + (index * v->type_size), v->data + ((index+1) * v->type_size), copy_length);
+    memmove(v->data + (index * v->type_size), v->data + ((index+1) * v->type_size), copy_length);
     --v->len;
     if (v->cap >= VEC_INIT_SIZE * 2 && v->len <= v->cap / 2) {
         vec_resize(v, v->len);

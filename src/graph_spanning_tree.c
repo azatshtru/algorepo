@@ -39,7 +39,7 @@ void graph_kruskal(struct graph* graph, struct graph* minimum_spanning_tree) {
 }
 
 void graph_prim(struct graph* graph, struct graph* spanning_tree) {
-    PriorityQueue(struct vertex*) q = priority_queue_new(struct vertex*, NULL);
+    PriorityQueue(struct vertex*) q = priority_queue_new(struct vertex*);
     struct edge* edges[graph_edges_len(graph)];
 
     unsigned int vertex_len = graph_vertices_len(graph);
@@ -51,7 +51,7 @@ void graph_prim(struct graph* graph, struct graph* spanning_tree) {
         processed[i] = 0;
     }
 
-    priority_queue_nqx(q, graph_vertex_from_i(graph, 0), 0);
+    priority_queue_nq(q, graph_vertex_from_i(graph, 0), 0);
 
     for(int j = 0; j < vertex_len - 1; j++) {
         struct vertex* s = priority_queue_dq(q);
@@ -69,7 +69,7 @@ void graph_prim(struct graph* graph, struct graph* spanning_tree) {
             struct vertex* u = vec_get(s->out, i);
             struct edge* edge = graph_edge_between(graph, s, u);
             int weight = weighted_edge_weight(edge);
-            priority_queue_nqx(q, u, -weight);
+            priority_queue_nq(q, u, -weight);
             if(!processed[u->i] && distance[u->i] > weight) {
                 distance[u->i] = weight;
                 edges[u->i] = edge;

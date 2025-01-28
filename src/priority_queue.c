@@ -1,23 +1,62 @@
 #include "../headers/priority_queue.h"
 
-void* priority_queue_allocate(uint32 type_size, int(*priority)(void*)) {
+void print_priorities(char* label, void* q_ptr) {
+    struct priority_queue* q = (struct priority_queue*)q_ptr;
+    printf("%s: [ ", label);
+    for(int i = 0; i < q->len; i++) {
+        printf("%d, ", q->priority[i]);
+    }
+    printf("\b\b ]\n");
+}
+
+void* priority_queue_allocate(unsigned int cap, unsigned long typesize) {
     struct priority_queue* q = malloc(sizeof(struct priority_queue));
-    q->v = vec_allocate(VEC_INIT_SIZE, type_size);
-    q->priority = priority;
-    q->proxy_priority = vec_new(int);
-    return (void*)q;
+    q->data = malloc(PRIORITY_QUEUE_INIT_SIZE * typesize);
+    q->priority = malloc(PRIORITY_QUEUE_INIT_SIZE * sizeof(int));
+    q->tmp = malloc(typesize);
+    q->len = 0;
+    q->cap = cap;
+    q->typesize = typesize;
+    return q;
 }
 
 void priority_queue_free(void* q_ptr, void(*free_fn)(void*)) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
-    vec_free(q->v, free_fn);
-    vec_free(q->proxy_priority, NULL);
+    if(free_fn) {
+        for(int i = 0; i < q->len; i++) {
+            free_fn(q->data + i*q->typesize);
+        }
+    }
+    free(q->data);
+    free(q->priority);
+    free(q->tmp);
     free(q);
+}
+
+void priority_queue_resize(void* q_ptr, int new_len) {
+    struct priority_queue* q = (struct priority_queue*)q_ptr;
+    int len = q->len > new_len ? new_len : q->len;
+
+
+    int* prior = malloc(new_len * sizeof(int));
+    memmove(prior, q->priority, len * sizeof(int));
+    char* data = malloc(new_len * q->typesize);
+    memmove(data, q->data, len * q->typesize);
+
+    // free(q->data);
+    q->data = data;
+
+
+    // free(q->priority);
+    q->priority = prior;
+    print_priorities("after", q);
+
+    q->cap = new_len;
 }
 
 int priority_queue_len(void* q_ptr) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
-    return vec_len(q->v);
+    return q->len;
 }
 
 int priority_queue_is_empty(void* q_ptr) {
@@ -26,36 +65,62 @@ int priority_queue_is_empty(void* q_ptr) {
 
 int priority_queue_priority(void* q_ptr, int index) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
-    if(q->priority == NULL) {
-        return vec_get(q->proxy_priority, index);
-    }
-    return q->priority(q->v->data + index*q->v->type_size);
+    return q->priority[index];
 }
 
-int priority_queue_cmp_by_index(struct priority_queue* q, int i, int j) {
-    int typesize = q->v->type_size;
-    return i < priority_queue_len(q) && j < priority_queue_len(q)
-        && priority_queue_priority(q, i) < priority_queue_priority(q, j);
-}
-
-void priority_queue_heapify(void* q_ptr) {
+int priority_queue_zap_min(void* q_ptr, void(*free_fn)(void*)) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
-    int typesize = q->v->type_size;
+    priority_queue_swap(q, 0, priority_queue_len(q) - 1);
+    if(free_fn) {
+        free_fn(q->data + (q->len-1) * q->typesize);
+    }
+    --q->len;
+    if (q->cap >= PRIORITY_QUEUE_INIT_SIZE * 2 && q->len <= q->cap / 2) {
+        priority_queue_resize(q, q->cap/2);
+    }
+    priority_queue_heapify_down(q);
+    return 0;
+}
+
+void priority_queue_heapify_up(void* q_ptr) {
+    struct priority_queue* q = (struct priority_queue*)q_ptr;
+    int i = q->len - 1;
+
+    while(i > 0) {
+        int j = (i - 1) / 2;
+        if (q->priority[i] < q->priority[j]) {
+            priority_queue_swap(q, i, j);
+            i = j;
+        } else {
+            break;
+        }
+    }
+}
+
+void priority_queue_heapify_down(void* q_ptr) {
+    struct priority_queue* q = (struct priority_queue*)q_ptr;
+    int typesize = q->typesize;
 
     int i = 0;
-    while(2*i+1 < priority_queue_len(q)) {
-    int j = i;
-        if(priority_queue_cmp_by_index(q, 2*i+1, j)) { j = 2*i+1; }
-        if(priority_queue_cmp_by_index(q, 2*i+2, j)) { j = 2*i+2; }
-        if(j == i) { return; }
-        priority_queue_swap(q_ptr, i, j);
+    while(1) {
+        int j = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        if (left < q->len && q->priority[left] < q->priority[j]) { j = left; }
+        if (right < q->len && q->priority[right] < q->priority[j]) { j = right; }
+        if (j == i) { break; }
+
+        priority_queue_swap(q, i, j);
         i = j;
     }
 }
 
 void priority_queue_swap(void* q_ptr, int a, int b) {
     struct priority_queue* q = (struct priority_queue*)q_ptr;
-    int typesize = q->v->type_size;
-    swap(q->v->data + a*typesize, q->v->data + b*typesize, typesize);
-    swap(*q->proxy_priority + a, *q->proxy_priority + b, sizeof(int));
+    int typesize = q->typesize;
+    swap(q->data + a*typesize, q->data + b*typesize, typesize);
+    q->priority[a] = q->priority[a] ^ q->priority[b];
+    q->priority[b] = q->priority[a] ^ q->priority[b];
+    q->priority[a] = q->priority[a] ^ q->priority[b];
 }

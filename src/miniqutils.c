@@ -1,4 +1,5 @@
 #include "../headers/miniqutils.h"
+#include <stdio.h>
 
 #define EULER_CONSTANT 2.718281828459045235
 #define PI 3.14159265358979323846
@@ -17,9 +18,10 @@ int power(int base, int exponent) {
 
 void swap(void* a, void* b, unsigned int size) {
     char temp[size];
-    memcpy(temp, a, size);
-    memcpy(a, b, size);
-    memcpy(b, temp, size);
+    memzero(temp, size);
+    memmove(temp, a, size);
+    memmove(a, b, size);
+    memmove(b, temp, size);
 }
 
 int cantor_pairing(int a, int b) {
