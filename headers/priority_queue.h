@@ -16,8 +16,6 @@ struct priority_queue {
     int typesize;
 };
 
-void print_priorities(char* label, void* q_ptr);
-
 void* priority_queue_allocate(unsigned int cap, unsigned long typesize);
 void priority_queue_free(void* q_ptr, void(*free_fn)(void*));
 void priority_queue_resize(void* q_ptr, int len);

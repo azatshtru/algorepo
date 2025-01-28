@@ -34,10 +34,11 @@ void priority_queue_resize(void* q_ptr, int new_len) {
     char* data = malloc(new_len * q->typesize);
     memmove(data, q->data, len * q->typesize);
 
-    q->data = data;
-    q->priority = priority;
     free(q->data);
     free(q->priority);
+
+    q->data = data;
+    q->priority = priority;
 
     q->cap = new_len;
 }

@@ -133,7 +133,7 @@ oj_test(priority_queue_enqueue_10_pointers) {
     PriorityQueue(struct test_huffman_tree_node*) tree = priority_queue_new(struct test_huffman_tree_node*);
 
     for(int i = 0; i < 6; i++) {
-        nodes[i] = malloc(sizeof(int));
+        nodes[i] = malloc(sizeof(struct test_huffman_tree_node));
         (*nodes[i]).symbol = character[i];
         (*nodes[i]).is_leaf = 1;
         (*nodes[i]).frequency = frequencies[i];

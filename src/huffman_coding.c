@@ -11,7 +11,7 @@ int huffman_tree_node_priority(void* node_ptr) {
 }
 
 struct huffman_tree_node* huffman_tree_node_new(char symbol, int is_leaf, int frequency, struct huffman_tree_node* left, struct huffman_tree_node* right) {
-    struct huffman_tree_node* node = malloc(sizeof(struct huffman_tree_node*));
+    struct huffman_tree_node* node = malloc(sizeof(struct huffman_tree_node));
     node->symbol = symbol;
     node->is_leaf = is_leaf;
     node->frequency = frequency;
@@ -74,7 +74,7 @@ void huffman_encoding_prefix_codes(struct huffman_prefix_table* prefix_table, st
 
 void huffman_encoding(struct huffman_prefix_table* prefix_table, char* cstr, int len) {
     struct huffman_tree_node* root = huffman_tree(cstr, len);
-    // huffman_encoding_prefix_codes(prefix_table, root, 0);
+    huffman_encoding_prefix_codes(prefix_table, root, 0);
     free(root);
 }
 
