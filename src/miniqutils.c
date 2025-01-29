@@ -97,3 +97,13 @@ double natural_log(double x) {
     result += scale;
     return invert ? -result : result;
 }
+
+void euro_coins(int* coins) {
+    int i = 0;
+    coins[0] = 1;
+    coins[1] = 2;
+    coins[2] = 5;
+    coins[3] = 10;
+    coins[4] = 20;
+    coins[5] = 50;
+}
