@@ -1,69 +1,81 @@
-#include "graph.c"
-#include "../VI. Queues/circular_deque.c"
-#include "../VI. Queues/priority_queue.c"
-
-#define INFINITY_8BIT 127778
+#include "../headers/graph.h"
+#include "../headers/queue.h"
+#include "../headers/priority_queue.h"
+#include "../headers/miniqutils.h"
 
 #ifndef ACYCLIC_GRAPH
 #define ACYCLIC_GRAPH
 
-boolean acyclic_graph_topological_dfs(GraphNode* node, uint8* state, uint8** topological_order) {
-    if(state[node->graph_index] == 2) { return TRUE; }
-    if(state[node->graph_index] == 1) { return FALSE; }
-    boolean flag;
-    state[node->graph_index] = 1;
-    for(int i = 0; i < vec_len(node->neighbour_list); i++) {
-        GraphNode* u = node->neighbour_list[i].node;
-        flag = acyclic_graph_topological_dfs(u, state, topological_order);
-        if(flag == FALSE) { break; }
+#define PROCESSING 1
+#define PROCESSED 2
+
+int acyclic_graph_topological_depth_first_search(struct vertex* v, int* state, struct vertex** topological_order, int topological_order_index) {
+    if(state[v->i] == PROCESSED) { return 1; }
+    if(state[v->i] == PROCESSING) { return 0; }
+    int is_acyclic;
+    state[v->i] = PROCESSING;
+    for(int i = 0; i < graph_vertex_out_degree(v); i++) {
+        struct vertex* u = vec_get(v->out, i);
+        is_acyclic = acyclic_graph_topological_depth_first_search(u, state, topological_order, topological_order_index);
+        if(is_acyclic == 0) { break; }
     }
-    state[node->graph_index] = 2;
-    if(topological_order != NULL) { __vec_push__(*topological_order, node->graph_index); }
-    return flag;
+    state[v->i] = PROCESSED;
+    if(topological_order != NULL) {
+        topological_order[topological_order_index++] = v;
+    }
+    return is_acyclic;
 }
 
-uint8* acyclic_graph_sort_topologically(AdjacencyListGraph adj_graph) {
-    uint8 state[vec_len(adj_graph)];
-    for(int i = 0; i < vec_len(adj_graph); i++) { state[i] = 0; }
-    uint8* topological_order = __vec_new__(uint8);
-    for(int i = 0; i < vec_len(adj_graph); i++) {
-        if(state[i]!=0) { continue; }
-        if(acyclic_graph_topological_dfs(adj_graph+i, state, &topological_order)) { continue; }
-        else { return NULL; }
+int acyclic_graph_toplogical_sort(struct graph* graph, struct vertex** topological_order) {
+    int vertex_len = graph_vertices_len(graph);
+    int state[vertex_len];
+    for(int i = 0; i < vertex_len; i++) {
+        state[i] = 0;
     }
-    for(int i = 0, j = vec_len(adj_graph)-1; i < j; i++, j--) {
-        topological_order[i] = topological_order[i] ^ topological_order[j];
-        topological_order[j] = topological_order[i] ^ topological_order[j];
-        topological_order[i] = topological_order[i] ^ topological_order[j];
+    for(int i = 0; i < vertex_len; i++) {
+        if(state[i] != 0) { continue; }
+        if(acyclic_graph_topological_depth_first_search(graph_vertex_from_i(graph, i), state, topological_order, 0)) {
+            continue;
+        } else {
+            return 1;
+        }
     }
-    return topological_order;
+    for(int i = 0, j = vertex_len - 1; i < j; i++, j--) {
+        swap(topological_order + i, topological_order + j, sizeof(struct vertex*));
+    }
+    return 0;
 }
 
-uint8 _acyclic_graph_number_of_paths(AdjacencyListGraph adj_graph, uint8 base_node, uint8 current_node, uint8* paths, uint8* visited) {
-    if(visited[current_node]) { return paths[current_node]; }
-    visited[current_node] = 1;
-    if(current_node == base_node) { return 1; }
-    uint8 pathsum = 0;
-    for(int i = 0; i < vec_len(adj_graph[current_node].neighbour_list); i++) {
-        GraphNode u = *(adj_graph[current_node].neighbour_list[i].node);
-        pathsum += _acyclic_graph_number_of_paths(adj_graph, base_node, u.graph_index, paths, visited);
+int acyclic_graph_paths_to(struct graph* graph, struct vertex* s, struct vertex* current, int* paths, int* visited) {
+    if(visited[current->i]) {
+        return paths[current->i];
     }
-    paths[current_node] = pathsum;
+    visited[current->i] = 1;
+    if(current == s) {
+        return 1;
+    }
+    int pathsum = 0;
+    for(int i = 0; i < graph_vertex_out_degree(current); i++) {
+        struct vertex* u = vec_get(current->out, i);
+        pathsum += acyclic_graph_paths_to(graph, s, u, paths, visited);
+    }
+    paths[current->i] = pathsum;
     return pathsum;
 }
 
-uint8 acyclic_graph_number_of_paths(AdjacencyListGraph adj_graph, uint8 starting_node_index, uint8 query_node_index) {
-    uint8 paths[vec_len(adj_graph)];
-    boolean visited[vec_len(adj_graph)];
-    for(int i = 0; i < vec_len(adj_graph); i++) { 
+int acyclic_graph_paths_between(struct graph* graph, struct vertex* from, struct vertex* to) {
+    int vertex_len = graph_vertices_len(graph);
+    int paths[vertex_len];
+    int visited[vertex_len];
+    for(int i = 0; i < vertex_len; i++) { 
         paths[i] = 0;
-        visited[i] = FALSE;
+        visited[i] = 0;
     }
-    paths[query_node_index] = 1;
+    paths[to->i] = 1;
 
-    _acyclic_graph_number_of_paths(adj_graph, query_node_index, starting_node_index, paths, visited);
+    acyclic_graph_paths_to(graph, to, from, paths, visited);
 
-    return paths[starting_node_index];
+    return paths[from->i];
 }
 
 void graph_dijkstra_acyclic_product(AdjacencyListGraph graph, uint8 starting_node_index, AdjacencyListGraph* acyclic_graph) {

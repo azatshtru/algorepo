@@ -1,5 +1,4 @@
 #include "../headers/huffman_coding.h"
-#include <stdio.h>
 
 int huffman_tree_node_priority(void* node_ptr) {
     struct huffman_tree_node* node = *((struct huffman_tree_node**)node_ptr);
