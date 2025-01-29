@@ -15,7 +15,8 @@ void array_random_01(float* array_ptr, uint32 length) {
 }
 
 // Traversal is technique used to pass through each element of an array to analyse it.
-// Additionally, a flag can be used to keep track of properties of the entire array that are derived through individual analysis of elements.
+// Additionally, a flag can be used to keep track of properties of the entire array that are
+// derived through individual analysis of elements.
 
 float array_sum_float(float* array_ptr, uint32 length) {
     float sum = 0; // initializing the flag
@@ -39,4 +40,25 @@ float array_max_float(float* array_ptr, uint32 length) {
         max = array_ptr[i] > max ? array_ptr[i] : max;
     }
     return max;
+}
+
+/// from an array of numbers, find a continuous subarray whose values sum to the given target
+int subarray_with_sum(int* array, int len, int target, int* start, int* end) {
+    int i = 0;
+    int j = 0;
+    int sum = array[i];
+    while(i < len || j < len) {
+        while(sum < target) {
+            sum += array[j++];
+        }
+        if(sum == target) {
+            *start = i;
+            *end = j;
+            return 1;
+        }
+        while(sum > target) {
+            sum -= array[i++];
+        }
+    }
+    return 0;
 }

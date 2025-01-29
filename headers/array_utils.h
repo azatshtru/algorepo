@@ -33,4 +33,6 @@ float array_sum_float(float* array_ptr, uint32 length);
 float array_min_float(float* array_ptr, uint32 length);
 float array_max_float(float* array_ptr, uint32 length);
 
+int subarray_with_sum(int* array, int len, int target, int* start, int* end);
+
 #endif
