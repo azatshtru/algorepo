@@ -24,6 +24,14 @@ void swap(void* a, void* b, unsigned int size) {
     memmove(b, temp, size);
 }
 
+int log_2(int x) {
+    int log = 0;
+    while(x>>=1) {
+        ++log;
+    }
+    return log; 
+}
+
 int cantor_pairing(int a, int b) {
     return ((a+b)*(a+b+1))/2 + b;
 }
