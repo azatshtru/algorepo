@@ -55,16 +55,16 @@ void graph_hierholzer(struct graph* graph, struct edge** eulerian_path) {
     }
 }
 
-void hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(struct vertex*) path) {
+void graph_hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(struct vertex*) path) {
     if (mask == (1 << pos)) {
         vec_push(path, graph_vertex_from_i(graph, pos));
         return;
     }
-    hamiltonian_path_traverse(graph, previous, mask ^ (1 << pos), previous[mask][pos], path);
+    graph_hamiltonian_path_traverse(graph, previous, mask ^ (1 << pos), previous[mask][pos], path);
     vec_push(path, graph_vertex_from_i(graph, pos));
 }
 
-int hamiltonian_path(struct graph* graph, struct vertex** path) {
+int graph_hamiltonian_path(struct graph* graph, struct vertex** path) {
     int n = graph_vertices_len(graph);
 
     int** distance = malloc(sizeof(int*) * (1<<n));
@@ -136,7 +136,7 @@ int hamiltonian_path(struct graph* graph, struct vertex** path) {
     return has_hamiltonian_path;
 }
 
-int hamiltonian_circuit(struct graph* graph, struct vertex** path) {
+int graph_hamiltonian_circuit(struct graph* graph, struct vertex** path) {
     int n = graph_vertices_len(graph);
 
     int** distance = malloc(sizeof(int*) * (1<<n));
@@ -207,4 +207,102 @@ int hamiltonian_circuit(struct graph* graph, struct vertex** path) {
     free(distance);
     free(previous);
     return found_circuit;
+}
+
+void de_bruijn_traverse(int* a, int t, int p, int k, int n, vector(int) sequence) {
+    if(t > n) {
+        if(n % p == 0) {
+            for(int i = 1; i < p + 1; i++) {
+                vec_push(sequence, a[i]);
+            }
+        }
+    } else {
+        a[t] = a[t - p];
+        de_bruijn_traverse(a, t + 1, p, k, n, sequence);
+        for(int j = a[t - p] + 1; j < k; j++) {
+            a[t] = j;
+            de_bruijn_traverse(a, t + 1, t, k, n, sequence);
+        }
+    }
+}
+
+void de_bruijn(int k, int n, vector(char) out) {
+    int alphabet[k];
+    for(int i = 0; i < k; i++) {
+        alphabet[i] = i;
+    }
+
+    int a[k * n];
+    memzero(a, sizeof(int) * k * n);
+    vector(int) sequence = vec_new(int);
+
+
+    de_bruijn_traverse(a, 1, 1, k, n, sequence);
+    for(int i = 0; i < vec_len(sequence); i++) {
+        vec_push(out, alphabet[vec_get(sequence, i)]);
+    }
+
+    vec_free(sequence, NULL);
+}
+
+
+int knight_moves_x[8] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+int knight_moves_y[8] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
+int knight_move_is_valid(int** board, int n, int x, int y) {
+    return (x >= 0 && x < n && y >= 0 && y < n && board[x][y] == -1);
+}
+
+int knight_moves_count(int** board, int n, int x, int y) {
+    int count = 0;
+    for (int i = 0; i < 8; i++)
+        if (knight_move_is_valid(board, n, x + knight_moves_x[i], y + knight_moves_y[i])) {
+            count++;
+        }
+    return count;
+}
+
+int knight_move_warnsdorff(int** board, int n, int *x, int *y) {
+    int min_degree = I32_MAX;
+    int index = -1;
+    int nx;
+    int ny;
+
+    for (int i = 0; i < n; i++) {
+        nx = *x + knight_moves_x[i];
+        ny = *y + knight_moves_y[i];
+
+        if (knight_move_is_valid(board, n, nx, ny)) {
+            int degree = knight_moves_count(board, n, nx, ny);
+            if (degree < min_degree) {
+                min_degree = degree;
+                index = i;
+            }
+        }
+    }
+
+    if (index == -1) return 0;
+
+    *x += knight_moves_x[index];
+    *y += knight_moves_y[index];
+    return 1;
+}
+
+int knights_tour(int** board, int n, int start_x, int start_y) {
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            board[i][j] = -1;
+
+    int x = start_x;
+    int y = start_y;
+    board[x][y] = 0;
+
+    for (int move = 1; move < n * n; move++) {
+        if (!knight_move_warnsdorff(board, n, &x, &y))
+            return 0;
+
+        board[x][y] = move;
+    }
+
+    return 1;
 }
