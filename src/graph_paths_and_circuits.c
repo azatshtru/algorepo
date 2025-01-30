@@ -54,3 +54,157 @@ void graph_hierholzer(struct graph* graph, struct edge** eulerian_path) {
         last_vertex = current_vertex;
     }
 }
+
+void hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(struct vertex*) path) {
+    if (mask == (1 << pos)) {
+        vec_push(path, graph_vertex_from_i(graph, pos));
+        return;
+    }
+    hamiltonian_path_traverse(graph, previous, mask ^ (1 << pos), previous[mask][pos], path);
+    vec_push(path, graph_vertex_from_i(graph, pos));
+}
+
+int hamiltonian_path(struct graph* graph, struct vertex** path) {
+    int n = graph_vertices_len(graph);
+
+    int** distance = malloc(sizeof(int*) * (1<<n));
+    int** previous = malloc(sizeof(int*) * (1<<n));
+    for(int i = 0; i < (1<<n); i++) {
+        distance[i] = malloc(sizeof(int) * n);
+        previous[i] = malloc(sizeof(int) * n);
+        memzero(distance[i], sizeof(int) * n);
+        memzero(previous[i], sizeof(int) * n);
+    }
+
+    for (int i = 0; i < (1 << n); i++) {
+        for (int j = 0; j < n; j++) {
+            distance[i][j] = I32_MAX;
+            previous[i][j] = -1;
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        distance[1 << i][i] = 0;
+    }
+
+    for (int mask = 0; mask < (1 << n); mask++) {
+        for (int u = 0; u < n; u++) {
+            if (!(mask & (1 << u))) { continue; }
+
+            struct vertex* current = graph_vertex_from_i(graph, u);
+            for (int i = 0; i < vec_len(current->out); i++) {
+                int v = vec_get(current->out, i)->i;
+                if (mask & (1 << v)) { continue; }
+
+                int new_mask = mask | (1 << v);
+                if (distance[mask][u] != I32_MAX && distance[new_mask][v] > distance[mask][u] + 1) {
+                    distance[new_mask][v] = distance[mask][u] + 1;
+                    previous[new_mask][v] = u;
+                }
+            }
+        }
+    }
+
+    int final_mask = (1 << n) - 1;
+    int min_length = I32_MAX;
+    int end_vertex = -1;
+
+    for (int i = 0; i < n; i++) {
+        if (distance[final_mask][i] < min_length) {
+            min_length = distance[final_mask][i];
+            end_vertex = i;
+        }
+    }
+
+    int has_hamiltonian_path = 1;
+
+    if (min_length == I32_MAX) {
+        has_hamiltonian_path = 0;
+    } else {
+        vector(struct vertex*) path_vector = vec_new(struct vertex*);
+        hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
+        memmove(path, vec_as_array(path_vector), sizeof(struct vertex*) * vec_len(path_vector));
+        vec_free(path_vector, NULL);
+    }
+
+    for(int i = 0; i < (1<<n); i++) {
+        free(distance[i]);
+        free(previous[i]);
+    }
+    free(distance);
+    free(previous);
+    return has_hamiltonian_path;
+}
+
+int hamiltonian_circuit(struct graph* graph, struct vertex** path) {
+    int n = graph_vertices_len(graph);
+
+    int** distance = malloc(sizeof(int*) * (1<<n));
+    int** previous = malloc(sizeof(int*) * (1<<n));
+    for(int i = 0; i < (1<<n); i++) {
+        distance[i] = malloc(sizeof(int) * n);
+        previous[i] = malloc(sizeof(int) * n);
+        memzero(distance[i], sizeof(int) * n);
+        memzero(previous[i], sizeof(int) * n);
+    }
+
+    for (int i = 0; i < (1 << n); i++) {
+        for (int j = 0; j < n; j++) {
+            distance[i][j] = I32_MAX;
+            previous[i][j] = -1;
+        }
+    }
+
+    distance[1][0] = 0;
+
+    for (int mask = 0; mask < (1 << n); mask++) {
+        for (int u = 0; u < n; u++) {
+            if (!(mask & (1 << u))) { continue; }
+
+            struct vertex* current = graph_vertex_from_i(graph, u);
+            for (int i = 0; i < n; i++) {
+                int v = vec_get(current->out, i)->i;
+                if (mask & (1 << v)) { continue; }
+
+                int new_mask = mask | (1 << v);
+                if (distance[mask][u] != I32_MAX && distance[new_mask][v] > distance[mask][u] + 1) {
+                    distance[new_mask][v] = distance[mask][u] + 1;
+                    previous[new_mask][v] = u;
+                }
+            }
+        }
+    }
+
+    int final_mask = (1 << n) - 1;
+    int found_circuit = 0;
+    int end_vertex = -1;
+
+    for (int i = 0; i < n; i++) {
+        if(distance[final_mask][i] != I32_MAX
+            && graph_edge_between(
+                graph,
+                graph_vertex_from_i(graph, i),
+                graph_vertex_from_i(graph, 0)
+            )
+        ) {
+            found_circuit = 1;
+            end_vertex = i;
+            break;
+        }
+    }
+
+    if (found_circuit) {
+        vector(struct vertex*) path_vector = vec_new(struct vertex*);
+        hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
+        memmove(path, vec_as_array(path_vector), sizeof(struct vertex*) * vec_len(path_vector));
+        vec_free(path_vector, NULL);
+    }
+
+    for(int i = 0; i < (1<<n); i++) {
+        free(distance[i]);
+        free(previous[i]);
+    }
+    free(distance);
+    free(previous);
+    return found_circuit;
+}
