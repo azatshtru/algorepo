@@ -246,14 +246,14 @@ void de_bruijn(int k, int n, vector(char) out) {
 }
 
 
-int knight_moves_x[8] = { 2, 1, -1, -2, -2, -1, 1, 2 };
-int knight_moves_y[8] = { 1, 2, 2, 1, -1, -2, -2, -1 };
-
 int knight_move_is_valid(int** board, int n, int x, int y) {
     return (x >= 0 && x < n && y >= 0 && y < n && board[x][y] == -1);
 }
 
 int knight_moves_count(int** board, int n, int x, int y) {
+    int knight_moves_x[8] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+    int knight_moves_y[8] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
     int count = 0;
     for (int i = 0; i < 8; i++)
         if (knight_move_is_valid(board, n, x + knight_moves_x[i], y + knight_moves_y[i])) {
@@ -263,6 +263,9 @@ int knight_moves_count(int** board, int n, int x, int y) {
 }
 
 int knight_move_warnsdorff(int** board, int n, int *x, int *y) {
+    int knight_moves_x[8] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+    int knight_moves_y[8] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
     int min_degree = I32_MAX;
     int index = -1;
     int nx;
