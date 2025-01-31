@@ -122,7 +122,7 @@ int graph_hamiltonian_path(struct graph* graph, struct vertex** path) {
         has_hamiltonian_path = 0;
     } else {
         vector(struct vertex*) path_vector = vec_new(struct vertex*);
-        hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
+        graph_hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
         memmove(path, vec_as_array(path_vector), sizeof(struct vertex*) * vec_len(path_vector));
         vec_free(path_vector, NULL);
     }
@@ -195,7 +195,7 @@ int graph_hamiltonian_circuit(struct graph* graph, struct vertex** path) {
 
     if (found_circuit) {
         vector(struct vertex*) path_vector = vec_new(struct vertex*);
-        hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
+        graph_hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
         memmove(path, vec_as_array(path_vector), sizeof(struct vertex*) * vec_len(path_vector));
         vec_free(path_vector, NULL);
     }

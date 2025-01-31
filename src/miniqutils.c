@@ -4,6 +4,34 @@
 #define EULER_CONSTANT 2.718281828459045235
 #define PI 3.14159265358979323846
 
+double min_f(int n, ...) {
+    va_list args;
+    va_start(args, n);
+    double minimum = va_arg(args, double);
+    
+    for(int i = 1; i < n; i++) {
+        double x = va_arg(args, double);
+        minimum = x < minimum ? x : minimum;
+    }
+
+    va_end(args);
+    return minimum;
+}
+
+int min_i(int n, ...) {
+    va_list args;
+    va_start(args, n);
+    int minimum = va_arg(args, int);
+    
+    for(int i = 1; i < n; i++) {
+        int x = va_arg(args, int);
+        minimum = x < minimum ? x : minimum;
+    }
+
+    va_end(args);
+    return minimum;
+}
+
 void memzero(void* array, int len) {
     memset(array, 0, len);
 }
@@ -36,13 +64,16 @@ int cantor_pairing(int a, int b) {
     return ((a+b)*(a+b+1))/2 + b;
 }
 
+float positive_infinity() {
+    union raw_float positive_infinity_IEEE745;
+    positive_infinity_IEEE745.u = 0x7F800000; // IEEE 754 representation of +Infinity for 32-bit float
+    return positive_infinity_IEEE745.f;
+}
+
 float negative_infinity() {
-    union {
-        int i;
-        float f;
-    } u;
-    u.i = 0xFF800000; // IEEE 754 representation of -Infinity for a 32-bit float
-    return u.f;
+    union raw_float negative_infinity_IEEE745;
+    negative_infinity_IEEE745.u = 0xFF800000; // IEEE 754 representation of -Infinity for 32-bit float
+    return negative_infinity_IEEE745.f;
 }
 
 int positive_mod(int a, int m) {

@@ -7,9 +7,9 @@
 
 int graph_eulerian_path_exists(struct graph* graph, struct vertex** start_vertex);
 void graph_hierholzer(struct graph* graph, struct edge** eulerian_path);
-void hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(struct vertex*) path);
-int hamiltonian_path(struct graph* graph, struct vertex** path);
-int hamiltonian_circuit(struct graph* graph, struct vertex** path);
+void graph_hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(struct vertex*) path);
+int graph_hamiltonian_path(struct graph* graph, struct vertex** path);
+int graph_hamiltonian_circuit(struct graph* graph, struct vertex** path);
 
 void de_bruijn_traverse(int* a, int t, int p, int k, int n, vector(int) sequence);
 void de_bruijn(int k, int n, vector(char) out);

@@ -69,6 +69,18 @@ oj_test(swaping_2_points) {
     oj_fresh;
 }
 
+oj_test(minimum_of_81_72_24_46_53) {
+    oj_assert_eq_float(24, min_f(5.0, 81.0, 72.0, 24.0, 46.0, 53.0));
+    oj_assert_eq_int(24, min_i(5, 81, 72, 24, 46, 53));
+    oj_fresh;
+}
+
+oj_prepare(miniqutils_variadic_minimum_tests) {
+    oj_run(minimum_of_81_72_24_46_53);
+    oj_report;
+    oj_fresh;
+}
+
 oj_prepare(swap_tests) {
     oj_run(swaping_2_points);
     oj_report;
@@ -110,6 +122,7 @@ int main() {
     oj_blend(cantor_pairing_tests, 0);
     oj_blend(container_of_tests, 0);
     oj_blend(swap_tests, 0);
+    oj_blend(miniqutils_variadic_minimum_tests, 0);
     return 0;
 }
 

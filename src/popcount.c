@@ -33,11 +33,14 @@ int popcount_parallel(int x) {
 /// popcount_sparse_ones is used if it is known that ones are relatively less compared to zeroes
 int popcount_sparse_ones(int x) { 
     int count = 0;
-    while(x) { x &= (x-1); ++count; }
+    while(x) {
+        x &= (x-1);
+        ++count;
+    }
     return count;
 }
 
 /// given two values, find how often their bits differ
 int popcount_hamming_distance(int a, int b) {
-    return popcount_parallel(a^b);
+    return popcount_parallel(a ^ b);
 }

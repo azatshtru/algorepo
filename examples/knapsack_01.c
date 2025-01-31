@@ -26,3 +26,7 @@ int knapsack_01x(int* weights, int weights_len, int capacity) {
     }
     return knapsack[capacity];
 }
+
+int main() {
+    return 0;
+}
