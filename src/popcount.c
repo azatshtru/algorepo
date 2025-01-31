@@ -36,3 +36,8 @@ int popcount_sparse_ones(int x) {
     while(x) { x &= (x-1); ++count; }
     return count;
 }
+
+/// given two values, find how often their bits differ
+int popcount_hamming_distance(int a, int b) {
+    return popcount_parallel(a^b);
+}
