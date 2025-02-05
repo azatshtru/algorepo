@@ -93,7 +93,7 @@ void hashset_shush_remove(void* hashset_ptr, void* value_ptr) {
         hashset_resize_rehash(hashset, rehash);
     }
 
-    unsigned int hash = hashset_entry_index(hashset_ptr, value_ptr, 1);
+    unsigned int hash = hashset_entry_index(hashset_ptr, value_ptr, 0);
     if(hashset->data_states[hash] == 2) {
         hashset->data_states[hash] = 1;
         --hashset->len;
@@ -144,7 +144,8 @@ unsigned int hashset_len(void* hashset) {
 
 int hashset_lazy_iterate(void* hashset_ptr, int index) {
     struct hashset* hashset = (struct hashset*)hashset_ptr;
-    if(index >= hashset->cardinality) { return -1; }
-    while(hashset->data_states[++index] != 2 && index < hashset->cardinality) {}
+    if(hashset->data_states[index] == 2 && index < hashset->cardinality) { index++; }
+    while(hashset->data_states[index] != 2 && index < hashset->cardinality) { index++; }
+    if(index >= hashset->cardinality) { return 0; }
     return index;
 }

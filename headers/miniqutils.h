@@ -5,6 +5,9 @@
 #ifndef MINIQUTILS
 #define MINIQUTILS
 
+#define EULER_CONSTANT 2.718281828459045235
+#define PI 3.14159265358979323846
+
 union raw_float {
     unsigned int u;
     float f;

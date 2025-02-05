@@ -1,9 +1,6 @@
 #include "../headers/miniqutils.h"
 #include <stdio.h>
 
-#define EULER_CONSTANT 2.718281828459045235
-#define PI 3.14159265358979323846
-
 double min_f(int n, ...) {
     va_list args;
     va_start(args, n);

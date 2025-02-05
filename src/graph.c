@@ -1,140 +1,143 @@
 #include "../headers/graph.h"
 
+unsigned int graph_edge_hash(void* edge_ptr) {
+    struct edge* edge = (struct edge*)edge_ptr;
+    return cantor_pairing((unsigned long)edge->from, (unsigned long)edge->to);
+}
+
+int graph_edge_cmp(void* edge1, void* edge2) {
+    struct edge* a = (struct edge*)edge1;
+    struct edge* b = (struct edge*)edge2;
+    return a->from == b->from && a->to == b->to;
+}
+
+unsigned int graph_vertex_hash(void* v_ptr) {
+    struct vertex* v = (struct vertex*)v_ptr;
+    return (unsigned long)v->value;
+}
+
+int graph_vertex_cmp(void* v1, void* v2) {
+    struct vertex* a = (struct vertex*)v1;
+    struct vertex* b = (struct vertex*)v2;
+    return a->value == b->value;
+}
+
 struct graph graph_new() {
     struct graph graph;
-    graph.edges = hashset_new(struct edge*, graph_edge_hash, graph_edge_cmp);
-    graph.vertices = vec_new(struct vertex*);
-    graph.freelist = vec_new(int);
+    graph.edges = hashset_new(struct edge, graph_edge_hash, graph_edge_cmp);
+    graph.adjacency_list = hashset_new(struct vertex, graph_vertex_hash, graph_vertex_cmp);
+    graph.vertigo = vec_new(void*);
     return graph;
 }
 
 void graph_free(struct graph* graph) {
-    for(int i = 0; i < vec_len(graph->vertices); i++) {
-        if(vec_contains(graph->freelist, i)) { continue; }
-        struct vertex* v = graph_vertex_from_i(graph, i);
-        graph_remove_vertex(graph, v);
+    struct vertex vertices[graph_vertices_len(graph)];
+    graph_adjacency_list(graph, vertices);
+    for(int i = 0; i < graph_vertices_len(graph); i++) {
+        struct vertex v = vertices[i];
+        graph_remove_vertex(graph, v.value);
     }
     hashset_free(graph->edges, NULL);
-    vec_free(graph->vertices, NULL);
-    vec_free(graph->freelist, NULL);
+    hashset_free(graph->adjacency_list, NULL);
+    vec_free(graph->vertigo, NULL);
 }
 
-unsigned int graph_edge_hash(void* edge_ptr) {
-    struct edge* edge = *((struct edge**)edge_ptr);
-    return cantor_pairing(edge->from->i, edge->to->i);
+void graph_edges(struct graph* graph, struct edge* edges) {
+    unsigned int i = 0;
+    int j = 0;
+    do {
+        i = hashset_lazy_iterate(graph->edges, i);
+        edges[j++] = (*graph->edges)[i];
+    } while(i != 0);
 }
 
-int graph_edge_cmp(void* edge1, void* edge2) {
-    struct edge* a = *((struct edge**)edge1);
-    struct edge* b = *((struct edge**)edge2);
-    return a->from->i == b->from->i && a->to->i == b->to->i;
+void graph_adjacency_list(struct graph* graph, struct vertex* vertices) {
+    unsigned int i = 0;
+    int j = 0;
+    do {
+        i = hashset_lazy_iterate(graph->adjacency_list, i);
+        vertices[j++] = (*graph->adjacency_list)[i];
+    } while(i != 0);
 }
 
-void print_vertex_neighbor_i(struct vertex* v) {
-    printf("%d\n", v->i);
+struct vertex graph_vertex(struct graph* graph, void* value) {
+    struct vertex v = { value, NULL, NULL };
+    return hashset_get(graph->adjacency_list, v);
 }
 
-void graph_add_edge(struct graph* graph, struct edge* edge, struct vertex* from, struct vertex* to) {
-    edge->from = from;
-    edge->to = to;
-    if(graph_edge_between(graph, from, to)) { return; }
-    vec_push(from->out, to);
-    vec_push(to->in, from);
+struct edge graph_edge_between(struct graph* graph, void* from, void* to) {
+    struct edge edge_key = { from, to, 0 };
+    struct edge null_edge = { NULL, NULL, 0 };
+    return hashset_contains(graph->edges, edge_key) ? hashset_get(graph->edges, edge_key) : null_edge;
+}
+
+int graph_edge_between_exists(struct graph* graph, void* from, void* to) {
+    struct edge edge = graph_edge_between(graph, from, to);
+    return hashset_contains(graph->edges, edge);
+}
+
+void graph_add_edge(struct graph* graph, void* from, void* to, int weight) {
+    struct edge edge = { from, to, weight };
+    if(hashset_contains(graph->edges, edge)) { return; }
+    vec_push(graph_vertex(graph, from).out, to);
+    vec_push(graph_vertex(graph, to).in, from);
     hashset_insert(graph->edges, edge);
 }
 
-void graph_remove_edge(struct graph* graph, struct vertex* from, struct vertex* to) {
-    struct edge* edge = graph_edge_between(graph, from, to);
-    if(edge != NULL) {
+void graph_remove_edge(struct graph* graph, void* from, void* to) {
+    struct edge edge = { from, to, 0 };
+    if(hashset_contains(graph->edges, edge)) {
         hashset_remove(graph->edges, edge);
-        vec_zap(from->out, vec_index(from->out, to), NULL);
-        vec_zap(to->in, vec_index(to->in, from), NULL);
+        vec_zap(graph_vertex(graph, from).out, vec_index(graph_vertex(graph, from).out, to), NULL);
+        vec_zap(graph_vertex(graph, to).in, vec_index(graph_vertex(graph, to).in, from), NULL);
     }
 }
 
-unsigned int graph_vertex_identity(struct graph* graph) {
-    if(vec_len(graph->freelist) > 0) {
-        return vec_pop(graph->freelist, -1);
-    }
-    return graph_vertices_len(graph);
+void graph_add_vertex(struct graph* graph, void* value) {
+    struct vertex v;
+    v.value = value;
+    v.in = vec_new(void*);
+    v.out = vec_new(void*);
+    hashset_insert(graph->adjacency_list, v);
+    vec_push(graph->vertigo, value);
 }
 
-void graph_add_vertex(struct graph* graph, struct vertex* v) {
-    int identity = graph_vertex_identity(graph);
-    v->in = vec_new(struct vertex*);
-    v->out = vec_new(struct vertex*);
-    v->i = identity;
-    if(identity == graph_vertices_len(graph)) {
-        vec_push(graph->vertices, v);
-    } else {
-        vec_set(graph->vertices, identity, v);
+void graph_remove_vertex(struct graph* graph, void* value) {
+    struct vertex v = graph_vertex(graph, value);
+    for(int i = vec_len(v.out) - 1; i >= 0; i--) {
+        void* u = vec_get(v.out, i);
+        graph_remove_edge(graph, value, u);
     }
-}
-
-void graph_remove_vertex(struct graph* graph, struct vertex* v) {
-    for(int i = vec_len(v->out) - 1; i >= 0; i--) {
-        struct vertex* u = vec_get(v->out, i);
-        graph_remove_edge(graph, v, u);
+    for(int i = vec_len(v.in) - 1; i >= 0; i--) {
+        void* u = vec_get(v.in, i);
+        graph_remove_edge(graph, u, value);
     }
-    for(int i = vec_len(v->in) - 1; i >= 0; i--) {
-        struct vertex* u = vec_get(v->in, i);
-        graph_remove_edge(graph, u, v);
-    }
-    vec_push(graph->freelist, v->i);
-    vec_free(v->out, NULL);
-    vec_free(v->in, NULL);
-    vec_set(graph->vertices, v->i, NULL);
-}
-
-struct vertex* graph_vertex_from_i(struct graph* graph, int index) {
-    return vec_contains(graph->freelist, index) ? NULL : vec_get(graph->vertices, index);
-}
-
-struct edge* graph_edge_between(struct graph* graph, struct vertex* from, struct vertex* to) {
-    struct edge edge_key = { from, to };
-    return hashset_contains(graph->edges, &edge_key) ? hashset_get(graph->edges, &edge_key) : NULL;
+    vec_free(v.out, NULL);
+    vec_free(v.in, NULL);
+    hashset_remove(graph->adjacency_list, v);
+    // vec_zap(graph->vertigo, -1, NULL);
 }
 
 unsigned int graph_vertices_len(struct graph* graph) {
-    return vec_len(graph->vertices) - vec_len(graph->freelist);
+    return hashset_len(graph->adjacency_list);
 }
 
 unsigned int graph_edges_len(struct graph* graph) {
     return hashset_len(graph->edges);
 }
 
-int graph_vertex_adjacent(struct graph* graph, struct vertex* x, struct vertex* y) {
-    return graph_edge_between(graph, x, y) || graph_edge_between(graph, y, x);
+int graph_vertices_are_adjacent(struct graph* graph, void* x, void* y) {
+    return graph_edge_between_exists(graph, x, y) || graph_edge_between_exists(graph, y, x);
 }
 
-int graph_vertex_out_degree(struct vertex* x) {
-    return vec_len(x->out);
+int graph_vertex_out_degree(struct graph* graph, void* x) {
+    return vec_len(graph_vertex(graph, x).out);
 }
 
-int graph_vertex_in_degree(struct vertex* x) {
-    return vec_len(x->in);
+int graph_vertex_in_degree(struct graph* graph, void* x) {
+    return vec_len(graph_vertex(graph, x).in);
 }
 
-void vertex_int_init(struct vertex_int* v, struct graph* graph, int value) {
-    v->value = value;
-    graph_add_vertex(graph, &v->v);
+int graph_edge_weight(struct graph* graph, void* from, void* to) {
+    return graph_edge_between(graph, from, to).weight;
 }
-
-int vertex_int_value(struct vertex* vertex) {
-    return container_of(vertex, struct vertex_int, v)->value;
-}
-
-void weighted_edge_init(
-    struct weighted_edge* edge,
-    struct graph* graph,
-    int weight,
-    struct vertex* from, struct vertex* to
-) {
-    edge->weight = weight;
-    graph_add_edge(graph, &edge->edge, from, to);
-}
-
-int weighted_edge_weight(struct edge* edge) {
-    return container_of(edge, struct weighted_edge, edge)->weight;
-}
-

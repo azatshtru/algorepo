@@ -1,22 +1,28 @@
 #include "../headers/graph_shortest_path.h"
 
-unsigned int graph_dijkstra(struct graph* graph, unsigned int s, unsigned int e) {
-    int distance[graph_vertices_len(graph)];
-    int processed[graph_vertices_len(graph)];
+unsigned int graph_dijkstra(struct graph* graph, void* s, void* e) {
+    int vertex_len = graph_vertices_len(graph);
+    int distance[vertex_len];
+    int processed[vertex_len];
+    struct vertex vertices[vertex_len];
+    graph_vertices(graph, vertices);
 
-    PriorityQueue(int) q = priority_queue_new(int);
 
-    for(int i = 0; i < vec_len(graph); i++) { 
+    PriorityQueue(struct vertex) q = priority_queue_new(struct vertex);
+
+    for(int i = 0; i < vertex_len; i++) { 
         distance[i] = INT32_MAX;
         processed[i] = 0;
+        if(vertices[i].value == s) {
+            distance[i] = 0;
+            priority_queue_nq(q, vertices[i], 0);
+        }
     }
-    distance[s] = 0;
-    priority_queue_nq(q, 0, 0);
 
     while(priority_queue_len(q)) {
-        int index = priority_queue_dq(q);
         if(processed[index]) { continue; }
         processed[index] = 1;
+        struct vertex current = priority_queue_dq(q);
         struct vertex* current = graph_vertex_from_i(graph, index);
         for(int i = 0; i < graph_vertex_out_degree(current); i++) {
             struct vertex* neighbour = vec_get(current->out, i);

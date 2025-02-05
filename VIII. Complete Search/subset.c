@@ -1,11 +1,8 @@
-#include <stdio.h>
-#include "../IV. Dynamic Arrays and Linked Lists/dynamic_array.c"
+#include "../headers/complete_search.h"
 
-//The standard elegant algorithm to find all subsets of the set of first n nonnegative integers has a core-recursive-algorithm, and a processing stage.
-//An integer n is used to keep track of when to perform processing stage during recursion, once n becomes zero, the subset is processed.
-//The core algorithm is pretty simple, it has 4 steps: Push, Search, Pop, Search [PSPS]
-//n is pushed into an array S, and then subsets of set of first n-1 integers are found, this gives all subsets of set of first n-1 positive integers that also include n.
-//n is popped from the array S, and then subsets of set of first n-1 integers are found again, this gives all subsets of set of first n-1 positive integers not including n.
+SubsetIterator subsets(SubsetIterator it, int n) {
+    
+}
 
 int subsets(int n) {
     //bookkeeping

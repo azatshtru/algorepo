@@ -1,20 +1,8 @@
 #include "../headers/graph_spanning_tree.h"
 
-float graph_weighted_edge_cmp(void* a, void* b) {
-    return weighted_edge_weight((struct edge*)a) - weighted_edge_weight((struct edge*)b);
-}
-
-void graph_edges_as_vec(struct graph* graph, vector(struct edge*) edges) {
-    int i = -1;
-    do {
-        i = hashset_lazy_iterate(graph->edges, i);
-        vec_push(edges, (*graph->edges)[i]);
-    } while(i != -1);
-}
-
 void graph_kruskal(struct graph* graph, struct graph* minimum_spanning_tree) {
-    vector(struct edge*) edges = vec_new(struct edge*);
-    graph_edges_as_vec(graph, edges);
+    struct edge* edges[graph_edges_len(graph)];
+    graph_edges(graph, edges);
     quicksort(vec_as_array(edges), sizeof(struct edge*), 0, vec_len(edges)-1, graph_weighted_edge_cmp);
 
     unsigned int vertex_len = graph_vertices_len(graph);
@@ -22,20 +10,19 @@ void graph_kruskal(struct graph* graph, struct graph* minimum_spanning_tree) {
     DisjointSetInt forest = disjoint_set_int_new(vertex_len);
 
     for(int i = 0; i < vec_len(edges); i++) {
-        struct vertex* from = vec_get(edges, i)->from;
-        struct vertex* to = vec_get(edges, i)->to;
+        struct vertex* from = edges[i]->from;
+        struct vertex* to = edges[i]->to;
         disjoint_set_int_insert(&forest, from->i);
         disjoint_set_int_insert(&forest, to->i);
         if(disjoint_set_int_union(&forest, from->i, to->i)) {
             graph_add_vertex(minimum_spanning_tree, from); 
             graph_add_vertex(minimum_spanning_tree, to); 
-            graph_add_edge(minimum_spanning_tree, vec_get(edges, i), from, to);
+            graph_add_edge(minimum_spanning_tree, edges[i], from, to);
         }
 
     }
 
     disjoint_set_int_free(&forest);
-    vec_free(edges, NULL);
 }
 
 void graph_prim(struct graph* graph, struct graph* spanning_tree) {

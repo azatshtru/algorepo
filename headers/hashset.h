@@ -27,9 +27,6 @@ unsigned int hash_fnv1a(char* s, unsigned int length);
 unsigned int hash_fnv1a_cstr(void* s);
 int cmp_cstr(void* s1, void* s2);
 
-#define generic_primitive_cmp(type, x, y) *(type*)x == *(type*)y
-#define generic_hash(type, x) hash_fnv1a((char*)x, sizeof(type))
-
 #define hashset(type) type**
 
 void* hashset_allocate(unsigned int typesize, unsigned int (*hash_fn)(void*), int (*cmp_fn)(void*, void*));
