@@ -54,6 +54,7 @@ void graph_prim(struct graph* graph, struct graph* spanning_tree) {
         if(processed_count == graph_vertices_len(graph)) break;
 
         graph_add_edge(spanning_tree, current.from, current.to, current.weight);
+
         for(int i = 0; i < vec_len(to_vertex.out); i++) {
             void* neighbour = vec_get(to_vertex.out, i);
             struct edge edge = graph_edge_between(graph, to_vertex.value, neighbour);

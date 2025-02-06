@@ -1,19 +1,19 @@
 #include "../headers/graph_paths_and_circuits.h"
 
-int graph_eulerian_path_exists(struct graph* graph, struct vertex** start_vertex) {
-    struct vertex* start = NULL;
-    struct vertex* end = NULL;
+int graph_eulerian_path_exists(struct graph* graph, void** start_vertex) {
+    void* start = NULL;
+    void* end = NULL;
     int vertex_len = graph_vertices_len(graph);
 
     for (int i = 0; i < vertex_len; i++) {
-        struct vertex* v = graph_vertex_from_i(graph, i);
-        if(graph_vertex_out_degree(v) - graph_vertex_in_degree(v) == 1) {
+        void* v = vec_get(graph->vertices, i);
+        if(graph_vertex_out_degree(graph, v) - graph_vertex_in_degree(graph, v) == 1) {
             if(start) { return 0; }
             start = v;
-        } else if(graph_vertex_in_degree(v) - graph_vertex_out_degree(v) == 1) {
+        } else if(graph_vertex_in_degree(graph, v) - graph_vertex_out_degree(graph, v) == 1) {
             if(end) { return 0; }
             end = v;
-        } else if (graph_vertex_out_degree(v) != graph_vertex_in_degree(v)) {
+        } else if (graph_vertex_out_degree(graph, v) != graph_vertex_in_degree(graph, v)) {
             return 0;
         }
     }
@@ -21,47 +21,47 @@ int graph_eulerian_path_exists(struct graph* graph, struct vertex** start_vertex
     return 1;
 }
 
-void graph_hierholzer(struct graph* graph, struct edge** eulerian_path) {
-    struct vertex* start;
+void graph_hierholzer(struct graph* graph, struct edge* eulerian_path) {
+    void* start;
     if(!graph_eulerian_path_exists(graph, &start)) {
         return;
     }
     if(start == NULL) {
-        start = graph_vertex_from_i(graph, 0);
+        start = vec_get(graph->vertices, 0);
     }
 
-    VecDeque(struct vertex*) stack = queue_new(struct vertex*);
-    vector(struct vertex*) path = vec_new(struct vertex*);
+    VecDeque(struct vertex) stack = queue_new(struct vertex);
+    vector(void*) path = vec_new(void*);
     int processed[graph_vertices_len(graph)];
     memzero(processed, sizeof(int) * graph_vertices_len(graph));
 
-    queue_push_back(stack, start);
+    queue_push_back(stack, graph_vertex(graph, start));
     while(!queue_is_empty(stack)) {
-        struct vertex* v = queue_back(stack);
+        struct vertex v = queue_back(stack);
         
-        if(processed[v->i] < vec_len(v->out)) {
-            queue_push_back(stack, graph_vertex_from_i(graph, processed[v->i]++));
+        if(processed[v.i] < vec_len(v.out)) {
+            queue_push_back(stack, graph_vertex(graph, vec_get(v.out, processed[v.i]++)));
         } else {
-            vec_push(path, queue_pop_back(stack));
+            vec_push(path, queue_pop_back(stack).value);
         }
     }
 
     int j = 0;
-    struct vertex* last_vertex = vec_pop(path, -1);
+    void* last_vertex = vec_pop(path, -1);
     for (int i = vec_len(path) - 2; i >= 0; i--) {
-        struct vertex* current_vertex = vec_pop(path, -1);
+        void* current_vertex = vec_pop(path, -1);
         eulerian_path[j++] = graph_edge_between(graph, last_vertex, current_vertex);
         last_vertex = current_vertex;
     }
 }
 
-void graph_hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(struct vertex*) path) {
+void graph_hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(void*) path) {
     if (mask == (1 << pos)) {
-        vec_push(path, graph_vertex_from_i(graph, pos));
+        vec_push(path, vec_get(graph->vertices, pos));
         return;
     }
     graph_hamiltonian_path_traverse(graph, previous, mask ^ (1 << pos), previous[mask][pos], path);
-    vec_push(path, graph_vertex_from_i(graph, pos));
+    vec_push(path, vec_get(graph->vertices, pos));
 }
 
 int graph_hamiltonian_path(struct graph* graph, struct vertex** path) {
@@ -91,9 +91,10 @@ int graph_hamiltonian_path(struct graph* graph, struct vertex** path) {
         for (int u = 0; u < n; u++) {
             if (!(mask & (1 << u))) { continue; }
 
-            struct vertex* current = graph_vertex_from_i(graph, u);
-            for (int i = 0; i < vec_len(current->out); i++) {
-                int v = vec_get(current->out, i)->i;
+            void* current = vec_get(graph->vertices, u);
+            for (int i = 0; i < vec_len(graph_vertex(graph, current).out); i++) {
+                void* neighbor = vec_get(graph_vertex(graph, current).out, i);
+                int v = graph_vertex(graph, neighbor).i;
                 if (mask & (1 << v)) { continue; }
 
                 int new_mask = mask | (1 << v);
@@ -121,9 +122,9 @@ int graph_hamiltonian_path(struct graph* graph, struct vertex** path) {
     if (min_length == I32_MAX) {
         has_hamiltonian_path = 0;
     } else {
-        vector(struct vertex*) path_vector = vec_new(struct vertex*);
+        vector(void*) path_vector = vec_new(void*);
         graph_hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
-        memmove(path, vec_as_array(path_vector), sizeof(struct vertex*) * vec_len(path_vector));
+        memmove(path, vec_as_array(path_vector), sizeof(void*) * vec_len(path_vector));
         vec_free(path_vector, NULL);
     }
 
@@ -161,9 +162,10 @@ int graph_hamiltonian_circuit(struct graph* graph, struct vertex** path) {
         for (int u = 0; u < n; u++) {
             if (!(mask & (1 << u))) { continue; }
 
-            struct vertex* current = graph_vertex_from_i(graph, u);
+            void* current = vec_get(graph->vertices, u);
             for (int i = 0; i < n; i++) {
-                int v = vec_get(current->out, i)->i;
+                void* neighbor = vec_get(graph_vertex(graph, current).out, i);
+                int v = graph_vertex(graph, neighbor).i;
                 if (mask & (1 << v)) { continue; }
 
                 int new_mask = mask | (1 << v);
@@ -181,10 +183,10 @@ int graph_hamiltonian_circuit(struct graph* graph, struct vertex** path) {
 
     for (int i = 0; i < n; i++) {
         if(distance[final_mask][i] != I32_MAX
-            && graph_edge_between(
+            && graph_edge_between_exists(
                 graph,
-                graph_vertex_from_i(graph, i),
-                graph_vertex_from_i(graph, 0)
+                vec_get(graph->vertices, i),
+                vec_get(graph->vertices, 0)
             )
         ) {
             found_circuit = 1;
@@ -194,9 +196,9 @@ int graph_hamiltonian_circuit(struct graph* graph, struct vertex** path) {
     }
 
     if (found_circuit) {
-        vector(struct vertex*) path_vector = vec_new(struct vertex*);
+        vector(void*) path_vector = vec_new(void*);
         graph_hamiltonian_path_traverse(graph, previous, final_mask, end_vertex, path_vector);
-        memmove(path, vec_as_array(path_vector), sizeof(struct vertex*) * vec_len(path_vector));
+        memmove(path, vec_as_array(path_vector), sizeof(void*) * vec_len(path_vector));
         vec_free(path_vector, NULL);
     }
 

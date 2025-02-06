@@ -5,9 +5,9 @@
 #ifndef GRAPH_PATHS_AND_CIRCUITS
 #define GRAPH_PATHS_AND_CIRCUITS
 
-int graph_eulerian_path_exists(struct graph* graph, struct vertex** start_vertex);
-void graph_hierholzer(struct graph* graph, struct edge** eulerian_path);
-void graph_hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(struct vertex*) path);
+int graph_eulerian_path_exists(struct graph* graph, void** start_vertex);
+void graph_hierholzer(struct graph* graph, struct edge* eulerian_path);
+void graph_hamiltonian_path_traverse(struct graph* graph, int** previous, int mask, int pos, vector(void*) path);
 int graph_hamiltonian_path(struct graph* graph, struct vertex** path);
 int graph_hamiltonian_circuit(struct graph* graph, struct vertex** path);
 
