@@ -61,7 +61,7 @@ void graph_adjacency_list(struct graph* graph, struct vertex* vertices) {
 }
 
 struct vertex graph_vertex(struct graph* graph, void* value) {
-    struct vertex v = { value, NULL, NULL };
+    struct vertex v = { value, 0, NULL, NULL };
     return hashset_get(graph->adjacency_list, v);
 }
 
@@ -96,6 +96,7 @@ void graph_remove_edge(struct graph* graph, void* from, void* to) {
 void graph_add_vertex(struct graph* graph, void* value) {
     struct vertex v;
     v.value = value;
+    v.i = vec_len(graph->vertigo);
     v.in = vec_new(void*);
     v.out = vec_new(void*);
     hashset_insert(graph->adjacency_list, v);
@@ -114,8 +115,16 @@ void graph_remove_vertex(struct graph* graph, void* value) {
     }
     vec_free(v.out, NULL);
     vec_free(v.in, NULL);
+
+    if(vec_len(graph->vertigo) > 1) {
+        struct vertex vertex_with_largest_i = graph_vertex(graph, vec_get(graph->vertigo, vec_len(graph->vertigo) - 1));
+        vec_set(graph->vertigo, v.i, vertex_with_largest_i.value);
+        vertex_with_largest_i.i = v.i;
+        hashset_insert(graph->adjacency_list, vertex_with_largest_i);
+    }
+
+    vec_zap(graph->vertigo, -1, NULL);
     hashset_remove(graph->adjacency_list, v);
-    // vec_zap(graph->vertigo, -1, NULL);
 }
 
 unsigned int graph_vertices_len(struct graph* graph) {

@@ -192,28 +192,28 @@ oj_test(test_graph_adjacent_vertices) {
     graph_add_edge(&g, &v1, &v2, 1);
     graph_add_edge(&g, &v2, &v4, 1);
 
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v1, &v2));
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v2, &v1));
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v3, &v1));
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v1, &v3));
-    oj_assert_eq_int(0, graph_vertex_adjacent(&g, &v2, &v3));
-    oj_assert_eq_int(0, graph_vertex_adjacent(&g, &v4, &v3));
-    oj_assert_eq_int(0, graph_vertex_adjacent(&g, &v1, &v4));
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v4, &v2));
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v2, &v4));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v1, &v2));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v2, &v1));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v3, &v1));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v1, &v3));
+    oj_assert_eq_int(0, graph_vertices_are_adjacent(&g, &v2, &v3));
+    oj_assert_eq_int(0, graph_vertices_are_adjacent(&g, &v4, &v3));
+    oj_assert_eq_int(0, graph_vertices_are_adjacent(&g, &v1, &v4));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v4, &v2));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v2, &v4));
 
     graph_remove_edge(&g, &v1, &v2);
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v1, &v2));
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v2, &v1));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v1, &v2));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v2, &v1));
 
     graph_remove_vertex(&g, &v1);
-    oj_assert_eq_int(0, graph_vertex_adjacent(&g, &v1, &v2));
-    oj_assert_eq_int(0, graph_vertex_adjacent(&g, &v2, &v1));
+    oj_assert_eq_int(0, graph_vertices_are_adjacent(&g, &v1, &v2));
+    oj_assert_eq_int(0, graph_vertices_are_adjacent(&g, &v2, &v1));
 
     graph_add_edge(&g, &v2, &v3, 1);
     graph_add_edge(&g, &v4, &v3, 1);
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v2, &v3));
-    oj_assert_eq_int(1, graph_vertex_adjacent(&g, &v4, &v3));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v2, &v3));
+    oj_assert_eq_int(1, graph_vertices_are_adjacent(&g, &v4, &v3));
 
     graph_free(&g);
     oj_fresh;

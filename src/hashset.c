@@ -13,7 +13,7 @@ unsigned int hash_fnv1a(char* s, unsigned int length) {
 }
 
 unsigned int hash_fnv1a_cstr(void* s) { return hash_fnv1a((char*)s, strlen((char*)s)); }
-int cmp_cstr(void* s1, void* s2) { return !strcmp(*(char**)s1, *(char**)s2); }
+int cmp_cstr(void* s1, void* s2) { return !strcmp((char*)s1, (char*)s2); }
 
 void* hashset_allocate(unsigned int typesize, unsigned int (*hash_fn)(void*), int (*cmp_fn)(void*, void*)) {
     struct hashset* hashset_ptr = malloc(sizeof(struct hashset)); 

@@ -7,6 +7,7 @@
 
 struct vertex {
     void* value;
+    int i;
     vector(void*) out;
     vector(void*) in;
 };
