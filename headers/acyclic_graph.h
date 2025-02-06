@@ -9,14 +9,14 @@
 #define PROCESSED 2
 
 int acyclic_graph_topological_sort_reversed(
-        struct vertex* v,
+        struct graph* graph,
+        void* v,
         int* state,
-        struct vertex** topological_order,
-        int topological_order_index
-    );
+        void** topological_order,
+        int topological_order_index);
 
-int acyclic_graph_toplogical_sort(struct graph* graph, struct vertex** topological_order);
-int acyclic_graph_paths_to(struct graph* graph, struct vertex* s, struct vertex* current, int* paths, int* visited);
+int acyclic_graph_toplogical_sort(struct graph* graph, void** topological_order);
+int acyclic_graph_paths_to(struct graph* graph, void* s, void* current, int* paths, int* visited);
 int acyclic_graph_paths_between(struct graph* graph, struct vertex* from, struct vertex* to);
 void graph_dijkstra_acyclic_product(struct graph* graph, struct vertex* s, struct graph* acyclic_product);
 

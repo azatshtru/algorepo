@@ -38,7 +38,7 @@ unsigned int graph_bellman_ford(struct graph* graph, void* s, void* e) {
     for(int i = 1; i <= vertex_len; i++) {
         distance[i] = INT32_MAX;
     }
-    distance[graph_vertex(graph, s).i] = 0;
+   distance[graph_vertex(graph, s).i] = 0;
 
     struct edge edges[graph_edges_len(graph)];
     graph_edges(graph, edges);

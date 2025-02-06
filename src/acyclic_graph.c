@@ -1,23 +1,24 @@
 #include "../headers/acyclic_graph.h"
 
-int acyclic_graph_topological_sort_reversed(struct vertex* v, int* state, struct vertex** topological_order, int topological_order_index) {
-    if(state[v->i] == PROCESSED) { return 1; }
-    if(state[v->i] == PROCESSING) { return 0; }
+int acyclic_graph_topological_sort_reversed(struct graph* graph, void* v, int* state, void** topological_order, int topological_order_index) {
+    struct vertex vadj = graph_vertex(graph, v);
+    if(state[vadj.i] == PROCESSED) return 1;
+    if(state[vadj.i] == PROCESSING) return 0;
     int is_acyclic;
-    state[v->i] = PROCESSING;
-    for(int i = 0; i < graph_vertex_out_degree(v); i++) {
-        struct vertex* u = vec_get(v->out, i);
-        is_acyclic = acyclic_graph_topological_sort_reversed(u, state, topological_order, topological_order_index);
-        if(is_acyclic == 0) { break; }
+    state[vadj.i] = PROCESSING;
+    for(int i = 0; i < graph_vertex_out_degree(graph, v); i++) {
+        void* u = vec_get(vadj.out, i);
+        is_acyclic = acyclic_graph_topological_sort_reversed(graph, u, state, topological_order, topological_order_index);
+        if(is_acyclic == 0) break;
     }
-    state[v->i] = PROCESSED;
+    state[vadj.i] = PROCESSED;
     if(topological_order != NULL) {
         topological_order[topological_order_index++] = v;
     }
     return is_acyclic;
 }
 
-int acyclic_graph_toplogical_sort(struct graph* graph, struct vertex** topological_order) {
+int acyclic_graph_toplogical_sort(struct graph* graph, void** topological_order) {
     int vertex_len = graph_vertices_len(graph);
     int state[vertex_len];
     for(int i = 0; i < vertex_len; i++) {
@@ -25,32 +26,31 @@ int acyclic_graph_toplogical_sort(struct graph* graph, struct vertex** topologic
     }
     for(int i = 0; i < vertex_len; i++) {
         if(state[i] != 0) { continue; }
-        if(acyclic_graph_topological_sort_reversed(graph_vertex_from_i(graph, i), state, topological_order, 0)) {
+        if(acyclic_graph_topological_sort_reversed(graph, vec_get(graph->vertices, i), state, topological_order, 0)) {
             continue;
         } else {
             return 1;
         }
     }
     for(int i = 0, j = vertex_len - 1; i < j; i++, j--) {
-        swap(topological_order + i, topological_order + j, sizeof(struct vertex*));
+        swap(topological_order + i, topological_order + j, sizeof(void*));
     }
     return 0;
 }
 
-int acyclic_graph_paths_to(struct graph* graph, struct vertex* s, struct vertex* current, int* paths, int* visited) {
-    if(visited[current->i]) {
-        return paths[current->i];
+int acyclic_graph_paths_to(struct graph* graph, void* s, void* current, int* paths, int* visited) {
+    struct vertex current_adj = graph_vertex(graph, current);
+    if(visited[current_adj.i]) {
+        return paths[current_adj.i];
     }
-    visited[current->i] = 1;
-    if(current == s) {
-        return 1;
-    }
+    visited[current_adj.i] = 1;
+    if(current == s) return 1;
     int pathsum = 0;
-    for(int i = 0; i < graph_vertex_out_degree(current); i++) {
-        struct vertex* u = vec_get(current->out, i);
+    for(int i = 0; i < graph_vertex_out_degree(graph, current); i++) {
+        void* u = vec_get(current_adj.out, i);
         pathsum += acyclic_graph_paths_to(graph, s, u, paths, visited);
     }
-    paths[current->i] = pathsum;
+    paths[current_adj.i] = pathsum;
     return pathsum;
 }
 
