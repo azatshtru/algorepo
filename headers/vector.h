@@ -30,7 +30,7 @@ int vec_shush_index(void* vec, void* value_ptr);
 #define vector(type) type **
 #define vec_new(type) (type**)vec_allocate(VEC_INIT_SIZE, sizeof(type))
 #define vi(vec_ptr, _index) (*(vec_ptr))[(_index)]
-#define vec_as_array(vec_ptr) *(vec_ptr)
+#define vec_as_array(vec_ptr) (*(vec_ptr))
 #define vec_get(vec_ptr, _index) (*(vec_ptr))[(_index)]
 #define vec_set(vec_ptr, _index, value) (*(vec_ptr))[(_index)] = (value)
 

@@ -19,7 +19,7 @@ struct edge {
 };
 
 struct graph {
-    vector(void*) vertigo;
+    vector(void*) vertices;
     hashset(struct vertex) adjacency_list;
     hashset(struct edge) edges;
 };
@@ -32,6 +32,7 @@ int graph_vertex_cmp(void* v1, void* v2);
 struct graph graph_new();
 void graph_free(struct graph* graph);
 
+void** graph_vertices(struct graph* graph);
 void graph_edges(struct graph* graph, struct edge* edges);
 void graph_adjacency_list(struct graph* graph, struct vertex* vertices);
 

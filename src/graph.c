@@ -1,4 +1,5 @@
 #include "../headers/graph.h"
+#include "../headers/logging.h"
 
 unsigned int graph_edge_hash(void* edge_ptr) {
     struct edge* edge = (struct edge*)edge_ptr;
@@ -26,7 +27,7 @@ struct graph graph_new() {
     struct graph graph;
     graph.edges = hashset_new(struct edge, graph_edge_hash, graph_edge_cmp);
     graph.adjacency_list = hashset_new(struct vertex, graph_vertex_hash, graph_vertex_cmp);
-    graph.vertigo = vec_new(void*);
+    graph.vertices = vec_new(void*);
     return graph;
 }
 
@@ -39,7 +40,11 @@ void graph_free(struct graph* graph) {
     }
     hashset_free(graph->edges, NULL);
     hashset_free(graph->adjacency_list, NULL);
-    vec_free(graph->vertigo, NULL);
+    vec_free(graph->vertices, NULL);
+}
+
+void** graph_vertices(struct graph* graph) {
+    return vec_as_array(graph->vertices);
 }
 
 void graph_edges(struct graph* graph, struct edge* edges) {
@@ -96,11 +101,11 @@ void graph_remove_edge(struct graph* graph, void* from, void* to) {
 void graph_add_vertex(struct graph* graph, void* value) {
     struct vertex v;
     v.value = value;
-    v.i = vec_len(graph->vertigo);
+    v.i = vec_len(graph->vertices);
     v.in = vec_new(void*);
     v.out = vec_new(void*);
     hashset_insert(graph->adjacency_list, v);
-    vec_push(graph->vertigo, value);
+    vec_push(graph->vertices, value);
 }
 
 void graph_remove_vertex(struct graph* graph, void* value) {
@@ -116,14 +121,13 @@ void graph_remove_vertex(struct graph* graph, void* value) {
     vec_free(v.out, NULL);
     vec_free(v.in, NULL);
 
-    if(vec_len(graph->vertigo) > 1) {
-        struct vertex vertex_with_largest_i = graph_vertex(graph, vec_get(graph->vertigo, vec_len(graph->vertigo) - 1));
-        vec_set(graph->vertigo, v.i, vertex_with_largest_i.value);
-        vertex_with_largest_i.i = v.i;
-        hashset_insert(graph->adjacency_list, vertex_with_largest_i);
-    }
+    struct vertex u = graph_vertex(graph, vec_get(graph->vertices, vec_len(graph->vertices) - 1));
+    vec_set(graph->vertices, v.i, u.value);
+    u.i = v.i;
 
-    vec_zap(graph->vertigo, -1, NULL);
+    vec_zap(graph->vertices, -1, NULL);
+
+    hashset_insert(graph->adjacency_list, u);
     hashset_remove(graph->adjacency_list, v);
 }
 
