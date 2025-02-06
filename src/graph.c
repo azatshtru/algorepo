@@ -154,3 +154,7 @@ int graph_vertex_in_degree(struct graph* graph, void* x) {
 int graph_edge_weight(struct graph* graph, void* from, void* to) {
     return graph_edge_between(graph, from, to).weight;
 }
+
+float graph_cmp_edge_by_weight(void* a, void* b) {
+    return ((struct edge*)a)->weight - ((struct edge*)b)->weight;
+}

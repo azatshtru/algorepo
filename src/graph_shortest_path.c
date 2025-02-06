@@ -24,7 +24,7 @@ unsigned int graph_dijkstra(struct graph* graph, void* s, void* e) {
             int weight = graph_edge_weight(graph, current.value, neighbour.value);
             if(distance[current.i] + weight < distance[neighbour.i]) {
                 distance[neighbour.i] = distance[current.i] + weight;
-                priority_queue_nq(q, neighbour, -distance[neighbour.i]);
+                priority_queue_nq(q, neighbour, distance[neighbour.i]);
             }
         }
     }

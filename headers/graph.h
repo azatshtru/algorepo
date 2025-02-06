@@ -54,5 +54,6 @@ int graph_vertex_out_degree(struct graph* graph, void* x);
 int graph_vertex_in_degree(struct graph* graph, void* x);
 
 int graph_edge_weight(struct graph* graph, void* from, void* to);
+float graph_cmp_edge_by_weight(void* a, void* b);
 
 #endif
