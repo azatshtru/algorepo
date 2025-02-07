@@ -26,9 +26,9 @@ oj_test(graph_edge_insert) {
     graph_add_vertex(&g, &v1);
     graph_add_vertex(&g, &v2);
     graph_add_edge(&g, &v1, &v2, 1);
-    struct edge e = graph_edge_between(&g, &v1, &v2);
-    oj_assert(e.from == &v1, "");
-    oj_assert(e.to == &v2, "");
+    struct edge* e = graph_edge_between(&g, &v1, &v2);
+    oj_assert(e->from == &v1, "");
+    oj_assert(e->to == &v2, "");
     graph_remove_edge(&g, &v1, &v2);
     graph_free(&g);
     oj_fresh;
@@ -46,12 +46,12 @@ oj_test(graph_insert_3_edges) {
     graph_add_edge(&g, &v1, &v3, 1);
     graph_add_edge(&g, &v2, &v3, 1);
     oj_assert_eq_int(3, graph_edges_len(&g));
-    struct edge e1 = graph_edge_between(&g, &v1, &v2);
-    struct edge e2 = graph_edge_between(&g, &v1, &v3);
-    struct edge e3 = graph_edge_between(&g, &v2, &v3);
-    oj_assert(e1.from == &v1 && e1.to == &v2, "");
-    oj_assert(e2.from == &v1 && e2.to == &v3, "");
-    oj_assert(e3.from == &v2 && e3.to == &v3, "");
+    struct edge* e1 = graph_edge_between(&g, &v1, &v2);
+    struct edge* e2 = graph_edge_between(&g, &v1, &v3);
+    struct edge* e3 = graph_edge_between(&g, &v2, &v3);
+    oj_assert(e1->from == &v1 && e1->to == &v2, "");
+    oj_assert(e2->from == &v1 && e2->to == &v3, "");
+    oj_assert(e3->from == &v2 && e3->to == &v3, "");
     graph_free(&g);
     oj_fresh;
 }
@@ -149,28 +149,28 @@ oj_test(test_graph_edge_between) {
     graph_add_edge(&g, &v1, &v2, 1);
     graph_add_edge(&g, &v2, &v4, 1);
 
-    oj_assert(graph_edge_between(&g, &v1, &v2).from == &v1, "");
-    oj_assert(graph_edge_between(&g, &v2, &v1).from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v2, &v3).from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v2, &v4).from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v3, &v1).from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v2)->from == &v1, "");
+    oj_assert(graph_edge_between(&g, &v2, &v1)->from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v3)->from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v4)->from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v3, &v1)->from != NULL, "");
 
     graph_remove_edge(&g, &v1, &v2);
-    oj_assert(graph_edge_between(&g, &v2, &v1).from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v1, &v2).from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v1)->from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v2)->from == NULL, "");
 
     graph_remove_vertex(&g, &v1);
-    oj_assert(graph_edge_between(&g, &v2, &v1).from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v1, &v2).from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v1, &v3).from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v3, &v1).from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v2, &v4).from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v1)->from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v2)->from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v3)->from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v3, &v1)->from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v4)->from != NULL, "");
 
     graph_add_edge(&g, &v2, &v3, 1);
     graph_add_edge(&g, &v4, &v3, 1);
-    oj_assert(graph_edge_between(&g, &v2, &v3).from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v4, &v3).from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v3, &v4).from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v3)->from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v4, &v3)->from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v3, &v4)->from == NULL, "");
 
     graph_free(&g);
     oj_fresh;
@@ -292,7 +292,7 @@ oj_prepare(graph_query_tests) {
 
 int main() {
     oj_blend(graph_setup_tests, 0);
-    oj_blend(graph_query_tests, 0);
     oj_blend(graph_mutation_tests, 0);
+    oj_blend(graph_query_tests, 0);
     return 0;
 }

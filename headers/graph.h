@@ -20,8 +20,8 @@ struct edge {
 
 struct graph {
     vector(void*) vertices;
-    hashset(struct vertex) adjacency_list;
-    hashset(struct edge) edges;
+    hashset(struct vertex*) adjacency_list;
+    hashset(struct edge*) edges;
 };
 
 unsigned int graph_edge_hash(void* edge_ptr);
@@ -33,12 +33,10 @@ struct graph graph_new();
 void graph_free(struct graph* graph);
 
 void** graph_vertices(struct graph* graph);
-void graph_edges(struct graph* graph, struct edge* edges);
-void graph_adjacency_list(struct graph* graph, struct vertex* vertices);
+void graph_edges(struct graph* graph, struct edge** edges);
 
-struct vertex graph_vertex(struct graph* graph, void* value);
-struct edge graph_edge_between(struct graph* graph, void* from, void* to);
-int graph_edge_between_exists(struct graph* graph, void* from, void* to);
+struct vertex* graph_vertex(struct graph* graph, void* value);
+struct edge* graph_edge_between(struct graph* graph, void* from, void* to);
 
 void graph_add_edge(struct graph* graph, void* from, void* to, int weight);
 void graph_remove_edge(struct graph* graph, void* from, void* to);
@@ -50,8 +48,13 @@ unsigned int graph_edges_len(struct graph* graph);
 
 int graph_vertices_are_adjacent(struct graph* graph, void* x, void* y);
 
+void** graph_vertex_out(struct graph* graph, void* x);
+void** graph_vertex_in(struct graph* graph, void* x);
 int graph_vertex_out_degree(struct graph* graph, void* x);
 int graph_vertex_in_degree(struct graph* graph, void* x);
+
+int graph_vertex_i(struct graph* graph, void* x);
+void* graph_vertex_from_i(struct graph* graph, int i);
 
 int graph_edge_weight(struct graph* graph, void* from, void* to);
 float graph_cmp_edge_by_weight(void* a, void* b);
