@@ -149,28 +149,28 @@ oj_test(test_graph_edge_between) {
     graph_add_edge(&g, &v1, &v2, 1);
     graph_add_edge(&g, &v2, &v4, 1);
 
-    oj_assert(graph_edge_between(&g, &v1, &v2)->from == &v1, "");
-    oj_assert(graph_edge_between(&g, &v2, &v1)->from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v2, &v3)->from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v2, &v4)->from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v3, &v1)->from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v2) != NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v1) != NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v3) == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v4) != NULL, "");
+    oj_assert(graph_edge_between(&g, &v3, &v1) != NULL, "");
 
     graph_remove_edge(&g, &v1, &v2);
-    oj_assert(graph_edge_between(&g, &v2, &v1)->from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v1, &v2)->from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v1) != NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v2) == NULL, "");
 
     graph_remove_vertex(&g, &v1);
-    oj_assert(graph_edge_between(&g, &v2, &v1)->from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v1, &v2)->from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v1, &v3)->from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v3, &v1)->from == NULL, "");
-    oj_assert(graph_edge_between(&g, &v2, &v4)->from != NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v1) == NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v2) == NULL, "");
+    oj_assert(graph_edge_between(&g, &v1, &v3) == NULL, "");
+    oj_assert(graph_edge_between(&g, &v3, &v1) == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v4) != NULL, "");
 
     graph_add_edge(&g, &v2, &v3, 1);
     graph_add_edge(&g, &v4, &v3, 1);
-    oj_assert(graph_edge_between(&g, &v2, &v3)->from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v4, &v3)->from != NULL, "");
-    oj_assert(graph_edge_between(&g, &v3, &v4)->from == NULL, "");
+    oj_assert(graph_edge_between(&g, &v2, &v3) != NULL, "");
+    oj_assert(graph_edge_between(&g, &v4, &v3) != NULL, "");
+    oj_assert(graph_edge_between(&g, &v3, &v4) == NULL, "");
 
     graph_free(&g);
     oj_fresh;

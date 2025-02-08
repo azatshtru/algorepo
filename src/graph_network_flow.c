@@ -12,18 +12,16 @@ unsigned int ford_fulkerson_flow_hash(void* a) {
 }
 
 int graph_edmonds_karp_breadth_first_search(
-    struct graph* graph,
+    struct graph* residual_graph,
     struct vertex* source,
     struct vertex* sink,
-    struct vertex** predecessor,
-    hashset(struct ford_fulkerson_flow) residual
+    struct vertex** predecessor
 ) {
-    int vertex_len = graph_vertices_len(graph);
+    int vertex_len = graph_vertices_len(residual_graph);
 
     int visited[vertex_len];
     memzero(visited, sizeof(int) * vertex_len);
     visited[source->i] = 1;
-
     predecessor[source->i] = NULL;
 
     VecDeque(struct vertex*) q = queue_new(struct vertex*);
@@ -33,22 +31,40 @@ int graph_edmonds_karp_breadth_first_search(
         struct vertex* current = queue_pop_front(q);
         for(int i = 0; i < vec_len(current->out); i++) {
             struct vertex* u = vec_get(current->out, i);
-            struct ford_fulkerson_flow flow = { current, u, 0, NULL };
-            if(!visited[u->i] && hashset_get(residual, flow).flow > 0) {
+            if(!visited[u->i] && graph_edge_between(residual_graph, current->value, u->value) > 0) {
                 queue_push_back(q, u);
                 predecessor[u->i] = current;
                 visited[u->i] = 1;
 
                 if(u == sink) {
+                    queue_free(q, NULL);
                     return 1;
                 }
             }
         }
     }
+    queue_free(q, NULL);
     return 0;
 }
 
-int graph_ford_fulkerson(struct graph* graph, struct vertex* source, struct vertex* sink) {
+int graph_ford_fulkerson(struct graph* residual_graph, struct vertex* source, struct vertex* sink, struct vertex** predecessor) {
+    int path_flow = I32_MAX;
+
+    for (struct vertex* v = sink; v != source; v = predecessor[v->i]) {
+        struct vertex* u = predecessor[v->i];
+        path_flow =
+            path_flow < graph_edge_between(residual_graph, u->value, v->value)->weight
+            ? path_flow
+            : graph_edge_between(residual_graph, u->value, v->value)->weight;
+    }
+
+    for (struct vertex* v = sink; v != source; v = predecessor[v->i]) {
+        struct vertex* u = predecessor[v->i];
+        graph_edge_between(residual_graph, u->value, v->value)->weight -= path_flow;
+        graph_edge_between(residual_graph, v->value, u->value)->weight += path_flow;
+    }
+
+    return path_flow;
 
 }
 
@@ -56,46 +72,25 @@ int graph_edmonds_karp(struct graph* graph, struct vertex* source, struct vertex
     int vertex_len = graph_vertices_len(graph);
     struct vertex* predecessor[vertex_len];
 
-    struct weighted_edge edges[graph_edges_len(graph)];
     struct graph residual_graph = graph_new();
-    struct weighted_edge* edge = malloc(sizeof(struct weighted_edge));
-
-    hashset(struct ford_fulkerson_flow) residual = hashset_new(
-                struct ford_fulkerson_flow, ford_fulkerson_flow_hash, ford_fulkerson_flow_cmp);
+    for(int i = 0; i < vertex_len; i++) {
+        graph_add_vertex(&residual_graph, vec_get(graph->vertices, i));
+    }
 
     struct edge* edges[graph_edges_len(graph)];
     graph_edges(graph, edges);
     for(int i = 0; i < graph_edges_len(graph); i++) {
-        struct ford_fulkerson_flow flow = { edges[0]->from, edges[1]->to, weighted_edge_weight(edges[0]), NULL };
-        struct ford_fulkerson_flow reverse_flow = { edges[0]->to, edges[1]->from, 0, NULL };
-        hashset_insert(residual, flow);
+        struct edge* edge = edges[i];
+        graph_add_edge(&residual_graph, edge->from, edge->to, edge->weight);
+        graph_add_edge(&residual_graph, edge->to, edge->from, 0);
     }
 
     int max_flow = 0;
-
-    while (graph_edmonds_karp_breadth_first_search(graph, source, sink, predecessor, residual)) {
-        int path_flow = I32_MAX;
-
-        for (struct vertex* v = sink; v != source; v = predecessor[v->i]) {
-            struct vertex* u = predecessor[v->i];
-            struct ford_fulkerson_flow flow = { graph_edge_between(graph, u, v), 0 };
-            flow = hashset_get(residual, flow);
-            path_flow = path_flow < flow.flow ? path_flow : flow.flow;
-        }
-
-        for (struct vertex* v = sink; v != source; v = predecessor[v->i]) {
-            struct vertex* u = predecessor[v->i];
-            struct ford_fulkerson_flow flow = { graph_edge_between(graph, u, v), 0 };
-            flow = hashset_get(residual, flow);
-            hashset_insert(residual, )
-            residualGraph[u][v] -= pathFlow;
-            residualGraph[v][u] += pathFlow;  // Reverse flow to allow backtracking if needed
-        }
-
-        maxFlow += pathFlow;
+    while (graph_edmonds_karp_breadth_first_search(&residual_graph, source, sink, predecessor)) {
+        max_flow += graph_ford_fulkerson(&residual_graph, source, sink, predecessor);
     }
 
-    return maxFlow;
+    graph_free(&residual_graph);
 
-    hashset_free(residual, NULL);
+    return max_flow;
 }

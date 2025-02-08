@@ -17,8 +17,8 @@ int acyclic_graph_topological_sort_reversed(
 
 int acyclic_graph_toplogical_sort(struct graph* graph, void** topological_order);
 int acyclic_graph_paths_to(struct graph* graph, void* s, void* current, int* paths, int* visited);
-int acyclic_graph_paths_between(struct graph* graph, struct vertex* from, struct vertex* to);
-void graph_dijkstra_acyclic_product(struct graph* graph, struct vertex* s, struct graph* acyclic_product);
+int acyclic_graph_paths_between(struct graph* graph, void* from, void* to);
+void graph_dijkstra_acyclic_product(struct graph* graph, void* s, struct graph* acyclic_product);
 
 // similar to dijkstra's acyclic product, all dynamic programming problems result in an acyclic graph where
 // each node represents a state and the edges represent a path taken from that state

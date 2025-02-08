@@ -1,7 +1,7 @@
 #include "../headers/successor_graph.h"
 
 int successor_graph_precalculate_succ_i(struct graph* graph, int vertex_i, int limit, int** succ) {
-    struct vertex* v = graph_vertex_from_i(graph, vertex_i);
+    struct vertex* v = graph_vertex(graph, graph_vertex_from_i(graph, vertex_i));
     succ[log_2(limit)][vertex_i] = limit == 1 
         ? vec_get(v->out, 0)->i
         : successor_graph_precalculate_succ_i(
@@ -39,15 +39,16 @@ int successor_graph_succ_n(struct vertex* v, int k, int** succ) {
 
 void successor_graph_floyd_tortoise_and_hair(struct graph* successor_graph, int* first_vertex_index, int* cycle_length) {
     //cycle detection
-    struct vertex* a = successor_graph_succ(graph_vertex_from_i(successor_graph, 0));
-    struct vertex* b = successor_graph_succ(successor_graph_succ(graph_vertex_from_i(successor_graph, 0)));
+    struct vertex* init = graph_vertex(successor_graph, graph_vertex_from_i(successor_graph, 0));
+    struct vertex* a = successor_graph_succ(init);
+    struct vertex* b = successor_graph_succ(successor_graph_succ(init));
     while(a != b) {
         a = successor_graph_succ(a);
         b = successor_graph_succ(successor_graph_succ(b));
     }
 
     //first node of cycle
-    a = graph_vertex_from_i(successor_graph, 0);
+    a = graph_vertex(successor_graph, graph_vertex_from_i(successor_graph, 0));
     while(a != b) {
         a = successor_graph_succ(a);
         b = successor_graph_succ(b);

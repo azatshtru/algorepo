@@ -15,14 +15,13 @@ struct ford_fulkerson_flow {
 int ford_fulkerson_flow_cmp(void* a, void* b);
 unsigned int ford_fulkerson_flow_hash(void* a);
 int graph_edmonds_karp_breadth_first_search(
-        struct graph* graph,
+        struct graph* residual_graph,
         struct vertex* source,
         struct vertex* sink,
-        struct vertex** predecessor,
-        hashset(struct ford_fulkerson_flow) residual
+        struct vertex** predecessor
         );
 
-int graph_ford_fulkerson(struct graph* graph, struct vertex* source, struct vertex* sink);
+int graph_ford_fulkerson(struct graph* residual_graph, struct vertex* source, struct vertex* sink, struct vertex** predecessor);
 int graph_edmonds_karp(struct graph* graph, struct vertex* source, struct vertex* sink);
 
 #endif

@@ -1,17 +1,17 @@
 #include "../headers/acyclic_graph.h"
 
 int acyclic_graph_topological_sort_reversed(struct graph* graph, void* v, int* state, void** topological_order, int topological_order_index) {
-    struct vertex vadj = graph_vertex(graph, v);
-    if(state[vadj.i] == PROCESSED) return 1;
-    if(state[vadj.i] == PROCESSING) return 0;
+    struct vertex* vadj = graph_vertex(graph, v);
+    if(state[vadj->i] == PROCESSED) return 1;
+    if(state[vadj->i] == PROCESSING) return 0;
     int is_acyclic;
-    state[vadj.i] = PROCESSING;
+    state[vadj->i] = PROCESSING;
     for(int i = 0; i < graph_vertex_out_degree(graph, v); i++) {
-        void* u = vec_get(vadj.out, i);
+        void* u = vec_get(vadj->out, i)->value;
         is_acyclic = acyclic_graph_topological_sort_reversed(graph, u, state, topological_order, topological_order_index);
         if(is_acyclic == 0) break;
     }
-    state[vadj.i] = PROCESSED;
+    state[vadj->i] = PROCESSED;
     if(topological_order != NULL) {
         topological_order[topological_order_index++] = v;
     }
@@ -39,22 +39,22 @@ int acyclic_graph_toplogical_sort(struct graph* graph, void** topological_order)
 }
 
 int acyclic_graph_paths_to(struct graph* graph, void* s, void* current, int* paths, int* visited) {
-    struct vertex current_adj = graph_vertex(graph, current);
-    if(visited[current_adj.i]) {
-        return paths[current_adj.i];
+    struct vertex* current_adj = graph_vertex(graph, current);
+    if(visited[current_adj->i]) {
+        return paths[current_adj->i];
     }
-    visited[current_adj.i] = 1;
+    visited[current_adj->i] = 1;
     if(current == s) return 1;
     int pathsum = 0;
     for(int i = 0; i < graph_vertex_out_degree(graph, current); i++) {
-        void* u = vec_get(current_adj.out, i);
+        void* u = vec_get(current_adj->out, i)->value;
         pathsum += acyclic_graph_paths_to(graph, s, u, paths, visited);
     }
-    paths[current_adj.i] = pathsum;
+    paths[current_adj->i] = pathsum;
     return pathsum;
 }
 
-int acyclic_graph_paths_between(struct graph* graph, struct vertex* from, struct vertex* to) {
+int acyclic_graph_paths_between(struct graph* graph, void* from, void* to) {
     int vertex_len = graph_vertices_len(graph);
     int paths[vertex_len];
     int visited[vertex_len];
@@ -62,14 +62,14 @@ int acyclic_graph_paths_between(struct graph* graph, struct vertex* from, struct
         paths[i] = 0;
         visited[i] = 0;
     }
-    paths[to->i] = 1;
+    paths[graph_vertex_i(graph, to)] = 1;
 
     acyclic_graph_paths_to(graph, to, from, paths, visited);
 
-    return paths[from->i];
+    return paths[graph_vertex_i(graph, from)];
 }
 
-void graph_dijkstra_acyclic_product(struct graph* graph, struct vertex* s, struct graph* acyclic_product) {
+void graph_dijkstra_acyclic_product(struct graph* graph, void* s, struct graph* acyclic_product) {
     int vertex_len = graph_vertices_len(graph);
     int distance[vertex_len];
     int processed[vertex_len];
@@ -81,27 +81,25 @@ void graph_dijkstra_acyclic_product(struct graph* graph, struct vertex* s, struc
         processed[i] = 0;
         graph_add_vertex(acyclic_product, graph_vertex_from_i(graph, i));
     }
-    distance[s->i] = 0;
-    priority_queue_nq(q, s, 0);
+    distance[graph_vertex_i(graph, s)] = 0;
+    priority_queue_nq(q, graph_vertex(graph, s), 0);
 
     while(!priority_queue_is_empty(q)) {
         struct vertex* v = priority_queue_dq(q);
         if(processed[v->i]) { continue; }
         processed[v->i] = 1;
-        for(int i = 0; i < graph_vertex_out_degree(v); i++) {
+        for(int i = 0; i < vec_len(v->out); i++) {
             struct vertex* u = vec_get(v->out, i);
-            int weight = weighted_edge_weight(graph_edge_between(graph, v, u));
+            int weight = graph_edge_weight(graph, v->value, u->value);
             if(distance[v->i] + weight < distance[u->i]) {
                 distance[u->i] = distance[v->i] + weight;
-                priority_queue_nq(q, u, -distance[u->i]);
+                priority_queue_nq(q, u, distance[u->i]);
 
-                for(int i = 0; i < graph_vertex_in_degree(u); i++) {
-                    graph_remove_edge(acyclic_product, vec_get(u->in, i), u);
+                for(int i = 0; i < vec_len(u->in); i++) {
+                    graph_remove_edge(acyclic_product, vec_get(u->in, i), u->value);
                 }
-            } else if(distance[v->i] + weight > distance[u->i]) {
-                continue;
-            }
-            graph_add_edge(acyclic_product, graph_edge_between(graph, v, u), v, u);
+            } else if(distance[v->i] + weight > distance[u->i]) continue;
+            graph_add_edge(acyclic_product, v->value, u->value, graph_edge_weight(graph, v->value, u->value));
         }
     }
 
