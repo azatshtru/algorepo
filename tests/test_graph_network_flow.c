@@ -2,20 +2,97 @@
 #include "orange_juice.h"
 
 oj_test(edmonds_karp_returns_7_for_network_with_7_flow) {
-    oj_rotten;
-}
+    struct graph g = graph_new();
+    int v[6] = { 1, 2, 3, 4, 5, 6 };
+    for(int i = 0; i < 6; i++) {
+        graph_add_vertex(&g, v + i);
+    }
+    graph_add_edge(&g, v+0, v+1, 5);
+    graph_add_edge(&g, v+0, v+3, 4);
+    graph_add_edge(&g, v+3, v+1, 3);
+    graph_add_edge(&g, v+3, v+4, 1);
+    graph_add_edge(&g, v+1, v+2, 6);
+    graph_add_edge(&g, v+2, v+4, 8);
+    graph_add_edge(&g, v+2, v+5, 5);
+    graph_add_edge(&g, v+4, v+5, 2);
 
-oj_test(edmonds_karp_returns_5_for_network_with_5_flow) {
-    oj_rotten;
+    int result = graph_edmonds_karp(&g, v+0, v+5);
+
+    oj_assert_eq_int(7, result);
+
+    graph_free(&g);
+
+    oj_fresh;
 }
 
 oj_test(edmonds_karp_returns_19_for_network_with_19_flow) {
-    oj_rotten;
+    struct graph g = graph_new();
+    int v[6] = { 1, 2, 3, 4, 5, 6 };
+    for(int i = 0; i < 6; i++) {
+        graph_add_vertex(&g, v + i);
+    }
+    graph_add_edge(&g, v+0, v+1, 10);
+    graph_add_edge(&g, v+0, v+2, 10);
+    graph_add_edge(&g, v+1, v+2, 2);
+    graph_add_edge(&g, v+1, v+3, 4);
+    graph_add_edge(&g, v+1, v+4, 8);
+    graph_add_edge(&g, v+2, v+4, 9);
+    graph_add_edge(&g, v+3, v+5, 10);
+    graph_add_edge(&g, v+4, v+3, 6);
+    graph_add_edge(&g, v+4, v+5, 10);
+
+    int result = graph_edmonds_karp(&g, v+0, v+5);
+
+    oj_assert_eq_int(19, result);
+
+    graph_free(&g);
+
+    oj_fresh;
+}
+
+oj_test(edmonds_karp_returns_5_for_network_with_5_flow) {
+    struct graph graph = graph_new();
+
+    int a = 'A';
+    int b = 'B';
+    int c = 'C';
+    int d = 'D';
+    int e = 'E';
+    int f = 'F';
+    int g = 'G';
+
+    graph_add_vertex(&graph, &a);
+    graph_add_vertex(&graph, &b);
+    graph_add_vertex(&graph, &c);
+    graph_add_vertex(&graph, &d);
+    graph_add_vertex(&graph, &e);
+    graph_add_vertex(&graph, &f);
+    graph_add_vertex(&graph, &g);
+
+    graph_add_edge(&graph, &a, &b, 3);
+    graph_add_edge(&graph, &a, &d, 3);
+    graph_add_edge(&graph, &b, &c, 4);
+    graph_add_edge(&graph, &c, &a, 3);
+    graph_add_edge(&graph, &c, &d, 1);
+    graph_add_edge(&graph, &c, &e, 2);
+    graph_add_edge(&graph, &d, &e, 2);
+    graph_add_edge(&graph, &d, &f, 6);
+    graph_add_edge(&graph, &e, &b, 1);
+    graph_add_edge(&graph, &e, &g, 1);
+    graph_add_edge(&graph, &f, &g, 9);
+
+    int result = graph_edmonds_karp(&graph, &a, &g);
+
+    oj_assert_eq_int(5, result);
+
+    graph_free(&graph);
+
+    oj_fresh;
 }
 
 oj_prepare(test_edmonds_karp) {
-    oj_run(edmonds_karp_returns_7_for_network_with_7_flow);
     oj_run(edmonds_karp_returns_5_for_network_with_5_flow);
+    oj_run(edmonds_karp_returns_7_for_network_with_7_flow);
     oj_run(edmonds_karp_returns_19_for_network_with_19_flow);
     oj_report;
     oj_fresh;

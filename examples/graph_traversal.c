@@ -2,7 +2,7 @@
 #include "../headers/graph.h"
 
 void graph_breadth_first_search(struct graph* graph, void* origin) {
-    size_t vertices_len = graph_vertices_len(graph);
+    unsigned int vertices_len = graph_vertices_len(graph);
     unsigned int distance[vertices_len];
     unsigned int visited[vertices_len];
     memzero(distance, vertices_len * sizeof(unsigned int));
@@ -19,7 +19,7 @@ void graph_breadth_first_search(struct graph* graph, void* origin) {
         int index = queue_pop_front(queue);
         struct vertex* s = graph_vertex(graph, graph_vertex_from_i(graph, index));
 
-        printf("BFS: %d\n", *(int*)s);
+        printf("BFS: %d\n", *((int*)s->value));
 
         for(int i = 0; i < vec_len(s->out); i++) {
             struct vertex* u = vec_get(s->out, i);
@@ -35,7 +35,7 @@ void graph_depth_first_search(struct graph* graph, struct vertex* s, unsigned in
     if(visited[s->i]) { return; }
     visited[s->i] = 1;
 
-    printf("DFS: %d\n", *(int*)s);
+    printf("DFS: %d\n", *((int*)s->value));
     for(int i = 0; i < graph_vertex_out_degree(graph, s->value); i++) {
         graph_depth_first_search(graph, vec_get(s->out, i), visited);
     }
@@ -50,6 +50,14 @@ int main() {
     int v5 = 4;
     int v6 = 5;
     int v7 = 6;
+
+    graph_add_vertex(&g, &v1);
+    graph_add_vertex(&g, &v2);
+    graph_add_vertex(&g, &v3);
+    graph_add_vertex(&g, &v4);
+    graph_add_vertex(&g, &v5);
+    graph_add_vertex(&g, &v6);
+    graph_add_vertex(&g, &v7);
 
     graph_add_edge(&g, &v1, &v2, 1);
     graph_add_edge(&g, &v1, &v3, 1);
@@ -73,7 +81,7 @@ int main() {
     printf("\n");
     
 
-    size_t vertices_len = graph_vertices_len(&g);
+    unsigned int vertices_len = graph_vertices_len(&g);
     unsigned int visited[vertices_len];
 
     memzero(visited, vertices_len * sizeof(unsigned int));
