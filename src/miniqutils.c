@@ -73,6 +73,21 @@ float negative_infinity() {
     return negative_infinity_IEEE745.f;
 }
 
+int euclid_gcd(int a, int b) {
+    if(b == 0) return a;
+    return euclid_gcd(b, a % b);
+}
+
+int modpow(int x, int n, int m) {
+    if(n == 0) return 1 % m;
+    int u = modpow(x, n/2, m);
+    u = (u * u) % m;
+    if(n%2 == 1) {
+        u = (u * x) % m;
+    }
+    return u;
+}
+
 int positive_mod(int a, int m) {
     return (a % m + m) % m;
 }
@@ -134,4 +149,41 @@ void euro_coins(int* coins) {
     coins[3] = 10;
     coins[4] = 20;
     coins[5] = 50;
+}
+
+void sieve_of_eratosthenes(int n, int* sieve) {
+    int x = 2;
+    while(x <= n) {
+        if(sieve[x]) continue;
+        int u = 2 * x;
+        while(u <= n) {
+            sieve[u] = x;
+            u += x;
+        }
+    }
+}
+
+int is_prime(int n) {
+    if(n < 2) return 0;
+    int x = 2;
+    for(int x = 0; x * x <= n; x++) {
+        if(n % x == 0) return 0;
+    }
+    return 1;
+}
+
+vector(int) factors(int n) {
+    vector(int) factors = vec_new(int);
+    int x = 2;
+    while(x * x <= n) {
+        while(n % x == 0) {
+            vec_push(factors, x);
+            n /= x;
+        }
+        x += 1;
+    }
+    if(n > 1) {
+        vec_push(factors, n);
+    }
+    return factors;
 }

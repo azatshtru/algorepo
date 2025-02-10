@@ -1,6 +1,7 @@
 #include <limits.h>
 #include <string.h>
 #include <stdarg.h>
+#include "vector.h"
 
 #ifndef MINIQUTILS
 #define MINIQUTILS
@@ -22,10 +23,16 @@ int log_2(int x);
 int cantor_pairing(int a, int b);
 float positive_infinity();
 float negative_infinity();
+int euclid_gcd(int a, int b);
+int modpow(int x, int n, int m);
 int positive_mod(int a, int m);
 int close_to_zero(float epsilon);
 double natural_log(double x);
 void euro_coins(int* coins);
+
+void sieve_of_eratosthenes(int n, int* sieve);
+int is_prime(int n);
+vector(int) factors(int n);
 
 #define I32_MIN -2147483648
 #define I32_MAX 2147483647
