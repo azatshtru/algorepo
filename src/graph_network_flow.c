@@ -144,6 +144,45 @@ int graph_min_cut(struct graph* graph, void* source, void* sink, vector(struct e
     return max_flow;
 }
 
-int graph_max_node_disjoint_paths(struct graph* graph, void* source, void* sink) {
-    return 0;
+int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sink) {
+    int vertex_len = graph_vertices_len(graph);
+    char* split_vertices = malloc(vertex_len);
+    struct graph split_graph = graph_new();
+
+    graph_add_vertex(&split_graph, source);
+    for(int j = 0; j < vec_len(graph_vertex(graph, source)->out); j++) {
+        struct vertex* v = vec_get(graph_vertex(graph, source)->out, j);
+        graph_add_vertex(&split_graph, v->value);
+        graph_add_edge(&split_graph, source, v->value, 1);
+    }
+    graph_add_vertex(&split_graph, sink);
+    for(int j = 0; j < vec_len(graph_vertex(graph, sink)->out); j++) {
+        log_label("I have");
+        struct vertex* v = vec_get(graph_vertex(graph, sink)->out, j);
+        graph_add_vertex(&split_graph, v->value);
+        graph_add_edge(&split_graph, sink, v->value, 1);
+    }
+
+    for(int i = 0; i < vertex_len; i++) {
+        struct vertex* u = graph_vertex(graph, vec_get(graph->vertices, i));
+        if(u->value == source || u->value == sink) continue;
+        graph_add_vertex(&split_graph, u->value);
+        graph_add_vertex(&split_graph, split_vertices+i);
+        graph_add_edge(&split_graph, u->value, split_vertices+i, 1);
+
+        for(int j = 0; j < vec_len(u->out); j++) {
+            graph_add_vertex(&split_graph, vec_get(u->out, j)->value);
+            graph_add_edge(&split_graph, split_vertices+i, vec_get(u->out, j)->value, 1);
+        }
+    }
+
+    int disjoint_paths = graph_max_flow(&split_graph, source, sink);
+    free(split_vertices);
+    graph_free(&split_graph);
+
+    return disjoint_paths;
+}
+
+int graph_max_edge_disjoint_paths(struct graph* graph, void* source, void* sink) {
+    return graph_max_flow(graph, source, sink);
 }

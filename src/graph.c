@@ -86,6 +86,8 @@ void graph_remove_edge(struct graph* graph, void* from, void* to) {
 }
 
 void graph_add_vertex(struct graph* graph, void* value) {
+    struct vertex x = { value, 0, NULL, NULL };
+    if(hashset_contains(graph->adjacency_list, &x)) return;
     struct vertex* v = malloc(sizeof(struct vertex));
     v->value = value;
     v->i = vec_len(graph->vertices);
