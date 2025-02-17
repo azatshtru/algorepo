@@ -163,3 +163,34 @@ int graph_edge_weight(struct graph* graph, void* from, void* to) {
 float graph_cmp_edge_by_weight(void* a, void* b) {
     return (*((struct edge**)a))->weight - (*((struct edge**)b))->weight;
 }
+
+int graph_is_bipartite(struct graph* graph) {
+    unsigned int vertex_len = graph_vertices_len(graph);
+    Color color[vertex_len];
+    memzero(color, sizeof(int) * vertex_len);
+
+    VecDeque(struct vertex*) q = queue_new(struct vertex*);
+
+    for(int i = 0; i < vertex_len; i++) {
+        if(color[i]) continue;
+      
+        color[i] = RED;
+        queue_push_back(q, graph_vertex(graph, vec_get(graph->vertices, i)));
+
+        while(!queue_is_empty(q)) {
+            struct vertex* u = queue_pop_front(q);
+            for(int j = 0; j < vec_len(u->out); j++) {
+                struct vertex* v = vec_get(u->out, j);
+                if(color[v->i] == 0) {
+                    color[v->i] = color[u->i] == RED ? BLUE : RED;
+                    queue_push_back(q, v);
+                } else if (color[v->i] == color[u->i]) {
+                    queue_free(q, NULL);
+                    return 0;
+                }
+            }
+        }
+    }
+    queue_free(q, NULL);
+    return 1;
+}

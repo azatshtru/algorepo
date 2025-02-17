@@ -264,6 +264,57 @@ oj_test(test_graph_degree_queries) {
     oj_fresh;
 }
 
+oj_test(graph_is_bipartite_returns_true_if_graph_is_infact_bipartite) {
+    int v0 = 0;
+    int v1 = 1;
+    int v2 = 2;
+    int v3 = 3;
+    int v4 = 4;
+    int v5 = 5;
+    int v6 = 6;
+    int v7 = 7;
+
+    struct graph bipartite_graph = graph_new();
+    graph_add_vertex(&bipartite_graph, &v0);
+    graph_add_vertex(&bipartite_graph, &v1);
+    graph_add_vertex(&bipartite_graph, &v2);
+    graph_add_vertex(&bipartite_graph, &v3);
+    graph_add_vertex(&bipartite_graph, &v4);
+    graph_add_vertex(&bipartite_graph, &v5);
+    graph_add_vertex(&bipartite_graph, &v6);
+    graph_add_vertex(&bipartite_graph, &v7);
+
+    graph_add_edge(&bipartite_graph, &v0, &v1, 1);
+    graph_add_edge(&bipartite_graph, &v1, &v2, 1);
+    graph_add_edge(&bipartite_graph, &v2, &v3, 1);
+    graph_add_edge(&bipartite_graph, &v2, &v7, 1);
+    graph_add_edge(&bipartite_graph, &v3, &v4, 1);
+    graph_add_edge(&bipartite_graph, &v7, &v6, 1);
+    graph_add_edge(&bipartite_graph, &v6, &v5, 1);
+    graph_add_edge(&bipartite_graph, &v4, &v5, 1);
+
+    oj_assert_eq_int(1, graph_is_bipartite(&bipartite_graph));
+
+    struct graph non_bipartite_graph = graph_new();
+    graph_add_vertex(&non_bipartite_graph, &v0);
+    graph_add_vertex(&non_bipartite_graph, &v1);
+    graph_add_vertex(&non_bipartite_graph, &v2);
+    graph_add_vertex(&non_bipartite_graph, &v3);
+    graph_add_vertex(&non_bipartite_graph, &v4);
+    graph_add_vertex(&non_bipartite_graph, &v5);
+
+    graph_add_edge(&non_bipartite_graph, &v0, &v1, 1);
+    graph_add_edge(&non_bipartite_graph, &v1, &v2, 1);
+    graph_add_edge(&non_bipartite_graph, &v1, &v5, 1);
+    graph_add_edge(&non_bipartite_graph, &v2, &v3, 1);
+    graph_add_edge(&non_bipartite_graph, &v3, &v4, 1);
+    graph_add_edge(&non_bipartite_graph, &v5, &v4, 1);
+
+    oj_assert_eq_int(0, graph_is_bipartite(&non_bipartite_graph));
+
+    oj_fresh;
+}
+
 oj_prepare(graph_setup_tests) {
     oj_run(graph_allocates);
     oj_report;
@@ -285,6 +336,7 @@ oj_prepare(graph_query_tests) {
     oj_run(test_graph_edge_between);
     oj_run(test_graph_adjacent_vertices);
     oj_run(test_graph_degree_queries);
+    oj_run(graph_is_bipartite_returns_true_if_graph_is_infact_bipartite);
     oj_report;
     oj_fresh;
 }

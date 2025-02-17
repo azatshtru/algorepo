@@ -6,10 +6,6 @@
 #ifndef RED_BLACK_TREES
 #define RED_BLACK_TREES
 
-#define RED 1
-#define BLACK 0
-#define Color int
-
 struct red_black_tree_node {
     int key;
     struct red_black_tree_node* parent;

@@ -14,6 +14,13 @@ union raw_float {
     float f;
 };
 
+typedef unsigned int Color;
+#define RED 0xFF0000
+#define GREEN 0x00FF00
+#define BLUE 0x0000FF
+#define BLACK 0x000000
+#define WHITE 0xFFFFFF
+
 double min_f(int n, ...);
 int min_i(int n, ...);
 void memzero(void* array, int len);

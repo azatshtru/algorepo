@@ -4,6 +4,7 @@
 #include "vector.h"
 #include "hashset.h"
 #include "miniqutils.h"
+#include "queue.h"
 
 struct vertex {
     void* value;
@@ -57,5 +58,6 @@ void* graph_vertex_from_i(struct graph* graph, int i);
 
 int graph_edge_weight(struct graph* graph, void* from, void* to);
 float graph_cmp_edge_by_weight(void* a, void* b);
+int graph_is_bipartite(struct graph* graph);
 
 #endif
