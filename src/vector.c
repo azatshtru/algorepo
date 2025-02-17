@@ -64,3 +64,11 @@ int vec_shush_index(void* vec, void* value_ptr) {
     }
     return -1;
 }
+
+void vec_clear(void* vec) {
+    Vector* v = (Vector*)vec;
+    v->len = 0;
+    while(v->cap >= VEC_INIT_SIZE * 2 && v->len <= v->cap / 2) {
+        vec_resize(v, v->len);
+    }
+}

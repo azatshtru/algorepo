@@ -148,7 +148,7 @@ int graph_min_cut(struct graph* graph, void* source, void* sink, vector(struct e
     return max_flow;
 }
 
-int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sink, vector(vector(void*)) disjoint_paths) {
+int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sink) {
     int vertex_len = graph_vertices_len(graph);
     char* split_vertices = malloc(vertex_len);
     struct graph split_graph = graph_new();
@@ -182,6 +182,22 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
     struct graph residual_graph = graph_new();
     graph_network_flow_init_residual_graph(&split_graph, &residual_graph);
     int max_disjoint_paths = graph_edmonds_karp(&residual_graph, source, sink);
+
+    for(int i = 0; i < graph_vertices_len(&split_graph); i++) {
+        struct vertex* u = graph_vertex(&split_graph, vec_get(split_graph.vertices, i));
+        log_char("I am", *(char*)u->value);
+        log_pointer("My address", u->value);
+        log_array(vec_as_array(u->out), struct vertex*, vec_len(u->out), x, printf("%p", x->value));
+    }
+
+    log_label("\n\n\nfrom here residual begins\n\n");
+
+    for(int i = 0; i < graph_vertices_len(&residual_graph); i++) {
+        struct vertex* u = graph_vertex(&residual_graph, vec_get(residual_graph.vertices, i));
+        log_char("I am", *(char*)u->value);
+        log_pointer("My address", u->value);
+        log_array(vec_as_array(u->out), struct vertex*, vec_len(u->out), x, printf("%p", x->value));
+    }
 
     graph_free(&split_graph);
     graph_free(&residual_graph);

@@ -26,6 +26,7 @@ int vec_zap(void* vec, int index, void(*free_fn)(void*));
 int vec_cmp(void* v1_ptr, void* v2_ptr);
 uint32 vec_len(void* vec);
 int vec_shush_index(void* vec, void* value_ptr);
+void vec_clear(void* vec);
 
 #define vector(type) type **
 #define vec_new(type) (type**)vec_allocate(VEC_INIT_SIZE, sizeof(type))

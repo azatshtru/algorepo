@@ -96,8 +96,7 @@ oj_test(edmonds_karp_returns_5_for_network_with_5_flow) {
 
     int result = graph_max_flow(&graph, &a, &g);
 
-    vector(vector(void*)) disjoint_paths = vec_new(vector(void*));
-    oj_assert_eq_int(2, graph_max_vertex_disjoint_paths(&graph, &a, &g, disjoint_paths));
+    oj_assert_eq_int(2, graph_max_vertex_disjoint_paths(&graph, &a, &g));
     oj_assert_eq_int(5, result);
 
     graph_free(&graph);
