@@ -39,6 +39,7 @@ struct vertex* graph_vertex(struct graph* graph, void* value);
 struct edge* graph_edge_between(struct graph* graph, void* from, void* to);
 
 void graph_add_edge(struct graph* graph, void* from, void* to, int weight);
+void graph_add_edge_symmetric(struct graph* graph, void* from, void* to, int weight);
 void graph_remove_edge(struct graph* graph, void* from, void* to);
 void graph_add_vertex(struct graph* graph, void* value);
 void graph_remove_vertex(struct graph* graph, void* value);
@@ -58,6 +59,8 @@ void* graph_vertex_from_i(struct graph* graph, int i);
 
 int graph_edge_weight(struct graph* graph, void* from, void* to);
 float graph_cmp_edge_by_weight(void* a, void* b);
-int graph_is_bipartite(struct graph* graph);
+
+void graph_as_undirected(struct graph* directed_graph, struct graph* undirected_graph);
+int graph_is_bipartite(struct graph* graph, Color* color);
 
 #endif

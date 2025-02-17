@@ -293,7 +293,7 @@ oj_test(graph_is_bipartite_returns_true_if_graph_is_infact_bipartite) {
     graph_add_edge(&bipartite_graph, &v6, &v5, 1);
     graph_add_edge(&bipartite_graph, &v4, &v5, 1);
 
-    oj_assert_eq_int(1, graph_is_bipartite(&bipartite_graph));
+    oj_assert_eq_int(1, graph_is_bipartite(&bipartite_graph, NULL));
 
     struct graph non_bipartite_graph = graph_new();
     graph_add_vertex(&non_bipartite_graph, &v0);
@@ -310,7 +310,7 @@ oj_test(graph_is_bipartite_returns_true_if_graph_is_infact_bipartite) {
     graph_add_edge(&non_bipartite_graph, &v3, &v4, 1);
     graph_add_edge(&non_bipartite_graph, &v5, &v4, 1);
 
-    oj_assert_eq_int(0, graph_is_bipartite(&non_bipartite_graph));
+    oj_assert_eq_int(0, graph_is_bipartite(&non_bipartite_graph, NULL));
 
     oj_fresh;
 }

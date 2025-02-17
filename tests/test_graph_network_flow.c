@@ -1,5 +1,6 @@
 #include "../headers/graph_network_flow.h"
 #include "orange_juice.h"
+#include "../headers/logging.h"
 
 oj_test(edmonds_karp_returns_7_for_network_with_7_flow) {
     struct graph g = graph_new();
@@ -18,6 +19,7 @@ oj_test(edmonds_karp_returns_7_for_network_with_7_flow) {
 
     vector(struct edge*) min_cut = vec_new(struct edge*);
     int result = graph_min_cut(&g, v+0, v+5, min_cut);
+
 
     oj_assert_eq_int(2, vec_len(min_cut));
 
@@ -94,7 +96,8 @@ oj_test(edmonds_karp_returns_5_for_network_with_5_flow) {
 
     int result = graph_max_flow(&graph, &a, &g);
 
-    oj_assert_eq_int(2, graph_max_vertex_disjoint_paths(&graph, &a, &g));
+    vector(vector(void*)) disjoint_paths = vec_new(vector(void*));
+    oj_assert_eq_int(2, graph_max_vertex_disjoint_paths(&graph, &a, &g, disjoint_paths));
     oj_assert_eq_int(5, result);
 
     graph_free(&graph);
@@ -102,15 +105,46 @@ oj_test(edmonds_karp_returns_5_for_network_with_5_flow) {
     oj_fresh;
 }
 
+oj_test(graph_max_bipartite_matchings_returns_maximum_matchings_in_a_bipartite_graph) {
+    struct graph g = graph_new();
+    int v[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    for(int i = 0; i < 8; i++) {
+        graph_add_vertex(&g, v + i);
+    }
+    graph_add_edge(&g, v+0, v+4, 1);
+    graph_add_edge(&g, v+4, v+2, 1);
+    graph_add_edge(&g, v+1, v+6, 1);
+    graph_add_edge(&g, v+3, v+6, 1);
+    graph_add_edge(&g, v+2, v+5, 1);
+    graph_add_edge(&g, v+2, v+7, 1);
+
+    vector(struct edge*) matching = vec_new(struct edge*);
+    vector(void*) min_vertex_cover = vec_new(void*);
+    int result = graph_max_bipartite_matchings(&g, matching, min_vertex_cover);
+    log_array(vec_as_array(matching), struct edge*, 3, x, printf("(%d, %d)", *(int*)x->from, *(int*)x->to));
+    log_array(vec_as_array(min_vertex_cover), void*, 3, x, printf("%d", *(int*)x));
+
+
+    oj_assert_eq_int(3, result);
+    oj_fresh;
+}
+
+oj_prepare(test_applications_of_network_flow) {
+    oj_run(graph_max_bipartite_matchings_returns_maximum_matchings_in_a_bipartite_graph);
+    oj_report;
+    oj_fresh;
+}
+
 oj_prepare(test_edmonds_karp) {
     oj_run(edmonds_karp_returns_19_for_network_with_19_flow);
-    oj_run(edmonds_karp_returns_5_for_network_with_5_flow);
     oj_run(edmonds_karp_returns_7_for_network_with_7_flow);
+    oj_run(edmonds_karp_returns_5_for_network_with_5_flow);
     oj_report;
     oj_fresh;
 }
 
 int main() {
     oj_blend(test_edmonds_karp, 0);
+    oj_blend(test_applications_of_network_flow, 0);
     return 0;
 }

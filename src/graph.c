@@ -1,4 +1,5 @@
 #include "../headers/graph.h"
+#include "../headers/logging.h"
 
 unsigned int graph_edge_hash(void* edge_ptr) {
     struct edge* edge = *((struct edge**)edge_ptr);
@@ -41,11 +42,11 @@ void graph_free(struct graph* graph) {
 
 void graph_edges(struct graph* graph, struct edge** edges) {
     unsigned int i = 0;
-    int j = 0;
+    unsigned int j = 0;
     do {
         i = hashset_lazy_iterate(graph->edges, i);
         edges[j++] = (*graph->edges)[i];
-    } while(i != 0);
+    } while(j < graph_edges_len(graph));
 }
 
 struct vertex* graph_vertex(struct graph* graph, void* value) {
@@ -71,6 +72,11 @@ void graph_add_edge(struct graph* graph, void* from, void* to, int weight) {
     vec_push(graph_vertex(graph, from)->out, graph_vertex(graph, to));
     vec_push(graph_vertex(graph, to)->in, graph_vertex(graph, from));
     hashset_insert(graph->edges, edge);
+}
+
+void graph_add_edge_symmetric(struct graph* graph, void* from, void* to, int weight) {
+    graph_add_edge(graph, from, to, weight);
+    graph_add_edge(graph, to, from, weight);
 }
 
 void graph_remove_edge(struct graph* graph, void* from, void* to) {
@@ -164,9 +170,26 @@ float graph_cmp_edge_by_weight(void* a, void* b) {
     return (*((struct edge**)a))->weight - (*((struct edge**)b))->weight;
 }
 
-int graph_is_bipartite(struct graph* graph) {
+void graph_as_undirected(struct graph* directed_graph, struct graph* undirected_graph) {
+    unsigned int vertex_len = graph_vertices_len(directed_graph);
+    for(int i = 0; i < vertex_len; i++) {
+        graph_add_vertex(undirected_graph, vec_get(directed_graph->vertices, i));
+    }
+    struct edge* edges[graph_edges_len(directed_graph)];
+    graph_edges(directed_graph, edges);
+    for(int i = 0; i < graph_edges_len(directed_graph); i++) {
+        graph_add_edge_symmetric(undirected_graph, edges[i]->from, edges[i]->to, edges[i]->weight);
+    }
+}
+
+int graph_is_bipartite(struct graph* graph, Color* color) {
     unsigned int vertex_len = graph_vertices_len(graph);
-    Color color[vertex_len];
+    struct graph undirected_graph = graph_new();
+    graph_as_undirected(graph, &undirected_graph);
+
+    if(color == NULL) {
+        color = malloc(vertex_len * sizeof(Color));
+    }
     memzero(color, sizeof(int) * vertex_len);
 
     VecDeque(struct vertex*) q = queue_new(struct vertex*);
@@ -175,7 +198,7 @@ int graph_is_bipartite(struct graph* graph) {
         if(color[i]) continue;
       
         color[i] = RED;
-        queue_push_back(q, graph_vertex(graph, vec_get(graph->vertices, i)));
+        queue_push_back(q, graph_vertex(&undirected_graph, vec_get(undirected_graph.vertices, i)));
 
         while(!queue_is_empty(q)) {
             struct vertex* u = queue_pop_front(q);
@@ -185,12 +208,14 @@ int graph_is_bipartite(struct graph* graph) {
                     color[v->i] = color[u->i] == RED ? BLUE : RED;
                     queue_push_back(q, v);
                 } else if (color[v->i] == color[u->i]) {
+                    graph_free(&undirected_graph);
                     queue_free(q, NULL);
                     return 0;
                 }
             }
         }
     }
+    graph_free(&undirected_graph);
     queue_free(q, NULL);
     return 1;
 }
