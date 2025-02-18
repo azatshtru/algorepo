@@ -96,7 +96,11 @@ oj_test(edmonds_karp_returns_5_for_network_with_5_flow) {
 
     int result = graph_max_flow(&graph, &a, &g);
 
-    oj_assert_eq_int(2, graph_max_vertex_disjoint_paths(&graph, &a, &g));
+    NetworkFlowPaths paths;
+    network_flow_paths_init(&paths);
+    oj_assert_eq_int(2, graph_max_vertex_disjoint_paths(&graph, &a, &g, paths));
+    network_flow_paths_free(paths);
+
     oj_assert_eq_int(5, result);
 
     graph_free(&graph);
@@ -135,8 +139,8 @@ oj_prepare(test_applications_of_network_flow) {
 }
 
 oj_prepare(test_edmonds_karp) {
-    oj_run(edmonds_karp_returns_19_for_network_with_19_flow);
     oj_run(edmonds_karp_returns_7_for_network_with_7_flow);
+    oj_run(edmonds_karp_returns_19_for_network_with_19_flow);
     oj_run(edmonds_karp_returns_5_for_network_with_5_flow);
     oj_report;
     oj_fresh;

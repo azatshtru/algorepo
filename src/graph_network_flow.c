@@ -1,6 +1,27 @@
 #include "../headers/graph_network_flow.h"
 #include "../headers/logging.h"
 
+void network_flow_paths_init(NetworkFlowPaths* paths) {
+    *paths = vec_new(vector(void*));
+}
+
+vector(void*) network_flow_paths_add(NetworkFlowPaths paths) {
+    vector(void*) path = vec_new(void*);
+    vec_push(paths, path);
+    return path;
+}
+
+vector(void*) network_flow_paths_get(NetworkFlowPaths paths, int index) {
+    return vec_get(paths, index);
+}
+
+void network_flow_paths_free(NetworkFlowPaths paths) {
+    for(int i = 0; i < vec_len(paths); i++) {
+        vec_free(vec_get(paths, i), NULL);
+    }
+    vec_free(paths, NULL);
+}
+
 int graph_edmonds_karp_breadth_first_search(
     struct graph* residual_graph,
     void* source_ptr,
@@ -148,7 +169,7 @@ int graph_min_cut(struct graph* graph, void* source, void* sink, vector(struct e
     return max_flow;
 }
 
-int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sink) {
+int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sink, NetworkFlowPaths paths) {
     int vertex_len = graph_vertices_len(graph);
     char* split_vertices = malloc(vertex_len);
     struct graph split_graph = graph_new();
@@ -183,21 +204,7 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
     graph_network_flow_init_residual_graph(&split_graph, &residual_graph);
     int max_disjoint_paths = graph_edmonds_karp(&residual_graph, source, sink);
 
-    for(int i = 0; i < graph_vertices_len(&split_graph); i++) {
-        struct vertex* u = graph_vertex(&split_graph, vec_get(split_graph.vertices, i));
-        log_char("I am", *(char*)u->value);
-        log_pointer("My address", u->value);
-        log_array(vec_as_array(u->out), struct vertex*, vec_len(u->out), x, printf("%p", x->value));
-    }
-
-    log_label("\n\n\nfrom here residual begins\n\n");
-
-    for(int i = 0; i < graph_vertices_len(&residual_graph); i++) {
-        struct vertex* u = graph_vertex(&residual_graph, vec_get(residual_graph.vertices, i));
-        log_char("I am", *(char*)u->value);
-        log_pointer("My address", u->value);
-        log_array(vec_as_array(u->out), struct vertex*, vec_len(u->out), x, printf("%p", x->value));
-    }
+    if(paths == NULL) return max_disjoint_paths;
 
     int visited[vertex_len];
     memzero(visited, sizeof(int) * vertex_len);
@@ -223,16 +230,10 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
 
     while(!queue_is_empty(q)) {
         struct vertex* u = queue_pop_front(q);
-        if(u->value == sink) {
-            log_label("path found, probably clear path and start again");
-            continue;
-        }
+        if(u->value == sink) continue;
         struct vertex* split_u = vec_get(u->out, 0);
-        // log_pointer("this is split", split_u->value);
-        // log_array(vec_as_array(split_u->out), struct vertex*, vec_len(split_u->out), x, printf("%p", x->value));
         if(visited[graph_vertex_i(graph, u->value)]) continue;
         visited[graph_vertex_i(graph, u->value)] = 1;
-        // vec_push(path, u->value);
         for(int i = 0; i < vec_len(split_u->out); i++) {
             struct vertex* v = vec_get(split_u->out, i);
             int flow = graph_edge_weight(&residual_graph, v->value, split_u->value);
@@ -243,14 +244,8 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
                 queue_push_back(q, v);
                 path[graph_vertex_i(graph, v->value)] = u->value;
             }
-            // log_pointer("split neighbor val", v->value);
-            // log_int("flow", flow);
         }
     }
-
-    log_array(path, void*, vertex_len, x,
-              printf("%p", x)
-              );
 
     vector(void*) reverse_concatenated_path = vec_new(void*);
     for(int i = 0; i < max_disjoint_paths; i++) {
@@ -264,23 +259,16 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
         vec_push(reverse_concatenated_path, source);
     }
     
-    log_array(vec_as_array(reverse_concatenated_path), void*, vec_len(reverse_concatenated_path), x, printf("%c", *(char*)x));
-    
-    vector(void*) paths[max_disjoint_paths];
     int last = vec_len(reverse_concatenated_path) - 1;
     for(int k = 0; k < max_disjoint_paths; k++) {
-        paths[k] = vec_new(void*);
+        vector(void*) path = network_flow_paths_add(paths);
         void* u = NULL;
         while(u != sink) {
             u = vec_get(reverse_concatenated_path, last);
-            log_pointer("u", u);
-            vec_push(paths[k], u);
+            vec_push(path, u);
             --last;
         }
     }
-
-    log_int("path1len", vec_len(paths[0]));
-    log_int("path2len", vec_len(paths[1]));
 
     queue_free(q, NULL);
     graph_free(&split_graph);
@@ -290,7 +278,7 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
     return max_disjoint_paths;
 }
 
-int graph_max_edge_disjoint_paths(struct graph* graph, void* source, void* sink) {
+int graph_max_edge_disjoint_paths(struct graph* graph, void* source, void* sink, NetworkFlowPaths paths) {
     return graph_max_flow(graph, source, sink);
 }
 
