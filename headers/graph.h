@@ -61,6 +61,7 @@ int graph_edge_weight(struct graph* graph, void* from, void* to);
 float graph_cmp_edge_by_weight(void* a, void* b);
 
 void graph_as_undirected(struct graph* directed_graph, struct graph* undirected_graph);
+int graph_path_exists_between(struct graph* graph, void* a, void* b);
 int graph_is_bipartite(struct graph* graph, Color* color);
 
 #endif

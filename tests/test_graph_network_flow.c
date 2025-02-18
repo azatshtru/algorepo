@@ -151,6 +151,9 @@ oj_test(graph_edge_disjoint_paths_returns_edge_disjoint_paths) {
     int max_edge_disjoint_paths = graph_max_edge_disjoint_paths(&g, v+0, v+5, paths);
     oj_assert_eq_int(2, max_edge_disjoint_paths);
 
+    oj_assert_eq_int(1, graph_path_exists_between(&g, v+0, v+5));
+    oj_assert_eq_int(0, graph_path_exists_between(&g, v+1, v+0));
+
     network_flow_paths_free(paths);
 
     oj_fresh;

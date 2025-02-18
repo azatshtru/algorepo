@@ -182,6 +182,27 @@ void graph_as_undirected(struct graph* directed_graph, struct graph* undirected_
     }
 }
 
+int graph_path_exists_between(struct graph* graph, void* a, void* b) {
+    VecDeque(struct vertex*) q = queue_new(struct vertex*);
+    int visited[graph_vertices_len(graph)];
+    memzero(visited, sizeof(int) * graph_vertices_len(graph));
+
+    queue_push_back(q, graph_vertex(graph, a));
+    
+    while(!queue_is_empty(q)) {
+        struct vertex* u = queue_pop_front(q); 
+        visited[u->i] = 1;
+        if(u->value == b) return 1;
+        for(int i = 0; i < vec_len(u->out); i++) {
+            struct vertex* v = vec_get(u->out, i);
+            if(!visited[v->i]) {
+                queue_push_back(q, v);
+            }
+        }
+    }
+    return 0;
+}
+
 int graph_is_bipartite(struct graph* graph, Color* color) {
     unsigned int vertex_len = graph_vertices_len(graph);
     struct graph undirected_graph = graph_new();

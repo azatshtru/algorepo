@@ -22,5 +22,7 @@ König's theorem states that the number of vertices in the minimum vertex cover 
 
 It is very important to note that König's theorem only works for bipartite graphs and for general graphs, finding minimum vertex covers is an NP-hard problem.
 
+The nodes that do not belong to the minimum vertex cover form a set called maximum independent vertex set. This is the largest possible set of nodes such that no two nodes in the set are connected with an edge. Finding this in a general graph is again an NP-hard problem.
+
 
 
