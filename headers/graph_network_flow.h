@@ -29,7 +29,19 @@ int graph_max_edge_disjoint_paths(struct graph* graph, void* source, void* sink,
 
 int graph_max_bipartite_matchings(struct graph* graph, vector(struct edge*) matching, vector(void*) minimum_vertex_cover);
 
-int graph_minimum_vertex_disjoint_path_cover(struct graph* graph, vector(struct edge*) path_cover);
-int graph_minimum_vertex_general_path_cover(struct graph* graph, vector(struct edge*) path_cover);
+int DAG_minimum_vertex_disjoint_path_cover(struct graph* graph, vector(struct edge*) path_cover);
+
+// implemented in the same way as vertex disjoint path covers,
+// but instead of adding an edge in the matching graph if it exists in the original graph,
+// we add an edge A->B in the matching graph if a directed path exists between A and B in the original graph
+int DAG_minimum_vertex_general_path_cover(struct graph* graph, vector(struct edge) path_cover);
+void DAG_minimum_vertex_general_path_cover_DFS(
+    struct graph* graph,
+    struct graph* matching_graph,
+    void** duplicates,
+    vector(void*) prefix,
+    void* current,
+    int* visited
+);
 
 #endif

@@ -173,11 +173,86 @@ oj_test(graph_minimum_node_disjoint_path_covers_returns_minimum_node_disjoint_pa
     graph_add_edge(&g, v+2, v+3, 1);
     
     vector(struct edge*) matching = vec_new(struct edge*);
-    int result = graph_minimum_vertex_disjoint_path_cover(&g, matching);
+    int result = DAG_minimum_vertex_disjoint_path_cover(&g, matching);
     oj_assert_eq_int(3, result);
 
     vec_free(matching, NULL);
+    graph_free(&g);
     
+    oj_fresh;
+}
+
+oj_test(graph_minimum_node_general_path_covers_DFS_adds_edge_to_matching_graph_if_path_exists_in_original_graph) {
+    struct graph g = graph_new();
+    int v[7] = { 1, 2, 3, 4, 5, 6, 7 };
+    for(int i = 0; i < 7; i++) {
+        graph_add_vertex(&g, v + i);
+    }
+    graph_add_edge(&g, v+0, v+4, 1);
+    graph_add_edge(&g, v+1, v+5, 1);
+    graph_add_edge(&g, v+4, v+5, 1);
+    graph_add_edge(&g, v+5, v+6, 1);
+    graph_add_edge(&g, v+5, v+2, 1);
+    graph_add_edge(&g, v+2, v+3, 1);
+    
+    unsigned int vertex_len = graph_vertices_len(&g);
+    struct graph matching_graph = graph_new();
+    void* duplicates[vertex_len];
+    for(int i = 0; i < vertex_len; i++) {
+        duplicates[i] = vec_get(g.vertices, i);
+        graph_add_vertex(&matching_graph, duplicates[i]);
+        graph_add_vertex(&matching_graph, duplicates+i);
+    }
+    vector(void*) prefix = vec_new(void*);
+    int visited[vertex_len];
+    memzero(visited, sizeof(int) * vertex_len);
+    for(int i = 0; i < vertex_len; i++) {
+        DAG_minimum_vertex_general_path_cover_DFS(&g, &matching_graph, duplicates, prefix, v+i, visited);
+    }
+
+    struct edge* edges[graph_edges_len(&matching_graph)];
+    graph_edges(&matching_graph, edges);
+    vec_free(prefix, NULL);
+
+    // log_array(edges, struct edge*, graph_edges_len(&matching_graph), e, printf("(%d, %d)", *(int*)e->from, **(int**)e->to));
+
+    oj_assert_eq_int(17, graph_edges_len(&matching_graph));
+    oj_assert_eq_int(5, vec_len(graph_vertex(&matching_graph, v+0)->out));
+    oj_assert_eq_int(4, vec_len(graph_vertex(&matching_graph, v+1)->out));
+    oj_assert_eq_int(1, vec_len(graph_vertex(&matching_graph, v+2)->out));
+    oj_assert_eq_int(0, vec_len(graph_vertex(&matching_graph, v+3)->out));
+    oj_assert_eq_int(4, vec_len(graph_vertex(&matching_graph, v+4)->out));
+    oj_assert_eq_int(3, vec_len(graph_vertex(&matching_graph, v+5)->out));
+    oj_assert_eq_int(0, vec_len(graph_vertex(&matching_graph, v+6)->out));
+
+    graph_free(&g);
+    oj_fresh;
+}
+
+oj_test(graph_minimum_node_general_path_covers_returns_minimum_node_general_path_covers) {
+    struct graph g = graph_new();
+    int v[7] = { 1, 2, 3, 4, 5, 6, 7 };
+    for(int i = 0; i < 7; i++) {
+        graph_add_vertex(&g, v + i);
+    }
+    graph_add_edge(&g, v+0, v+4, 1);
+    graph_add_edge(&g, v+1, v+5, 1);
+    graph_add_edge(&g, v+4, v+5, 1);
+    graph_add_edge(&g, v+5, v+6, 1);
+    graph_add_edge(&g, v+5, v+2, 1);
+    graph_add_edge(&g, v+2, v+3, 1);
+
+    vector(struct edge) path_cover = vec_new(struct edge);
+    int result = DAG_minimum_vertex_general_path_cover(&g, path_cover);
+
+    // log_array(vec_as_array(path_cover), struct edge, vec_len(path_cover), x, printf("(%d, %d)", *(int*)x.from, *(int*)x.to));
+    log_int("len", vec_len(path_cover));
+
+    oj_assert_eq_int(2, result);
+
+
+    vec_free(path_cover, NULL);
+    graph_free(&g);
     oj_fresh;
 }
 
@@ -185,6 +260,8 @@ oj_prepare(test_applications_of_network_flow) {
     oj_run(graph_max_bipartite_matchings_returns_maximum_matchings_in_a_bipartite_graph);
     oj_run(graph_edge_disjoint_paths_returns_edge_disjoint_paths);
     oj_run(graph_minimum_node_disjoint_path_covers_returns_minimum_node_disjoint_path_covers);
+    oj_run(graph_minimum_node_general_path_covers_DFS_adds_edge_to_matching_graph_if_path_exists_in_original_graph);
+    oj_run(graph_minimum_node_general_path_covers_returns_minimum_node_general_path_covers);
     oj_report;
     oj_fresh;
 }

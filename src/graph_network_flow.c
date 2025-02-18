@@ -452,7 +452,7 @@ int graph_max_bipartite_matchings(struct graph* graph, vector(struct edge*) matc
     return maximum_matchings;
 }
 
-int graph_minimum_vertex_disjoint_path_cover(struct graph* graph, vector(struct edge*) path_cover) {
+int DAG_minimum_vertex_disjoint_path_cover(struct graph* graph, vector(struct edge*) path_cover) {
     unsigned int vertex_len = graph_vertices_len(graph);
     struct graph matching_graph = graph_new();
     void* duplicates[vertex_len];
@@ -495,4 +495,92 @@ int graph_minimum_vertex_disjoint_path_cover(struct graph* graph, vector(struct 
     return vertex_len - maximum_matchings;
 }
 
-int graph_minimum_vertex_general_path_cover(struct graph* graph, vector(struct edge*) path_cover);
+void DAG_minimum_vertex_general_path_cover_DFS(
+    struct graph* graph,
+    struct graph* matching_graph,
+    void** duplicates,
+    vector(void*) prefix,
+    void* current,
+    int* visited
+) {
+    struct vertex* w = graph_vertex(matching_graph, current);
+    struct vertex* s = graph_vertex(graph, current);
+    if(visited[s->i]) {
+        for(int i = 0; i < vec_len(prefix); i++) {
+            struct vertex* u = graph_vertex(graph, vec_get(prefix, i));
+            if(graph_edge_between(matching_graph, duplicates[u->i], duplicates + s->i)) continue;
+            for(int j = 0; j < vec_len(w->out); j++) {
+                struct vertex* v = vec_get(w->out, j);
+                graph_add_edge(matching_graph, duplicates[u->i], v->value, 1);
+            }
+            graph_add_edge(matching_graph, duplicates[u->i], duplicates + s->i, 1);
+        }
+        return;
+    }
+    for(int i = 0; i < vec_len(prefix); i++) {
+        struct vertex* u = graph_vertex(graph, vec_get(prefix, i));
+        graph_add_edge(matching_graph, duplicates[u->i], duplicates + s->i, 1);
+    }
+    vec_push(prefix, current);
+    for(int i = 0; i < vec_len(s->out); i++) {
+        void* v = vec_get(s->out, i)->value;
+        DAG_minimum_vertex_general_path_cover_DFS(graph, matching_graph, duplicates, prefix, v, visited);
+    }
+    vec_pop(prefix, -1);
+    visited[s->i] = 1;
+}
+
+// implemented in the same way as disjoint path covers,
+// but instead of adding an edge in the matching graph if it exists in the original graph,
+// we add an edge A->B in the matching graph if a directed path exists between A and B in the original graph
+int DAG_minimum_vertex_general_path_cover(struct graph* graph, vector(struct edge) path_cover) {
+    unsigned int vertex_len = graph_vertices_len(graph);
+    struct graph matching_graph = graph_new();
+    void* duplicates[vertex_len];
+    for(int i = 0; i < vertex_len; i++) {
+        duplicates[i] = vec_get(graph->vertices, i);
+        graph_add_vertex(&matching_graph, duplicates[i]);
+        graph_add_vertex(&matching_graph, duplicates+i);
+    }
+
+    vector(void*) prefix = vec_new(void*);
+    int visited[vertex_len];
+    memzero(visited, sizeof(int) * vertex_len);
+    for(int i = 0; i < vertex_len; i++) {
+        DAG_minimum_vertex_general_path_cover_DFS(graph, &matching_graph, duplicates, prefix, duplicates[i], visited);
+    }
+
+    int matching_edges_len = graph_edges_len(&matching_graph);
+    struct edge* matching_edges[matching_edges_len];
+    graph_edges(&matching_graph, matching_edges);
+
+    void* source = malloc(1);
+    void* sink = malloc(1);
+    graph_add_vertex(&matching_graph, source);
+    graph_add_vertex(&matching_graph, sink);
+    for(int i = 0; i < vertex_len; i++) {
+        graph_add_edge(&matching_graph, source, duplicates[i], 1);
+        graph_add_edge(&matching_graph, duplicates+i, sink, 1);
+    }
+
+    struct graph residual_graph = graph_new();
+    graph_network_flow_init_residual_graph(&matching_graph, &residual_graph);
+    int maximum_matchings = graph_edmonds_karp(&residual_graph, source, sink);
+
+    for(int i = 0; i < matching_edges_len; i++) {
+        void* from = matching_edges[i]->from;
+        void* to = matching_edges[i]->to;
+        if(graph_edge_weight(&residual_graph, to, from)) {
+            to = *(void**)to;
+            struct edge edge = { from, to, 1 };
+            vec_push(path_cover, edge);
+        }
+    }
+
+    vec_free(prefix, NULL);
+    free(source);
+    free(sink);
+    graph_free(&matching_graph);
+
+    return vertex_len - maximum_matchings;
+}
