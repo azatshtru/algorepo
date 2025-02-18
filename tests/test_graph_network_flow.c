@@ -246,8 +246,8 @@ oj_test(graph_minimum_node_general_path_covers_returns_minimum_node_general_path
     int result = DAG_minimum_vertex_general_path_cover(&g, path_cover);
 
     // log_array(vec_as_array(path_cover), struct edge, vec_len(path_cover), x, printf("(%d, %d)", *(int*)x.from, *(int*)x.to));
-    log_int("len", vec_len(path_cover));
 
+    oj_assert_eq_int(5, vec_len(path_cover));
     oj_assert_eq_int(2, result);
 
 
