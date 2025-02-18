@@ -451,3 +451,48 @@ int graph_max_bipartite_matchings(struct graph* graph, vector(struct edge*) matc
 
     return maximum_matchings;
 }
+
+int graph_minimum_vertex_disjoint_path_cover(struct graph* graph, vector(struct edge*) path_cover) {
+    unsigned int vertex_len = graph_vertices_len(graph);
+    struct graph matching_graph = graph_new();
+    void* duplicates[vertex_len];
+    void* source = malloc(1);
+    void* sink = malloc(1);
+    graph_add_vertex(&matching_graph, source);
+    graph_add_vertex(&matching_graph, sink);
+    for(int i = 0; i < vertex_len; i++) {
+        duplicates[i] = vec_get(graph->vertices, i);
+        graph_add_vertex(&matching_graph, duplicates[i]);
+        graph_add_vertex(&matching_graph, duplicates+i);
+        graph_add_edge(&matching_graph, source, duplicates[i], 1);
+        graph_add_edge(&matching_graph, duplicates+i, sink, 1);
+    }
+
+    struct edge* edges[graph_edges_len(graph)];
+    graph_edges(graph, edges);
+    for(int i = 0; i < graph_edges_len(graph); i++) {
+        int from = graph_vertex_i(graph, edges[i]->from);
+        int to = graph_vertex_i(graph, edges[i]->to);
+        graph_add_edge(&matching_graph, duplicates[from], duplicates+to, 1);
+    }
+
+    struct graph residual_graph = graph_new();
+    graph_network_flow_init_residual_graph(&matching_graph, &residual_graph);
+    int maximum_matchings = graph_edmonds_karp(&residual_graph, source, sink);
+
+    for(int i = 0; i < graph_edges_len(graph); i++) {
+        struct vertex* from = graph_vertex(graph, edges[i]->from);
+        struct vertex* to = graph_vertex(graph, edges[i]->to);
+        if(graph_edge_weight(&residual_graph, duplicates+to->i, duplicates[from->i])) {
+            vec_push(path_cover, graph_edge_between(graph, from->value, to->value));
+        }
+    }
+
+    free(source);
+    free(sink);
+    graph_free(&matching_graph);
+
+    return vertex_len - maximum_matchings;
+}
+
+int graph_minimum_vertex_general_path_cover(struct graph* graph, vector(struct edge*) path_cover);

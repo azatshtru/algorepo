@@ -159,9 +159,32 @@ oj_test(graph_edge_disjoint_paths_returns_edge_disjoint_paths) {
     oj_fresh;
 }
 
+oj_test(graph_minimum_node_disjoint_path_covers_returns_minimum_node_disjoint_path_covers) {
+    struct graph g = graph_new();
+    int v[7] = { 1, 2, 3, 4, 5, 6, 7 };
+    for(int i = 0; i < 7; i++) {
+        graph_add_vertex(&g, v + i);
+    }
+    graph_add_edge(&g, v+0, v+4, 1);
+    graph_add_edge(&g, v+1, v+5, 1);
+    graph_add_edge(&g, v+4, v+5, 1);
+    graph_add_edge(&g, v+5, v+6, 1);
+    graph_add_edge(&g, v+5, v+2, 1);
+    graph_add_edge(&g, v+2, v+3, 1);
+    
+    vector(struct edge*) matching = vec_new(struct edge*);
+    int result = graph_minimum_vertex_disjoint_path_cover(&g, matching);
+    oj_assert_eq_int(3, result);
+
+    vec_free(matching, NULL);
+    
+    oj_fresh;
+}
+
 oj_prepare(test_applications_of_network_flow) {
     oj_run(graph_max_bipartite_matchings_returns_maximum_matchings_in_a_bipartite_graph);
     oj_run(graph_edge_disjoint_paths_returns_edge_disjoint_paths);
+    oj_run(graph_minimum_node_disjoint_path_covers_returns_minimum_node_disjoint_path_covers);
     oj_report;
     oj_fresh;
 }

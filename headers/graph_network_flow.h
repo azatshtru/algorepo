@@ -29,4 +29,7 @@ int graph_max_edge_disjoint_paths(struct graph* graph, void* source, void* sink,
 
 int graph_max_bipartite_matchings(struct graph* graph, vector(struct edge*) matching, vector(void*) minimum_vertex_cover);
 
+int graph_minimum_vertex_disjoint_path_cover(struct graph* graph, vector(struct edge*) path_cover);
+int graph_minimum_vertex_general_path_cover(struct graph* graph, vector(struct edge*) path_cover);
+
 #endif
