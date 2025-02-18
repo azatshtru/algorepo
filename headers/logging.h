@@ -11,9 +11,9 @@
 
 #define log_array(array, type, len, x, print_ins) do {  \
     printf("[%s, %d]\n", __FILE__, __LINE__);           \
-    for(int i = 0; i < len; i++) {                      \
-        printf("  %d -> ", i);                          \
-        type x = array[i];                              \
+    for(int __i__ = 0; __i__ < len; __i__++) {                      \
+        printf("  %d -> ", __i__);                          \
+        type x = array[__i__];                              \
         print_ins;                                      \
         printf("\n");                                   \
     }                                                   \

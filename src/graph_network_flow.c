@@ -270,6 +270,7 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
         }
     }
 
+    vec_free(reverse_concatenated_path, NULL);
     queue_free(q, NULL);
     graph_free(&split_graph);
     graph_free(&residual_graph);
@@ -279,7 +280,63 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
 }
 
 int graph_max_edge_disjoint_paths(struct graph* graph, void* source, void* sink, NetworkFlowPaths paths) {
-    return graph_max_flow(graph, source, sink);
+    unsigned int vertex_len = graph_vertices_len(graph);
+
+    struct graph residual_graph = graph_new();
+    graph_network_flow_init_residual_graph(graph, &residual_graph);
+    int max_disjoint_paths = graph_edmonds_karp(&residual_graph, source, sink);
+
+    if(paths == NULL) return max_disjoint_paths;
+
+    vector(void*) path[vertex_len];
+    for(int i = 0; i < vertex_len; i++) {
+        path[i] = vec_new(void*);
+    }
+    VecDeque(struct vertex*) q = queue_new(struct vertex*);
+
+    struct vertex* s = graph_vertex(graph, source);
+    queue_push_back(q, s);
+
+    while(!queue_is_empty(q)) {
+        struct vertex* u = queue_pop_front(q);
+        if(u->value == sink) continue;
+        for(int i = 0; i < vec_len(u->out); i++) {
+            struct vertex* v = vec_get(u->out, i);
+            int flow = graph_edge_weight(&residual_graph, v->value, u->value);
+            if(flow && graph_edge_between(&residual_graph, u->value, v->value)) {
+                queue_push_back(q, v);
+                vec_push(path[graph_vertex_i(graph, v->value)], u->value);
+                graph_remove_edge(&residual_graph, u->value, v->value);
+            }
+        }
+    }
+
+    vector(void*) reverse_concatenated_path = vec_new(void*);
+    for(int k = 0; k < max_disjoint_paths; k++) {
+        void* u = sink;
+        vec_push(reverse_concatenated_path, u);
+        while(u != source) {
+            u = vec_pop(path[graph_vertex_i(graph, u)], -1);
+            vec_push(reverse_concatenated_path, u);
+        }
+    }
+
+    int last = vec_len(reverse_concatenated_path) - 1;
+    for(int k = 0; k < max_disjoint_paths; k++) {
+        vector(void*) path = network_flow_paths_add(paths);
+        void* u = NULL;
+        while(u != sink) {
+            u = vec_get(reverse_concatenated_path, last);
+            vec_push(path, u);
+            --last;
+        }
+    }
+
+    for(int i = 0; i < vertex_len; i++) {
+        vec_free(path[i], NULL);
+    }
+    queue_free(q, NULL);
+    return max_disjoint_paths;
 }
 
 int graph_max_bipartite_matchings(struct graph* graph, vector(struct edge*) matching, vector(void*) minimum_vertex_cover) {

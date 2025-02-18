@@ -20,7 +20,6 @@ oj_test(edmonds_karp_returns_7_for_network_with_7_flow) {
     vector(struct edge*) min_cut = vec_new(struct edge*);
     int result = graph_min_cut(&g, v+0, v+5, min_cut);
 
-
     oj_assert_eq_int(2, vec_len(min_cut));
 
     struct edge* e1 = vec_get(min_cut, 0);
@@ -132,8 +131,34 @@ oj_test(graph_max_bipartite_matchings_returns_maximum_matchings_in_a_bipartite_g
     oj_fresh;
 }
 
+oj_test(graph_edge_disjoint_paths_returns_edge_disjoint_paths) {
+    struct graph g = graph_new();
+    int v[6] = { 1, 2, 3, 4, 5, 6 };
+    for(int i = 0; i < 6; i++) {
+        graph_add_vertex(&g, v + i);
+    }
+    graph_add_edge(&g, v+0, v+1, 1);
+    graph_add_edge(&g, v+0, v+3, 1);
+    graph_add_edge(&g, v+1, v+3, 1);
+    graph_add_edge(&g, v+2, v+1, 1);
+    graph_add_edge(&g, v+2, v+4, 1);
+    graph_add_edge(&g, v+2, v+5, 1);
+    graph_add_edge(&g, v+3, v+2, 1);
+    graph_add_edge(&g, v+3, v+4, 1);
+    graph_add_edge(&g, v+4, v+5, 1);
+    NetworkFlowPaths paths;
+    network_flow_paths_init(&paths);
+    int max_edge_disjoint_paths = graph_max_edge_disjoint_paths(&g, v+0, v+5, paths);
+    oj_assert_eq_int(2, max_edge_disjoint_paths);
+
+    network_flow_paths_free(paths);
+
+    oj_fresh;
+}
+
 oj_prepare(test_applications_of_network_flow) {
     oj_run(graph_max_bipartite_matchings_returns_maximum_matchings_in_a_bipartite_graph);
+    oj_run(graph_edge_disjoint_paths_returns_edge_disjoint_paths);
     oj_report;
     oj_fresh;
 }
