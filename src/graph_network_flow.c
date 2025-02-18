@@ -199,6 +199,90 @@ int graph_max_vertex_disjoint_paths(struct graph* graph, void* source, void* sin
         log_array(vec_as_array(u->out), struct vertex*, vec_len(u->out), x, printf("%p", x->value));
     }
 
+    int visited[vertex_len];
+    memzero(visited, sizeof(int) * vertex_len);
+    void* path[vertex_len];
+    memzero(path, sizeof(void*) * vertex_len);
+
+    VecDeque(struct vertex*) q = queue_new(struct vertex*);
+
+    struct vertex* s = graph_vertex(&split_graph, source);
+    visited[graph_vertex_i(graph, source)] = 1;
+    path[graph_vertex_i(graph, source)] = source;
+    for(int i = 0; i < vec_len(s->out); i++) {
+        struct vertex* v = vec_get(s->out, i);
+        if(graph_edge_weight(&residual_graph, v->value, s->value)) {
+            queue_push_back(q, v);
+            path[graph_vertex_i(graph, v->value)] = source;
+        }
+    }
+
+    void* last_path_vertex[max_disjoint_paths];
+    memzero(last_path_vertex, sizeof(void*) * max_disjoint_paths);
+    int j = 0;
+
+    while(!queue_is_empty(q)) {
+        struct vertex* u = queue_pop_front(q);
+        if(u->value == sink) {
+            log_label("path found, probably clear path and start again");
+            continue;
+        }
+        struct vertex* split_u = vec_get(u->out, 0);
+        // log_pointer("this is split", split_u->value);
+        // log_array(vec_as_array(split_u->out), struct vertex*, vec_len(split_u->out), x, printf("%p", x->value));
+        if(visited[graph_vertex_i(graph, u->value)]) continue;
+        visited[graph_vertex_i(graph, u->value)] = 1;
+        // vec_push(path, u->value);
+        for(int i = 0; i < vec_len(split_u->out); i++) {
+            struct vertex* v = vec_get(split_u->out, i);
+            int flow = graph_edge_weight(&residual_graph, v->value, split_u->value);
+            if(flow) {
+                if(v->value == sink) {
+                    last_path_vertex[j++] = u->value;
+                }
+                queue_push_back(q, v);
+                path[graph_vertex_i(graph, v->value)] = u->value;
+            }
+            // log_pointer("split neighbor val", v->value);
+            // log_int("flow", flow);
+        }
+    }
+
+    log_array(path, void*, vertex_len, x,
+              printf("%p", x)
+              );
+
+    vector(void*) reverse_concatenated_path = vec_new(void*);
+    for(int i = 0; i < max_disjoint_paths; i++) {
+        int j = graph_vertex_i(graph, last_path_vertex[i]);
+        vec_push(reverse_concatenated_path, sink);
+        while(path[j] != source) {
+            vec_push(reverse_concatenated_path, graph_vertex_from_i(graph, j));
+            j = graph_vertex_i(graph, path[j]);
+        }
+        vec_push(reverse_concatenated_path, graph_vertex_from_i(graph, j));
+        vec_push(reverse_concatenated_path, source);
+    }
+    
+    log_array(vec_as_array(reverse_concatenated_path), void*, vec_len(reverse_concatenated_path), x, printf("%c", *(char*)x));
+    
+    vector(void*) paths[max_disjoint_paths];
+    int last = vec_len(reverse_concatenated_path) - 1;
+    for(int k = 0; k < max_disjoint_paths; k++) {
+        paths[k] = vec_new(void*);
+        void* u = NULL;
+        while(u != sink) {
+            u = vec_get(reverse_concatenated_path, last);
+            log_pointer("u", u);
+            vec_push(paths[k], u);
+            --last;
+        }
+    }
+
+    log_int("path1len", vec_len(paths[0]));
+    log_int("path2len", vec_len(paths[1]));
+
+    queue_free(q, NULL);
     graph_free(&split_graph);
     graph_free(&residual_graph);
     free(split_vertices);
