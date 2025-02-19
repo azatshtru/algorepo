@@ -35,16 +35,16 @@ oj_test(graph_kosaraju_returns_strongly_connected_components_of_DAG) {
     for(int i = 0; i < 7; i++) {
         graph_add_vertex(&g, v + i);
     }
-    graph_add_edge(&g, v+0, v+1, 1);
     graph_add_edge(&g, v+1, v+0, 1);
-    graph_add_edge(&g, v+1, v+2, 1);
-    graph_add_edge(&g, v+2, v+5, 1);
-    graph_add_edge(&g, v+5, v+6, 1);
-    graph_add_edge(&g, v+6, v+2, 1);
-    graph_add_edge(&g, v+3, v+0, 1);
-    graph_add_edge(&g, v+3, v+4, 1);
-    graph_add_edge(&g, v+4, v+1, 1);
-    graph_add_edge(&g, v+4, v+5, 1);
+    graph_add_edge(&g, v+0, v+1, 1);
+    graph_add_edge(&g, v+2, v+1, 1);
+    graph_add_edge(&g, v+5, v+2, 1);
+    graph_add_edge(&g, v+6, v+5, 1);
+    graph_add_edge(&g, v+2, v+6, 1);
+    graph_add_edge(&g, v+0, v+3, 1);
+    graph_add_edge(&g, v+4, v+3, 1);
+    graph_add_edge(&g, v+1, v+4, 1);
+    graph_add_edge(&g, v+5, v+4, 1);
 
 
     void* roots[graph_vertices_len(&g)];
@@ -62,8 +62,27 @@ oj_test(graph_kosaraju_returns_strongly_connected_components_of_DAG) {
     oj_fresh;
 }
 
+oj_test(test_graph_2sat) {
+    struct _2sat _2sat;
+    _2sat_init(&_2sat);
+    _2sat_add_disjunction(&_2sat, 2, -1);
+    _2sat_add_disjunction(&_2sat, -1, -2);
+    _2sat_add_disjunction(&_2sat, 1, 3);
+    _2sat_add_disjunction(&_2sat, -2, -3);
+    _2sat_add_disjunction(&_2sat, 1, 4);
+
+    vector(long) output = vec_new(long);
+    _2sat_solve(&_2sat, output);
+    oj_assert(vec_contains(output, 4), "");
+    oj_assert(vec_contains(output, 3), "");
+    oj_assert(vec_contains(output, -2), "");
+    oj_assert(vec_contains(output, -1), "");
+    oj_fresh;
+}
+
 oj_prepare(test_DAG_strongly_connected_components) {
     oj_run(graph_kosaraju_returns_strongly_connected_components_of_DAG);
+    oj_run(test_graph_2sat);
     oj_report;
     oj_fresh;
 }
