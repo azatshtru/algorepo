@@ -72,3 +72,15 @@ void vec_clear(void* vec) {
         vec_resize(v, v->len);
     }
 }
+
+void vec_reverse(void* vec) {
+    Vector* v = (Vector*)vec;
+    int size = v->type_size;
+    for(int i = 0, j = v->len - 1; i < j; i++, j--) {
+        char temp[size];
+        memset(temp, 0, size);
+        memmove(temp, v->data + i * size, size);
+        memmove(v->data + i * size, v->data + j * size, size);
+        memmove(v->data + j * size, temp, size);
+    }
+}

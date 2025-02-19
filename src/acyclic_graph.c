@@ -1,41 +1,35 @@
 #include "../headers/acyclic_graph.h"
+#include "../headers/logging.h"
 
-int acyclic_graph_topological_sort_reversed(struct graph* graph, void* v, int* state, void** topological_order, int topological_order_index) {
-    struct vertex* vadj = graph_vertex(graph, v);
-    if(state[vadj->i] == PROCESSED) return 1;
-    if(state[vadj->i] == PROCESSING) return 0;
-    int is_acyclic;
-    state[vadj->i] = PROCESSING;
-    for(int i = 0; i < graph_vertex_out_degree(graph, v); i++) {
-        void* u = vec_get(vadj->out, i)->value;
-        is_acyclic = acyclic_graph_topological_sort_reversed(graph, u, state, topological_order, topological_order_index);
-        if(is_acyclic == 0) break;
+int acyclic_graph_topological_sort_reversed(struct graph* graph, void* current, int* state, vector(void*) topological_order) {
+    struct vertex* u = graph_vertex(graph, current);
+    if(state[u->i] == 1) return 1;
+    if(state[u->i] == 2) return 0;
+    int is_cyclic = 0;
+    state[u->i] = 1;
+    for(int i = 0; i < vec_len(u->out); i++) {
+        struct vertex* v = vec_get(u->out, i);
+        is_cyclic = acyclic_graph_topological_sort_reversed(graph, v->value, state, topological_order);
+        if(is_cyclic) return 1;
     }
-    state[vadj->i] = PROCESSED;
+    state[u->i] = 2;
     if(topological_order != NULL) {
-        topological_order[topological_order_index++] = v;
+        vec_push(topological_order, current);
     }
-    return is_acyclic;
+    return is_cyclic;
 }
 
-int acyclic_graph_toplogical_sort(struct graph* graph, void** topological_order) {
+int acyclic_graph_toplogical_sort(struct graph* graph, vector(void*) topological_order) {
     int vertex_len = graph_vertices_len(graph);
     int state[vertex_len];
+    memzero(state, sizeof(int) * vertex_len);
     for(int i = 0; i < vertex_len; i++) {
-        state[i] = 0;
+        if(state[i] == 2) continue;
+        int is_cyclic = acyclic_graph_topological_sort_reversed(graph, vec_get(graph->vertices, i), state, topological_order);
+        if(is_cyclic) return 0;
     }
-    for(int i = 0; i < vertex_len; i++) {
-        if(state[i] != 0) { continue; }
-        if(acyclic_graph_topological_sort_reversed(graph, vec_get(graph->vertices, i), state, topological_order, 0)) {
-            continue;
-        } else {
-            return 1;
-        }
-    }
-    for(int i = 0, j = vertex_len - 1; i < j; i++, j--) {
-        swap(topological_order + i, topological_order + j, sizeof(void*));
-    }
-    return 0;
+    vec_reverse(topological_order);
+    return 1;
 }
 
 int acyclic_graph_paths_to(struct graph* graph, void* s, void* current, int* paths, int* visited) {
