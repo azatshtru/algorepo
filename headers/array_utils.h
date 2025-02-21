@@ -35,4 +35,9 @@ float array_max_float(float* array_ptr, uint32 length);
 
 int subarray_with_sum(int* array, int len, int target, int* start, int* end);
 
+/// sum of range [x, y] = prefix[y] - prefix[x]
+/// n-dimensional prefix arrays can also be constructed to aid in higher dimensional ranged queries
+void array_prefix_sum_int(int* array, uint32 length, int* prefix);
+void array_prefix_sum_int_2D(int** array, uint32 x, uint32 y, int** prefix);
+
 #endif

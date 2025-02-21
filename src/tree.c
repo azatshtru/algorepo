@@ -22,6 +22,7 @@ int graph_is_tree(struct graph* graph, void** parent) {
         for(int i = 0; i < vec_len(u->out); i++) {
             struct vertex* v = vec_get(u->out, i);
             parent[v->i] = u->value;
+            if(v->value == parent[u->i]) continue;
             if(visited[v->i]) return 0;
             visited[u->i] = 1;
             queue_push_back(q, vec_get(u->out, i));

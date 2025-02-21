@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-//While sum prefix tables can query in O(1) time, they need to process in O(n) time whenever the undelying array changes.
+//While sum prefix tables can query in O(1) time, they need to process in O(n) time whenever the underlying array changes.
 //A fenwick tree can process changes much faster in O(log n), with the small tradeoff of query processing in O(log n) time.
 //It is a binary indexed tree with the property that every kth index contains the sum of elements in the range [k-p+1, k]
 //where p is the largest power of 2 that divided k. p can be easily found with the bit operation k&-k.

@@ -62,3 +62,22 @@ int subarray_with_sum(int* array, int len, int target, int* start, int* end) {
     }
     return 0;
 }
+
+void array_prefix_sum_int(int* array, uint32 length, int* prefix) {
+    float sum = 0;
+    for(uint32 i = 0; i < length; i++) {
+        sum += array[i];
+        prefix[i] = sum;
+    }
+}
+
+void array_prefix_sum_int_2D(int** array, uint32 x, uint32 y, int** prefix) {
+    prefix[0][0] = 0;
+    for(uint32 i = 0; i < x; i++) {
+        array_prefix_sum_int(array[i], y, prefix[i]);
+        if(i == 0) continue;
+        for(uint32 j = 0; j < y; j++) {
+            prefix[i][j] = prefix[i-1][j] + prefix[i][j];
+        }
+    }
+}
