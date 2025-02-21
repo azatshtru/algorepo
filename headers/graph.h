@@ -41,6 +41,7 @@ struct edge* graph_edge_between(struct graph* graph, void* from, void* to);
 void graph_add_edge(struct graph* graph, void* from, void* to, int weight);
 void graph_add_edge_symmetric(struct graph* graph, void* from, void* to, int weight);
 void graph_remove_edge(struct graph* graph, void* from, void* to);
+void graph_remove_edge_symmetric(struct graph* graph, void* from, void* to);
 void graph_add_vertex(struct graph* graph, void* value);
 void graph_remove_vertex(struct graph* graph, void* value);
 

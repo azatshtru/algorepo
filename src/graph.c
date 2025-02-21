@@ -91,6 +91,11 @@ void graph_remove_edge(struct graph* graph, void* from, void* to) {
     }
 }
 
+void graph_remove_edge_symmetric(struct graph* graph, void* from, void* to) {
+    graph_remove_edge(graph, from, to);
+    graph_remove_edge(graph, to, from);
+}
+
 void graph_add_vertex(struct graph* graph, void* value) {
     struct vertex x = { value, 0, NULL, NULL };
     if(hashset_contains(graph->adjacency_list, &x)) return;
