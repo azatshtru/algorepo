@@ -22,4 +22,5 @@ int tree_diameter(struct graph* tree);
 
 int graph_is_binary_tree(struct graph* graph);
 
+
 #endif
