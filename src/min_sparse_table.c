@@ -9,7 +9,7 @@ int sparse_table_min_q(int* array, int a, int b, int** table) {
     if(a == b) {
         x = array[a];
     } else {
-        x = min_i(
+        x = min_i(2,
             sparse_table_min_q(array, a, a + w - 1, table),
             sparse_table_min_q(array, a + w, b, table)
         );
@@ -63,7 +63,7 @@ int sparse_table_minimum(int len, int* array, int a, int b, int** table) {
     if(table == NULL) return 0;
     int log = log_2(b - a + 1);
     int k = power(2, log);
-    int x = min_i(
+    int x = min_i(2,
         sparse_table_min_q(array, a, a + k - 1, table),
         sparse_table_min_q(array, b - k + 1, b, table)
     );
