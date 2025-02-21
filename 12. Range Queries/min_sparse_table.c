@@ -1,4 +1,4 @@
-#include "../headers/miniqutils.h"
+#include "../headers/min_sparse_table.h"
 
 int sparse_table_min_q(int* array, int a, int b, int** table) {
     if(table[log_2(b - a + 1)][a]) {
