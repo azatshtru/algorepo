@@ -24,5 +24,5 @@ It is very important to note that König's theorem only works for bipartite grap
 
 The nodes that do not belong to the minimum vertex cover form a set called maximum independent vertex set. This is the largest possible set of nodes such that no two nodes in the set are connected with an edge. Finding this in a general graph is again an NP-hard problem.
 
-
-
+### Dilworth's theorem
+An antichain is a set of nodes of a graph such that there is no path from any node to another node using the edges of the graph. Dilworth’s theorem states that in a directed acyclic graph, the size of a minimum general path cover equals the size of a maximum antichain.

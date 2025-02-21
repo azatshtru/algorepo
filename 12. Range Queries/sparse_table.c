@@ -1,74 +1,71 @@
-#include <stdlib.h>
+#include "../headers/miniqutils.h"
 
-int logb2(int n) {
-    int x = n;
-    int log = 0;
-    while(x > 1) { ++log; x/=2; }
-    return log;
-}
-    
-int pow_2(int x) {
-    int res = 1;
-    for(int i = 0; i < x; i++) { res *= 2; }
-    return res;
-}
-
-int min(int a, int b) {
-    return a > b ? b : a;
-}
-
-int min_q(int* A, int a, int b, int** P) {
-    if(P[logb2(b-a+1)][a]) { return P[logb2(b-a+1)][a]; }
-    int w = (b-a+1)/2;
-    int v;
-    if(a==b) { v = A[a]; }
-    else { v = min(min_q(A, a, a+w-1, P), min_q(A, a+w, b, P)); }
-    P[logb2(b-a+1)][a] = v;
-    return v;
+int sparse_table_min_q(int* array, int a, int b, int** table) {
+    if(table[log_2(b - a + 1)][a]) {
+        return table[log_2(b - a + 1)][a];
+    }
+    int w = (b - a + 1) / 2;
+    int x;
+    if(a == b) {
+        x = array[a];
+    } else {
+        x = min_i(
+            sparse_table_min_q(array, a, a + w - 1, table),
+            sparse_table_min_q(array, a + w, b, table)
+        );
+    }
+    table[log_2(b - a + 1)][a] = x;
+    return x;
 }
 
-int** generateMinSparseTable(int len, int* A) {
-    int p = logb2(len);
-    int** P = (int**)malloc((1+p)*sizeof(int*));
-    for(int i = 0; i < p; i++) { P[i] = (int*)malloc(sizeof(int)*(len-pow_2(i)+1)); }
-    return P;
+int** sparse_table_new(int len, int* array) {
+    int log = log_2(len);
+    int** table = malloc((1 + log) * sizeof(int*));
+    for(int i = 0; i < log; i++) {
+        table[i] = malloc(sizeof(int) * (len - power(2, i) + 1));
+    }
+    return table;
 }
 
-int fillSparseTable(int** P, int len, int* A) {
-    int p = logb2(len);
+int sparse_table_free(int** table, int len) {
+    int log = log_2(len);
+    for(int i = 0; i < log; i++) {
+        free(table[i]);
+    }
+    free(table);
+    return 0;
+}
+
+int sparse_table_init(int** table, int len, int* array) {
+    int p = log_2(len);
     for(int i = 0; i < p; i++) {
-        for(int j = 0; j < len-pow_2(i)+1; j++) {
-            min_q(A, j, j+pow_2(i)-1, P);
+        for(int j = 0; j < len - power(2, i) + 1; j++) {
+            sparse_table_min_q(array, j, j + power(2, i) - 1, table);
         }
     }
     return 0;
 }
 
-int printSparseTable(int** P, int len) {
-    int p = logb2(len);
-    for(int i = 0; i < p; i++) {
-        for(int j = 0; j < len-pow_2(i)+1; j++) {
-            printf("%d ", P[i][j]);
+int sparse_table_print(int** table, int len) {
+    int log = log_2(len);
+    printf("sparse_table![[\n");
+    for(int i = 0; i < log; i++) {
+        for(int j = 0; j < len - power(2, i) + 1; j++) {
+            printf("%d, ", table[i][j]);
         }
         printf("\n");
     }
+    printf("]]\n");
     return 0;
 }
 
-int releaseSparseTable(int** P, int length) {
-    int p = logb2(length);
-    for(int i = 0; i < p; i++) { free(P[i]); }
-    free(P);
-    return 0;
-}
-
-//O(1) minimum due to sparse table.
-int calculateMin(int len, int* A, int a, int b) {
-    int p = logb2(b-a+1);
-    int k = pow_2(p);
-    int** P = generateMinSparseTable(len, A);
-    fillSparseTable(P, len, A);
-    int x = min(min_q(A, a, a+k-1, P), min_q(A, b-k+1, b, P));
-    releaseSparseTable(P, len);
+int sparse_table_minimum(int len, int* array, int a, int b, int** table) {
+    if(table == NULL) return 0;
+    int log = log_2(b - a + 1);
+    int k = power(2, log);
+    int x = min_i(
+        sparse_table_min_q(array, a, a + k - 1, table),
+        sparse_table_min_q(array, b - k + 1, b, table)
+    );
     return x;
 }
