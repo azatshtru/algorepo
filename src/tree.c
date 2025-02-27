@@ -200,3 +200,7 @@ int tree_diameter(struct graph* tree) {
     return diameter;
 }
 // another method to calculate diameter is to calculate the maximum of `longest_path_through_vertex` for each vertex
+
+void tree_ancestor(struct graph* graph, void* x) {
+
+}

@@ -1,6 +1,6 @@
-/// implementation adapted from
-/// persistent_seg_tree_lazy_prop.cpp (https://github.com/TheAlgorithms/C-Plus-Plus/blob/master/range_queries/persistent_seg_tree_lazy_prop.cpp)
-/// by Magdy Sedra (https://github.com/MSedra)
+// implementation adapted from
+// persistent_seg_tree_lazy_prop.cpp (https://github.com/TheAlgorithms/C-Plus-Plus/blob/master/range_queries/persistent_seg_tree_lazy_prop.cpp)
+// by Magdy Sedra (https://github.com/MSedra)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -142,7 +142,7 @@ int main() {
 
     printf("UPDATE add 10 to elements from index 0 to 7 inclusive\n");
     lazy_persistent_segtree_update_push(&tree, 0, 7, 10);
-    printf("base array of segtree version { ");
+    printf("base array of segtree version 2 { ");
     for (int i = 0; i < vec_len(arr); ++i) {
         printf("%d, ", lazy_persistent_segtree_query_version(&tree, i, i, 2));
     }
