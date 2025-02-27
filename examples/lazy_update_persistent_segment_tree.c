@@ -1,160 +1,156 @@
-/// adapted from Magdy Sedra's persistent segment tree with lazy propagation
-/// https://github.com/MSedra
+/// implementation adapted from
+/// persistent_seg_tree_lazy_prop.cpp (https://github.com/TheAlgorithms/C-Plus-Plus/blob/master/range_queries/persistent_seg_tree_lazy_prop.cpp)
+/// by Magdy Sedra (https://github.com/MSedra)
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "../headers/vector.h"
 
-struct Node {
-    struct Node* left;
-    struct Node* right;
-    int val;
-    int prop;
+struct lazy_persistent_segtree_node {
+    struct lazy_persistent_segtree_node* left;
+    struct lazy_persistent_segtree_node* right;
+    int value;
+    int delta;
 };
 
-struct perSegTree {
+struct lazy_persistent_segtree {
     int n;
-    vector(struct Node*) ptrs;
-    vector(int) vec;
+    vector(struct lazy_persistent_segtree_node*) roots;
+    vector(int) data;
 };
 
-struct Node* newKid(struct Node* curr) {
-    struct Node* newNode = malloc(sizeof(struct Node));
-    newNode->left = curr->left;
-    newNode->right = curr->right;
-    newNode->prop = curr->prop;
-    newNode->val = curr->val;
-    return newNode;
+struct lazy_persistent_segtree_node* lazy_persistent_segtree_node_clone(struct lazy_persistent_segtree_node* node) {
+    struct lazy_persistent_segtree_node* new_node = malloc(sizeof(struct lazy_persistent_segtree_node));
+    new_node->left = node->left;
+    new_node->right = node->right;
+    new_node->delta = node->delta;
+    new_node->value = node->value;
+    return new_node;
 }
 
-void lazy(int i, int j, struct Node* curr) {
-    if (!curr->prop) {
+void lazy_persistent_segtree_propagate(int i, int j, struct lazy_persistent_segtree_node* node) {
+    if (!node->delta) {
         return;
     }
-    curr->val += (j - i + 1) * curr->prop;
+    node->value += (j - i + 1) * node->delta;
     if (i != j) {
-        curr->left = newKid(curr->left);
-        curr->right = newKid(curr->right);
-        curr->left->prop += curr->prop;
-        curr->right->prop += curr->prop;
+        node->left = lazy_persistent_segtree_node_clone(node->left);
+        node->right = lazy_persistent_segtree_node_clone(node->right);
+        node->left->delta += node->delta;
+        node->right->delta += node->delta;
     }
-    curr->prop = 0;
+    node->delta = 0;
 }
 
-struct Node* construct(struct perSegTree* tree, int i, int j) {
-    struct Node* newNode = malloc(sizeof(struct Node));
+struct lazy_persistent_segtree_node* lazy_persistent_segtree_build(struct lazy_persistent_segtree* tree, int i, int j) {
+    struct lazy_persistent_segtree_node* new_node = malloc(sizeof(struct lazy_persistent_segtree_node));
     if (i == j) {
-        newNode->val = vec_get(tree->vec, i);
+        new_node->value = vec_get(tree->data, i);
     } else {
         int mid = i + (j - i) / 2;
-        struct Node* leftt = construct(tree, i, mid);
-        struct Node* right = construct(tree, mid + 1, j);
-        newNode->val = leftt->val + right->val;
-        newNode->left = leftt;
-        newNode->right = right;
+        struct lazy_persistent_segtree_node* left = lazy_persistent_segtree_build(tree, i, mid);
+        struct lazy_persistent_segtree_node* right = lazy_persistent_segtree_build(tree, mid + 1, j);
+        new_node->value = left->value + right->value;
+        new_node->left = left;
+        new_node->right = right;
     }
-    return newNode;
+    return new_node;
 }
 
-struct Node* update(int i, int j, int l, int r, int value, struct Node* curr) {
-    lazy(i, j, curr);
+struct lazy_persistent_segtree_node* lazy_persistent_segtree_update(int i, int j, int l, int r, int value, struct lazy_persistent_segtree_node* node) {
+    lazy_persistent_segtree_propagate(i, j, node);
     if (i >= l && j <= r) {
-        struct Node* newNode = newKid(curr);
-        newNode->prop += value;
-        lazy(i, j, newNode);
-        return newNode;
+        struct lazy_persistent_segtree_node* new_node = lazy_persistent_segtree_node_clone(node);
+        new_node->delta += value;
+        lazy_persistent_segtree_propagate(i, j, new_node);
+        return new_node;
     }
     if (i > r || j < l) {
-        return curr;
+        return node;
     }
-    struct Node* newNode = malloc(sizeof(struct Node));
+    struct lazy_persistent_segtree_node* new_node = malloc(sizeof(struct lazy_persistent_segtree_node));
     int mid = i + (j - i) / 2;
-    newNode->left = update(i, mid, l, r, value, curr->left);
-    newNode->right = update(mid + 1, j, l, r, value, curr->right);
-    newNode->val = newNode->left->val + newNode->right->val;
-    return newNode;
+    new_node->left = lazy_persistent_segtree_update(i, mid, l, r, value, node->left);
+    new_node->right = lazy_persistent_segtree_update(mid + 1, j, l, r, value, node->right);
+    new_node->value = new_node->left->value + new_node->right->value;
+    return new_node;
 }
 
-int query(int i, int j, int l, int r, struct Node* curr) {
-    lazy(i, j, curr);
+int lazy_persistent_segtree_query(int i, int j, int l, int r, struct lazy_persistent_segtree_node* node) {
+    lazy_persistent_segtree_propagate(i, j, node);
     if (j < l || r < i) {
         return 0;
     }
     if (i >= l && j <= r) {
-        return curr->val;
+        return node->value;
     }
     int mid = i + (j - i) / 2;
-    return query(i, mid, l, r, curr->left)
-           + query(mid + 1, j, l, r, curr->right);
+    return lazy_persistent_segtree_query(i, mid, l, r, node->left)
+           + lazy_persistent_segtree_query(mid + 1, j, l, r, node->right);
 }
 
-void pub_construct(struct perSegTree* tree, vector(int) vec) {
-    if (vec_len(vec) == 0) return;
-    tree->n = vec_len(vec);
-    tree->vec = vec;
-    tree->ptrs = vec_new(struct Node*);
-    struct Node* root = construct(tree, 0, tree->n - 1);
-    vec_push(tree->ptrs, root);
+void lazy_persistent_segtree_new(struct lazy_persistent_segtree* tree, vector(int) data) {
+    if (vec_len(data) == 0) return;
+    tree->n = vec_len(data);
+    tree->data = data;
+    tree->roots = vec_new(struct lazy_persistent_segtree_node*);
+    struct lazy_persistent_segtree_node* root = lazy_persistent_segtree_build(tree, 0, tree->n - 1);
+    vec_push(tree->roots, root);
 }
 
-void pub_update(struct perSegTree* tree, int l, int r, int value) {
-    vec_push(tree->ptrs, update(
+void lazy_persistent_segtree_update_push(struct lazy_persistent_segtree* tree, int l, int r, int value) {
+    vec_push(tree->roots, lazy_persistent_segtree_update(
         0, tree->n - 1, l, r, value,
-        vec_get(tree->ptrs, vec_len(tree->ptrs) - 1)
+        vec_get(tree->roots, vec_len(tree->roots) - 1)
     ));
 }
 
-int pub_query(struct perSegTree* tree, int l, int r, int version) {
-    return query(0, tree->n - 1, l, r, vec_get(tree->ptrs, version));
+int lazy_persistent_segtree_query_version(struct lazy_persistent_segtree* tree, int l, int r, int version) {
+    return lazy_persistent_segtree_query(0, tree->n - 1, l, r, vec_get(tree->roots, version));
 }
 
-int size(struct perSegTree* tree) {
-    return vec_len(tree->ptrs);
+int lazy_persistent_segtree_versions(struct lazy_persistent_segtree* tree) {
+    return vec_len(tree->roots);
 }
 
-#include "../tests/orange_juice.h"
-#include "../headers/logging.h"
-
-oj_test(lazy_update_persistent_segment_tree_query_tests) {
+int main() {
     vector(int) arr = vec_new(int);
     int things[8] = { -5, 2, 3, 11, -2, 7, 0, 1 };
     for(int i = 0; i < 8; i++) {
         vec_push(arr, things[i]);
     }
-    struct perSegTree tree;
-    log_label("elements before any updates");
-    log_array(vec_as_array(arr), int, vec_len(arr), x, printf("%d", x));
-    pub_construct(&tree, arr);
+    struct lazy_persistent_segtree tree;
+    printf("base array before any updates { ");
+    for(int i = 0; i < vec_len(arr); i++) {
+        printf("%d, ", vec_get(arr, i));
+    }
+    printf("\b\b }\n\n");
+    lazy_persistent_segtree_new(&tree, arr);
 
-    log_int(
-        "Querying range sum on version 0 from index 2 to 4 = 3+11-2 = ",
-        pub_query(&tree, 2, 4, 0)
+    printf(
+        "QUERY range sum on version 0 from index 2 to 4 (3 + 11 - 2) -> %d\n\n",
+        lazy_persistent_segtree_query_version(&tree, 2, 4, 0)
     );
 
-    log_label("Subtract 7 from all elements from index 1 to index 5 inclusive");
-    pub_update(&tree, 1, 5, -7);
-    log_label("elements of segment tree whose version = 1 (after 1 update)");
-    log_array(vec_as_array(arr), int, vec_len(arr), x, printf("%d", x));
+    printf("UPDATE subtract 7 to elements from index 1 to 5 inclusive\n");
+    lazy_persistent_segtree_update_push(&tree, 1, 5, -7);
+    printf("base array of segtree version 1 { ");
+    for (int i = 0; i < vec_len(arr); ++i) {
+        printf("%d, ", lazy_persistent_segtree_query_version(&tree, i, i, 1));
+    }
+    printf("\b\b }\n\n");
 
-    log_label("Add 10 to all elements from index 0 to index 7 inclusive");
-    pub_update(&tree, 0, 7, 10);
-    log_label("elements of the segment tree whose version = 2 (after 2 updates)");
-    log_array(vec_as_array(arr), int, vec_len(arr), x, printf("%d", x));
+    printf("UPDATE add 10 to elements from index 0 to 7 inclusive\n");
+    lazy_persistent_segtree_update_push(&tree, 0, 7, 10);
+    printf("base array of segtree version { ");
+    for (int i = 0; i < vec_len(arr); ++i) {
+        printf("%d, ", lazy_persistent_segtree_query_version(&tree, i, i, 2));
+    }
+    printf("\b\b }\n\n");
 
-    log_int("Number of segment trees (versions) now ", size(&tree));
-    log_int("Querying range sum on version 0 from index 3 to 5 = 11-2+7 = ", pub_query(&tree, 3, 5, 0));
-    log_int("Querying range sum on version 1 from index 3 to 5 = 4-9+0 = ", pub_query(&tree, 3, 5, 1));
+    printf("number of segment tree versions -> %d\n", lazy_persistent_segtree_versions(&tree));
+    printf("QUERY range sum on version 0 from index 3 to 5 (11 - 2 + 7) -> %d\n", lazy_persistent_segtree_query_version(&tree, 3, 5, 0));
+    printf("QUERY range sum on version 1 from index 3 to 5 (4 - 9 + 0) -> %d\n", lazy_persistent_segtree_query_version(&tree, 3, 5, 1));
 
-    oj_rotten;
-}
-
-oj_prepare(lazy_update_persistent_segment_tree_tests) {
-    oj_run(lazy_update_persistent_segment_tree_query_tests);
-    oj_report;
-    oj_fresh;
-}
-
-int main() {
-    oj_blend(lazy_update_persistent_segment_tree_tests, 0);
     return 0;
 }
