@@ -309,6 +309,8 @@ void* tree_lowest_common_ancestor_farach_colton_and_bender(struct graph* tree, v
 
     tree_euler_tour(tree, root, root, 1, depth, visited, euler_tour);
 
+
     
     vec_free(euler_tour, NULL);
+    return NULL;
 }
