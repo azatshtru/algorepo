@@ -9,11 +9,13 @@ void graph_kruskal(struct graph* graph, struct graph* minimum_spanning_tree) {
 
     DisjointSetInt forest = disjoint_set_int_new(vertex_len);
 
+    for(int i = 0; i < vertex_len; i++) {
+        disjoint_set_int_insert(&forest, i);
+    }
+
     for(int i = 0; i < edges_len; i++) {
         struct vertex* from = graph_vertex(graph, edges[i]->from);
         struct vertex* to = graph_vertex(graph, edges[i]->to);
-        disjoint_set_int_insert(&forest, from->i);
-        disjoint_set_int_insert(&forest, to->i);
         if(disjoint_set_int_union(&forest, from->i, to->i)) {
             graph_add_vertex(minimum_spanning_tree, from->value); 
             graph_add_vertex(minimum_spanning_tree, to->value); 

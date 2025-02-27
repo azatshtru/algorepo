@@ -1,4 +1,5 @@
 #include "graph.h"
+#include "rmq_sparse_table.h"
 
 #ifndef TREE
 #define TREE

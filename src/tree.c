@@ -201,6 +201,114 @@ int tree_diameter(struct graph* tree) {
 }
 // another method to calculate diameter is to calculate the maximum of `longest_path_through_vertex` for each vertex
 
-void tree_ancestor(struct graph* graph, void* x) {
+void tree_ancestor_binary_lift_dfs(struct graph* tree, void* current, void* parent, int** ancestor, int* tin, int* tout, int t) {
+    struct vertex* v = graph_vertex(tree, current);
 
+    if(tin) tin[v->i] = ++t;
+
+    ancestor[v->i][0] = graph_vertex_i(tree, parent);
+    int l = log_2(graph_vertices_len(tree));
+    for(int i = 1; i <= l; ++i) {
+        ancestor[v->i][i] = ancestor[ancestor[v->i][i-1]][i-1];
+    }
+
+    for(int i = 0; i < vec_len(v->out); i++) {
+        struct vertex* u = vec_get(v->out, i);
+        if(u->value != parent) {
+            tree_ancestor_binary_lift_dfs(tree, u->value, v->value, ancestor, tin, tout, t);
+        }
+    }
+
+    if(tout) tout[v->i] = ++t;
+}
+
+int tree_vertex_is_ancestor(struct graph* tree, void* ancestor, void* descendant, int* tin, int* tout) {
+    int u = graph_vertex_i(tree, ancestor);
+    int v = graph_vertex_i(tree, descendant);
+    return tin[u] <= tin[v] && tout[u] >= tout[v];
+}
+
+void* tree_vertex_ancestor(struct graph* tree, void* current, int** ancestor, int k) {
+    struct vertex* v = graph_vertex(tree, current);
+    int kth_successor = k;
+    while(k > 0) {
+        kth_successor = ancestor[v->i][log_2(k)];
+        k /= 2;
+    }
+    return vec_get(tree->vertices, kth_successor);
+}
+
+void* tree_lowest_common_ancestor_binary_lift(struct graph* tree, void* u, void* v, void* root) {
+    unsigned int vertex_len = graph_vertices_len(tree);
+    int** ancestor = malloc(vertex_len * sizeof(int*));
+    for(int i = 0; i < vertex_len; i++) {
+        ancestor[i] = malloc((log_2(vertex_len) + 1) * sizeof(int));
+    }
+
+    int tin[vertex_len];
+    int tout[vertex_len];
+    tree_ancestor_binary_lift_dfs(tree, root, root, ancestor, tin, tout, 0);
+
+    if(tree_vertex_is_ancestor(tree, u, v, tin, tout)) return u;
+    if(tree_vertex_is_ancestor(tree, v, u, tin, tout)) return v;
+    int l = log_2(vertex_len);
+    int j;
+    for (int i = l; i >= 0; --i) {
+        j = graph_vertex(tree, u)->i;
+        if(!tree_vertex_is_ancestor(tree, vec_get(tree->vertices, ancestor[j][i]), v, tin, tout)) {
+            u = vec_get(tree->vertices, ancestor[j][i]);
+        }
+    }
+
+    j = graph_vertex(tree, u)->i;
+    void* lca = vec_get(tree->vertices, ancestor[j][0]);
+
+    for(int i = 0; i < vertex_len; i++) {
+        free(ancestor[i]);
+    }
+    free(ancestor);
+
+    return lca;
+}
+
+void tree_dfs_traversal_order(struct graph* tree, void* current, void* parent, int* visited, vector(void*) order) {
+    struct vertex* s = graph_vertex(tree, current);
+    if(visited[s->i]) return;
+    visited[s->i] = 1;
+    vec_push(order, current);
+
+    for(int i = 0; i < vec_len(s->out); i++) {
+        struct vertex* u = vec_get(s->out, i);
+        if(u->value == parent) continue;
+        tree_dfs_traversal_order(tree, u->value, current, visited, order);
+    }
+}
+
+void tree_euler_tour(struct graph* tree, void* current, void* parent, int h, int* depth, int* visited, vector(void*) euler_tour) {
+    struct vertex* s = graph_vertex(tree, current);
+
+    if(visited[s->i]) return;
+    visited[s->i] = 1;
+
+    vec_push(euler_tour, current);
+    depth[s->i] = h;
+
+    for(int i = 0; i < vec_len(s->out); i++) {
+        struct vertex* u = vec_get(s->out, i);
+        if(u->value == parent) continue;
+        tree_euler_tour(tree, u->value, current, h + 1, depth, visited, euler_tour);
+        vec_push(euler_tour, current);
+    }
+}
+
+void* tree_lowest_common_ancestor_farach_colton_and_bender(struct graph* tree, void* u, void* v, void* root) {
+    unsigned int vertex_len = graph_vertices_len(tree);
+    vector(void*) euler_tour = vec_new(void*);
+    int visited[vertex_len];
+    int depth[vertex_len];
+
+    tree_euler_tour(tree, root, root, 1, depth, visited, euler_tour);
+
+    
+    vec_free(euler_tour, NULL);
 }

@@ -1,4 +1,4 @@
-#include "../headers/min_sparse_table.h"
+#include "../headers/rmq_sparse_table.h"
 
 int sparse_table_min_q(int* array, int a, int b, int** table) {
     if(table[log_2(b - a + 1)][a]) {
@@ -21,7 +21,7 @@ int sparse_table_min_q(int* array, int a, int b, int** table) {
 int** sparse_table_new(int len, int* array) {
     int log = log_2(len);
     int** table = malloc((1 + log) * sizeof(int*));
-    for(int i = 0; i < log; i++) {
+    for(int i = 0; i < log + 1; i++) {
         table[i] = malloc(sizeof(int) * (len - power(2, i) + 1));
     }
     return table;
@@ -29,7 +29,7 @@ int** sparse_table_new(int len, int* array) {
 
 int sparse_table_free(int** table, int len) {
     int log = log_2(len);
-    for(int i = 0; i < log; i++) {
+    for(int i = 0; i < log + 1; i++) {
         free(table[i]);
     }
     free(table);
@@ -37,8 +37,8 @@ int sparse_table_free(int** table, int len) {
 }
 
 int sparse_table_init(int** table, int len, int* array) {
-    int p = log_2(len);
-    for(int i = 0; i < p; i++) {
+    int log = log_2(len);
+    for(int i = 0; i < log; i++) {
         for(int j = 0; j < len - power(2, i) + 1; j++) {
             sparse_table_min_q(array, j, j + power(2, i) - 1, table);
         }
@@ -69,3 +69,5 @@ int sparse_table_minimum(int len, int* array, int a, int b, int** table) {
     );
     return x;
 }
+
+// the "Four Russians" technique can be used to further improve the precompute time complexity to O(n)
