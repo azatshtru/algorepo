@@ -1,35 +1,18 @@
 #include "../headers/rmq_sparse_table.h"
 
-int sparse_table_min_q(int* array, int a, int b, int** table) {
-    if(table[log_2(b - a + 1)][a]) {
-        return table[log_2(b - a + 1)][a];
-    }
-    int w = (b - a + 1) / 2;
-    int x;
-    if(a == b) {
-        x = array[a];
-    } else {
-        x = min_i(2,
-            sparse_table_min_q(array, a, a + w - 1, table),
-            sparse_table_min_q(array, a + w, b, table)
-        );
-    }
-    table[log_2(b - a + 1)][a] = x;
-    return x;
-}
-
 int** sparse_table_new(int len, int* array) {
-    int log = log_2(len);
-    int** table = malloc((1 + log) * sizeof(int*));
+    int log = log_2(len) + 1;
+    int** table = malloc(log * sizeof(int*));
     for(int i = 0; i < log + 1; i++) {
-        table[i] = malloc(sizeof(int) * (len - power(2, i) + 1));
+        table[i] = malloc(sizeof(int) * (len - (1 << i) + 1));
     }
+    sparse_table_init(table, len, array);
     return table;
 }
 
 int sparse_table_free(int** table, int len) {
-    int log = log_2(len);
-    for(int i = 0; i < log + 1; i++) {
+    int log = log_2(len) + 1;
+    for(int i = 0; i < log; i++) {
         free(table[i]);
     }
     free(table);
@@ -37,20 +20,25 @@ int sparse_table_free(int** table, int len) {
 }
 
 int sparse_table_init(int** table, int len, int* array) {
-    int log = log_2(len);
-    for(int i = 0; i < log; i++) {
-        for(int j = 0; j < len - power(2, i) + 1; j++) {
-            sparse_table_min_q(array, j, j + power(2, i) - 1, table);
+    int log = log_2(len) + 1;
+
+    for(int j = 0; j < len; j++) {
+        table[0][j] = array[j];
+    }
+
+    for(int i = 1; i < log; i++) {
+        for(int j = 0; j < len - (1 << i) + 1; j++) {
+            table[i][j] = min_i(2, table[i - 1][j], table[i - 1][j + (1 << (i - 1))]);
         }
     }
     return 0;
 }
 
 int sparse_table_print(int** table, int len) {
-    int log = log_2(len);
+    int log = log_2(len) + 1;
     printf("sparse_table![[\n");
     for(int i = 0; i < log; i++) {
-        for(int j = 0; j < len - power(2, i) + 1; j++) {
+        for(int j = 0; j < len - (1 << i) + 1; j++) {
             printf("%d, ", table[i][j]);
         }
         printf("\n");
@@ -59,15 +47,10 @@ int sparse_table_print(int** table, int len) {
     return 0;
 }
 
-int sparse_table_minimum(int len, int* array, int a, int b, int** table) {
+int sparse_table_minimum(int a, int b, int** table) {
     if(table == NULL) return 0;
     int log = log_2(b - a + 1);
-    int k = power(2, log);
-    int x = min_i(2,
-        sparse_table_min_q(array, a, a + k - 1, table),
-        sparse_table_min_q(array, b - k + 1, b, table)
-    );
-    return x;
+    return min_i(2, table[log][a], table[log][b - (1 << log) + 1]);
 }
 
-// the "Four Russians" technique can be used to further improve the precompute time complexity to O(n)
+// the "Method of Four Russians" can be used to further improve the precompute time and space complexity to O(n)
