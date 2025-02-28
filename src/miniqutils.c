@@ -1,5 +1,6 @@
 #include "../headers/miniqutils.h"
 #include <stdio.h>
+#include "../headers/logging.h"
 
 double min_f(int n, ...) {
     va_list args;
@@ -50,6 +51,7 @@ void swap(void* a, void* b, unsigned int size) {
 }
 
 int log_2(int x) {
+    if(x <= 0) return -1;
     int log = 0;
     while(x>>=1) {
         ++log;

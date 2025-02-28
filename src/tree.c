@@ -1,4 +1,5 @@
 #include "../headers/tree.h"
+#include "../headers/logging.h"
 
 // a tree is a graph that has n nodes and n - 1 edges
 // each node except the root has only one parent
@@ -288,7 +289,7 @@ void tree_euler_tour(struct graph* tree, void* current, void* parent, int h, int
     struct vertex* s = graph_vertex(tree, current);
 
     if(visited[s->i]) return;
-    visited[s->i] = 1;
+    visited[s->i] = vec_len(euler_tour) + 1;
 
     vec_push(euler_tour, current);
     depth[s->i] = h;
@@ -301,16 +302,34 @@ void tree_euler_tour(struct graph* tree, void* current, void* parent, int h, int
     }
 }
 
-void* tree_lowest_common_ancestor_farach_colton_and_bender(struct graph* tree, void* u, void* v, void* root) {
+void tree_lowest_common_ancestor_farach_colton_and_bender(
+    struct graph* tree, void* root,
+    int query_len, void** u, void** v, void** out
+) {
     unsigned int vertex_len = graph_vertices_len(tree);
     vector(void*) euler_tour = vec_new(void*);
     int visited[vertex_len];
+    memzero(visited, sizeof(int) * vertex_len);
     int depth[vertex_len];
+    memzero(depth, sizeof(int) * vertex_len);
 
     tree_euler_tour(tree, root, root, 1, depth, visited, euler_tour);
 
+    int euler_depth[vec_len(euler_tour)];
+    for(int i = 0; i < vec_len(euler_tour); i++) {
+        euler_depth[i] = depth[graph_vertex_i(tree, vec_get(euler_tour, i))];
+    }
 
-    
+    RMQSparseTable sparse_table = sparse_table_new(vec_len(euler_tour), euler_depth);
+    for(int i = 0; i < query_len; i++) {
+        int u1 = visited[graph_vertex_i(tree, u[i])] - 1;
+        int v1 = visited[graph_vertex_i(tree, v[i])] - 1;
+        if(u1 > v1) swap(&u1, &v1, sizeof(int));
+        void* lca = vec_get(euler_tour, sparse_table_minimum(u1, v1, sparse_table).i);
+        out[i] = lca;
+    }
+
+
     vec_free(euler_tour, NULL);
-    return NULL;
+    sparse_table_free(sparse_table, vec_len(euler_tour));
 }
