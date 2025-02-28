@@ -149,3 +149,21 @@ int hashset_lazy_iterate(void* hashset_ptr, int index) {
     if(index >= hashset->cardinality) { return 0; }
     return index;
 }
+
+void* hashset_clone(void* hashset_) {
+    struct hashset* hashset = (struct hashset*)hashset_;
+    struct hashset* hashset_ptr = malloc(sizeof(struct hashset)); 
+    char* data = malloc(hashset->typesize * hashset->cardinality);
+    memcpy(data, hashset->data, hashset->typesize * hashset->cardinality);
+    char* data_states = malloc(hashset->cardinality);
+    memcpy(data_states, hashset->data_states, hashset->cardinality);
+    char* tmp = malloc(hashset->typesize);
+    struct hashset hashset_clone = { 
+        data, data_states, tmp,
+        hashset->typesize, hashset->cardinality, hashset->len,
+        hashset->hash_fn, hashset->cmp_fn,
+        hashset->load, hashset->load_factor_upsize_threshold, hashset->load_factor_downsize_threshold
+    };
+    *hashset_ptr = hashset_clone;
+    return (void*)hashset_ptr;
+}
