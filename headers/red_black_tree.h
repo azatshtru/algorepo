@@ -39,5 +39,6 @@ void red_black_tree_transplant(RedBlackTree* tree, RedBlackTreeNode* host, RedBl
 void red_black_tree_delete_fixup(RedBlackTree* tree, RedBlackTreeNode* sibling);
 
 void red_black_tree_levelwise_traverse_and_print_keys(RedBlackTree* tree);
+void red_black_tree_free(RedBlackTree* tree);
 
 #endif

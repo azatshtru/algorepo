@@ -351,3 +351,21 @@ void btree_levelwise_traverse_and_print_keys(BTree* btree) {
     queue_free(q, NULL);
     queue_free(levels, NULL);
 }
+
+void btree_free(BTree* btree) {
+    VecDeque(struct btree_node*) q = queue_new(struct btree_node*);
+    queue_push_back(q, btree->root);
+
+    while(!queue_is_empty(q)) {
+        struct btree_node* node = queue_pop_front(q);
+        if(!node->is_leaf) {
+            for(int i = 0; i < vec_len(node->children); i++) {
+                queue_push_back(q, vec_get(node->children, i));
+            }
+        }
+        vec_free(node->keys, NULL);
+        vec_free(node->children, NULL);
+        free(node);
+    }
+    queue_free(q, NULL);
+}

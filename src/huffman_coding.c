@@ -72,3 +72,10 @@ void huffman_encoding(struct huffman_prefix_table* prefix_table, char* cstr, int
     huffman_encoding_prefix_codes(prefix_table, root, 0);
     free(root);
 }
+
+void huffman_tree_free(struct huffman_tree_node* node) {
+    if(node == NULL) return;
+    huffman_tree_free(node->left);
+    huffman_tree_free(node->right);
+    huffman_tree_node_free(node);
+}

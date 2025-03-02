@@ -283,3 +283,21 @@ void red_black_tree_levelwise_traverse_and_print_keys(RedBlackTree* tree) {
     printf("\n");
     queue_free(q, NULL);
 }
+
+void red_black_tree_free(RedBlackTree* tree) {
+    VecDeque(struct red_black_tree_node*) q = queue_new(struct red_black_tree_node*);
+    queue_push_back(q, tree->root);
+
+    while(!queue_is_empty(q)) {
+        struct red_black_tree_node* node = queue_pop_front(q);
+        if(node->left != tree->nil) {
+            queue_push_back(q, node->left);
+        }
+        if(node->right != tree->nil) {
+            queue_push_back(q, node->right);
+        }
+        free(node);
+    }
+    queue_free(q, NULL);
+    free(tree->nil);
+}

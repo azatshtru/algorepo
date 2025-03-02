@@ -60,5 +60,6 @@ void btree_delete_merge(BTree* btree, struct btree_node* node, int i, int j);
 void btree_delete_sibling(BTree* btree, struct btree_node* node, int i, int j);
 
 void btree_levelwise_traverse_and_print_keys(BTree* btree);
+void btree_free(BTree* btree);
 
 #endif

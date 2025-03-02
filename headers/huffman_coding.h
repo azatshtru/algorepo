@@ -28,5 +28,6 @@ struct huffman_tree_node* huffman_tree(char* cstr, int len);
 
 void huffman_encoding_prefix_codes(struct huffman_prefix_table* prefix_table, struct huffman_tree_node* node, int code);
 void huffman_encoding(struct huffman_prefix_table* prefix_table, char* cstr, int len);
+void huffman_tree_free(struct huffman_tree_node* node);
 
 #endif
