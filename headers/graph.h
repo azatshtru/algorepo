@@ -50,8 +50,8 @@ unsigned int graph_edges_len(struct graph* graph);
 
 int graph_vertices_are_adjacent(struct graph* graph, void* x, void* y);
 
-void* graph_vertex_out(struct graph* graph, void* x, int index);
-void* graph_vertex_in(struct graph* graph, void* x, int index);
+struct vertex* graph_vertex_out(struct graph* graph, void* x, int index);
+struct vertex* graph_vertex_in(struct graph* graph, void* x, int index);
 int graph_vertex_out_degree(struct graph* graph, void* x);
 int graph_vertex_in_degree(struct graph* graph, void* x);
 

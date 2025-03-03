@@ -333,3 +333,57 @@ void tree_lowest_common_ancestor_farach_colton_and_bender(
     vec_free(euler_tour, NULL);
     sparse_table_free(sparse_table, vec_len(euler_tour));
 }
+
+void tree_lowest_common_ancestor_offline_dfs(
+    struct graph* tree, void* current, void* parent, int depth,
+    int* visited, DisjointSetInt* dsu, int* highest, struct graph* lca
+) {
+    struct vertex* s = graph_vertex(tree, current);
+    if(visited[s->i]) return;
+    visited[s->i] = 1;
+    for(int i = 0; i < graph_vertex_out_degree(lca, current); i++) {
+        struct vertex* u = graph_vertex_out(lca, current, i); 
+        if(visited[u->i]) {
+            graph_add_edge_symmetric(lca, current, u->value, highest[disjoint_set_int_find(dsu, u->i)]);
+        }
+    }
+    for(int i = 0; i < vec_len(s->out); i++) {
+        struct vertex* u = vec_get(s->out, i);
+        if(u->value == parent) continue;
+        tree_lowest_common_ancestor_offline_dfs(tree, u->value, current, depth + 1, visited, dsu, highest, lca);
+    }
+    disjoint_set_int_union(dsu, graph_vertex_i(tree, parent), s->i);
+    int representative = disjoint_set_int_find(dsu, s->i);
+    highest[representative] = graph_vertex_i(tree, parent);
+}
+
+void tree_lowest_common_ancestor_offline(
+    struct graph* tree, void* root,
+    int query_len, void** u, void** v, void** out
+) {
+    unsigned int vertex_len = graph_vertices_len(tree);
+    int visited[vertex_len];
+    memzero(visited, sizeof(int) * vertex_len);
+    int highest[vertex_len];
+
+    struct graph lca = graph_new();
+    DisjointSetInt dsu = disjoint_set_int_new(vertex_len);
+    for(int i = 0; i < vertex_len; i++) {
+        disjoint_set_int_insert(&dsu, i);
+        graph_add_vertex(&lca, vec_get(tree->vertices, i));
+        highest[i] = -1;
+    }
+
+    for(int i = 0; i < query_len; i++) {
+        graph_add_edge_symmetric(&lca, u[i], v[i], -1);
+    }
+
+    tree_lowest_common_ancestor_offline_dfs(tree, root, root, 1, visited, &dsu, highest, &lca);
+
+    for(int i = 0; i < query_len; i++) {
+        out[i] = vec_get(tree->vertices, graph_edge_weight(&lca, u[i], v[i]));
+    }
+
+    graph_free(&lca);
+    disjoint_set_int_free(&dsu);
+}

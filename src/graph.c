@@ -63,6 +63,8 @@ void graph_add_edge(struct graph* graph, void* from, void* to, int weight) {
     struct edge edge_value = { from, to, weight };
 
     if(hashset_contains(graph->edges, &edge_value)) {
+        struct edge* edge = hashset_get(graph->edges, &edge_value);
+        edge->weight = weight;
         return;
     }
 
@@ -151,11 +153,11 @@ int graph_vertex_in_degree(struct graph* graph, void* x) {
     return vec_len(graph_vertex(graph, x)->in);
 }
 
-void* graph_vertex_out(struct graph* graph, void* x, int index) {
+struct vertex* graph_vertex_out(struct graph* graph, void* x, int index) {
     return vec_as_array(graph_vertex(graph, x)->out)[index];
 }
 
-void* graph_vertex_in(struct graph* graph, void* x, int index) {
+struct vertex* graph_vertex_in(struct graph* graph, void* x, int index) {
     return vec_as_array(graph_vertex(graph, x)->in)[index];
 }
 

@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "rmq_sparse_table.h"
+#include "disjoint_set_int.h"
 
 #ifndef TREE
 #define TREE
@@ -33,4 +34,13 @@ void tree_lowest_common_ancestor_farach_colton_and_bender(
     struct graph* tree, void* root,
     int query_len, void** u, void** v, void** out
 );
+void tree_lowest_common_ancestor_offline_dfs(
+    struct graph* tree, void* current, void* parent, int depth,
+    int* visited, DisjointSetInt* dsu, int* highest, struct graph* lca
+);
+void tree_lowest_common_ancestor_offline(
+    struct graph* tree, void* root,
+    int query_len, void** u, void** v, void** out
+);
+
 #endif
