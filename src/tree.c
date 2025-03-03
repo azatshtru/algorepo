@@ -304,7 +304,7 @@ void tree_euler_tour(struct graph* tree, void* current, void* parent, int h, int
 
 void tree_lowest_common_ancestor_farach_colton_and_bender(
     struct graph* tree, void* root,
-    int query_len, void** u, void** v, void** out
+    int query_len, void** u, void** v, void** out, int* distance
 ) {
     unsigned int vertex_len = graph_vertices_len(tree);
     vector(void*) euler_tour = vec_new(void*);
@@ -327,6 +327,7 @@ void tree_lowest_common_ancestor_farach_colton_and_bender(
         if(u1 > v1) swap(&u1, &v1, sizeof(int));
         void* lca = vec_get(euler_tour, sparse_table_minimum(u1, v1, sparse_table).i);
         out[i] = lca;
+        distance[i] = euler_depth[u1] + euler_depth[v1] - 2 * euler_depth[sparse_table_minimum(u1, v1, sparse_table).i];
     }
 
 

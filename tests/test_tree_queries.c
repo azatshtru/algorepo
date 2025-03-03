@@ -24,12 +24,16 @@ oj_test(test_farach_colton_and_bender_lca_impl) {
     void* u[3] = { things + 4, things + 3, things + 5 };
     void* v[3] = { things + 7, things + 7, things + 2 };
     void* out[3];
+    int distance[3];
 
-    tree_lowest_common_ancestor_farach_colton_and_bender(&g, things + 0, 3, u, v, out);
+    tree_lowest_common_ancestor_farach_colton_and_bender(&g, things + 0, 3, u, v, out, distance);
 
     oj_assert_eq_int(2, *(int*)out[0]);
     oj_assert_eq_int(1, *(int*)out[1]);
     oj_assert_eq_int(1, *(int*)out[2]);
+    oj_assert_eq_int(3, distance[0]);
+    oj_assert_eq_int(4, distance[1]);
+    oj_assert_eq_int(3, distance[2]);
 
     oj_fresh;
 }
@@ -48,13 +52,14 @@ oj_test(test_offline_lca_impl) {
     graph_add_edge_symmetric(&g, things + 3, things + 6, 1);
     graph_add_edge_symmetric(&g, things + 5, things + 7, 1);
 
-    void* u[2] = { things + 4, things + 1 };
-    void* v[2] = { things + 7, things + 6 };
-    void* out[2];
+    void* u[3] = { things + 4, things + 1, things + 3 };
+    void* v[3] = { things + 7, things + 6, things + 5 };
+    void* out[3];
 
-    tree_lowest_common_ancestor_offline(&g, things + 0, 2, u, v, out);
+    tree_lowest_common_ancestor_offline(&g, things + 0, 3, u, v, out);
     oj_assert_eq_int(2, *(int*)out[0]);
     oj_assert_eq_int(1, *(int*)out[1]);
+    oj_assert_eq_int(1, *(int*)out[2]);
 
     oj_fresh;
 }
