@@ -272,17 +272,21 @@ void* tree_lowest_common_ancestor_binary_lift(struct graph* tree, void* u, void*
     return lca;
 }
 
-void tree_dfs_traversal_order(struct graph* tree, void* current, void* parent, int* visited, vector(void*) order) {
+int tree_dfs_traversal_order(struct graph* tree, void* current, void* parent, int* visited, vector(void*) order, int* subtree_sizes) {
     struct vertex* s = graph_vertex(tree, current);
-    if(visited[s->i]) return;
+    if(visited[s->i]) return subtree_sizes[s->i];
     visited[s->i] = 1;
     vec_push(order, current);
 
+    int subtree_size = 1;
     for(int i = 0; i < vec_len(s->out); i++) {
         struct vertex* u = vec_get(s->out, i);
         if(u->value == parent) continue;
-        tree_dfs_traversal_order(tree, u->value, current, visited, order);
+        subtree_size += tree_dfs_traversal_order(tree, u->value, current, visited, order, subtree_sizes);
     }
+
+    subtree_sizes[s->i] = subtree_size;
+    return subtree_size;
 }
 
 void tree_euler_tour(struct graph* tree, void* current, void* parent, int h, int* depth, int* visited, vector(void*) euler_tour) {

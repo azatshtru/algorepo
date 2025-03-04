@@ -28,7 +28,7 @@ void tree_ancestor_binary_lift_dfs(struct graph* tree, void* current, void* pare
 int tree_vertex_is_ancestor(struct graph* tree, void* ancestor, void* descendant, int* tin, int* tout);
 void* tree_vertex_ancestor(struct graph* tree, void* current, int** ancestor, int k);
 void* tree_lowest_common_ancestor_binary_lift(struct graph* tree, void* u, void* v, void* root);
-void tree_dfs_traversal_order(struct graph* tree, void* current, void* parent, int* visited, vector(void*) order);
+int tree_dfs_traversal_order(struct graph* tree, void* current, void* parent, int* visited, vector(void*) order, int* subtree_size);
 void tree_euler_tour(struct graph* tree, void* current, void* parent, int h, int* depth, int* visited, vector(void*) euler_tour);
 void tree_lowest_common_ancestor_farach_colton_and_bender(
     struct graph* tree, void* root,
