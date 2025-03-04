@@ -78,11 +78,10 @@ int subtree_sum_query_dfs_traversal_order(struct graph* tree, void* current, voi
     return subtree_size;
 }
 
-int subtree_sum(struct graph* tree, void* root, int query_len, int* out) {
+SubtreeSumQuerySparseSegtree* subtree_sum_segment_tree_construct(struct graph* tree, void* root, int* subtree_sizes, int* order_map) {
     unsigned int vertex_len = graph_vertices_len(tree);
     int visited[vertex_len];
     memzero(visited, vertex_len * sizeof(int));
-    int subtree_sizes[vertex_len];
     memzero(subtree_sizes, vertex_len * sizeof(int));
     vector(void*) order = vec_new(void*);
 
@@ -95,11 +94,21 @@ int subtree_sum(struct graph* tree, void* root, int query_len, int* out) {
 
     for(int i = 0; i < vertex_len; i++) {
         int index = graph_vertex_i(tree, vec_get(order, i));
-        out[index] = subtree_sum_query_sparse_segtree_sum(segtree, i, i + subtree_sizes[index]);
+        order_map[index] = i;
     }
 
     vec_free(order, NULL);
-    return 0;
+    return segtree;
+}
+
+int subtree_sum(struct graph* tree, SubtreeSumQuerySparseSegtree* segtree, int* subtree_sizes, int* order, void* branch) {
+    int index = graph_vertex_i(tree, branch);
+    return subtree_sum_query_sparse_segtree_sum(segtree, order[index], order[index] + subtree_sizes[index]);
+}
+
+void subtree_sum_add_vertex_value(struct graph* tree, SubtreeSumQuerySparseSegtree* segtree, int* order, void* v, int x) {
+    *(int*)v += x;
+    subtree_sum_query_sparse_segtree_add(segtree, order[graph_vertex_i(tree, v)], x);
 }
 
 int main() {
@@ -117,9 +126,9 @@ int main() {
     graph_add_edge_symmetric(&tree, things + 3, things + 7, 1);
     graph_add_edge_symmetric(&tree, things + 3, things + 8, 1);
 
-    int out[9];
-    subtree_sum(&tree, things + 0, 3, out);
-    log_array(out, int, 9, x, printf("%d", x));
+    int subtree_sizes[9];
+    int order[9];
+    SubtreeSumQuerySparseSegtree* segtree = subtree_sum_segment_tree_construct(&tree, things + 0, subtree_sizes, order);
 
     graph_free(&tree);
 }
