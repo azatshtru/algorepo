@@ -52,10 +52,11 @@ struct kth_smallest_element_in_range_segtree_vertex* kth_smallest_element_in_ran
     }
 }
 
-int kth_smallest_element_in_range_segtree_find_kth(struct kth_smallest_element_in_range_segtree_vertex* vl,
-             struct kth_smallest_element_in_range_segtree_vertex *vr,
-             int tl, int tr, int k
-             ) {
+int kth_smallest_element_in_range_segtree_find_kth(
+    struct kth_smallest_element_in_range_segtree_vertex* vl,
+    struct kth_smallest_element_in_range_segtree_vertex *vr,
+    int tl, int tr, int k
+) {
     if (tl == tr) return tl;
     int tm = (tl + tr) / 2, left_count = vr->l->sum - vl->l->sum;
     if (left_count >= k) return kth_smallest_element_in_range_segtree_find_kth(vl->l, vr->l, tl, tm, k);
@@ -76,4 +77,8 @@ int kth_smallest_element_in_range(int len, vector(struct kth_smallest_element_in
         vec_get(roots, a), vec_get(roots, b), 0, max_value + 1, k
     );
     return result;
+}
+
+int main() {
+    return 0;
 }

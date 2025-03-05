@@ -56,8 +56,7 @@ int tree_path_sum_query_sparse_segtree_sum(struct tree_path_sum_query_sparse_seg
     if (l <= v->left_range && v->right_range <= r) return v->sum + (r - l) * v->lazy;
     int max = v->left_range > l ? v->left_range : l;
     int min = v->right_range < r ? v->right_range : r;
-    if (max >= min)
-        return 0;
+    if (max >= min) return 0;
     tree_path_sum_query_sparse_segtree_extend(v);
     v->sum += v->lazy * (v->right_range - v->left_range);
     v->right->lazy += v->lazy;
@@ -71,10 +70,7 @@ void tree_path_sum_query_sparse_segtree_update_range(struct tree_path_sum_query_
         v->lazy += x;
         return;
     }
-    int max = v->left_range > l ? v->left_range : l;
-    int min = v->right_range < r ? v->right_range : r;
-    if (max >= min)
-        return;
+    if(r < v->left_range || l > v->right_range) return;
     tree_path_sum_query_sparse_segtree_extend(v);
     int h = (v->right_range - v->left_range + r - l + r - v->right_range + l - v->left_range) / 2;
     v->sum += h * x;
@@ -113,7 +109,7 @@ TreePathSumQuerySparseSegtree* tree_path_sum_segment_tree_construct(struct graph
 
     tree_path_sum_query_dfs_traversal_order(tree, root, root, *(int*)root, visited, order, subtree_sizes, path_sums);
 
-    TreePathSumQuerySparseSegtree* segtree = tree_path_sum_query_sparse_segtree_new(0, 16);
+    TreePathSumQuerySparseSegtree* segtree = tree_path_sum_query_sparse_segtree_new(0, 1<<(log_2(vertex_len)+1));
     for(int i = 0; i < vertex_len; i++) {
         tree_path_sum_query_sparse_segtree_add(segtree, i, (vec_get(path_sums, i)));
         order_map[graph_vertex_i(tree, vec_get(order, i))] = i;

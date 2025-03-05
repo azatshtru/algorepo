@@ -87,7 +87,8 @@ SubtreeSumQuerySparseSegtree* subtree_sum_segment_tree_construct(struct graph* t
 
     subtree_sum_query_dfs_traversal_order(tree, root, root, visited, order, subtree_sizes);
 
-    SubtreeSumQuerySparseSegtree* segtree = subtree_sum_query_sparse_segtree_new(0, 16);
+
+    SubtreeSumQuerySparseSegtree* segtree = subtree_sum_query_sparse_segtree_new(0, 1<<(log_2(vertex_len)+1));
     for(int i = 0; i < vertex_len; i++) {
         subtree_sum_query_sparse_segtree_add(segtree, i, *(int*)(vec_get(order, i)));
     }
