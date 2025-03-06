@@ -98,4 +98,4 @@ int main() {
     return 0;
 }
 
-// can be extended to higher degrees dynamically by calculating polynomial shifts using taylor series.
+// can be extended to higher degrees dynamically by calculating polynomial shifts using taylor series
