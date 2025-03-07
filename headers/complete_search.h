@@ -4,12 +4,7 @@
 #ifndef COMPLETE_SEARCH
 #define COMPLETE_SEARCH
 
-typedef struct subset_iterator {
-    vector(int) state;
-    int n;
-} SubsetIterator;
-
-void subset_init(SubsetIterator* it);
-SubsetIterator subset_next(SubsetIterator it, int n);
+int subset_next(vector(int) subset, int n);
+int permutation_next(int* permutation, int n);
 
 #endif
