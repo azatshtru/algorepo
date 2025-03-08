@@ -5,7 +5,7 @@ int subset_next(vector(int) subset, int n) {
     int len = vec_len(subset);
     if(len == 0) {
         vec_push(subset, 0);
-        return 0;
+        return 1;
     }
     int last = vec_get(subset, len - 1);
     if(last == n) {
@@ -13,10 +13,10 @@ int subset_next(vector(int) subset, int n) {
         vec_pop(subset, -1);
         int x = vec_pop(subset, -1);
         vec_push(subset, x + 1);
-        return 0;
+        return 1;
     }
     vec_push(subset, last + 1);
-    return 0;
+    return 1;
 }
 
 int permutation_next(int* permutation, int n) {

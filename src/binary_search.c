@@ -22,7 +22,7 @@ int binary_search_l(void* array, int typesize, int length, void* value, float(*c
     return b;
 }
 
-// Binary search can be used to calculate local maxima of some array (if array has only one maxima).
+// binary search can be used to calculate local maxima of some array (if array has only one maxima)
 int binary_search_local_maxima(void* array, int typesize, int length, float(*cmp_fn)(void*, void*)) {
     int a = -1;
     for(int b = length/2; b >= 1; b /= 2) {
