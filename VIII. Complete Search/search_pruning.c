@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-//Pruning the search by noticing common patterns to determine if the search cannot continue further in a backtracking algorithm can heavily optimize the running time.
-//This is demonstrated here by calculating the total number of paths in an nxn grid from one corner to its opposite corner such that each square is visited only once.
-//This begins with a naive algorithm with no pruning and then pruning is done in 4 levels. 
+// pruning the search by noticing common patterns to determine if the search cannot
+// continue further in a backtracking algorithm can heavily optimize the running time
+//
+// this is demonstrated here by calculating the total number of paths in an nxn grid
+// from one corner to its opposite corner such that each square is visited only once
+//
+// this begins with a naive algorithm with no pruning and then pruning is done in 3 levels
 
 int* initNxNGrid(int n) {
     int* grid=(int*)malloc((n*n+1)*sizeof(int));
@@ -132,5 +136,10 @@ int nxnPathsBenchmark(int n) {
     printf("\nOptimization 2: %d\n", nxnPaths_2(n, 0, 0));
     printf("time taken: %.2f seconds\n", (float)(clock()-begin)/CLOCKS_PER_SEC);
     printf("\n");
+    return 0;
+}
+
+int main() {
+    nxnPathsBenchmark(7);
     return 0;
 }

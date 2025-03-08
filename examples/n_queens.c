@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 // backtracking recursively constructs solutions following a certain rule starting from nothing
@@ -29,13 +30,8 @@ void freeNxNChessboard(struct nxnChessboard* board) {
     free(board->diag2);
 }
 
-int nQueens(struct nxnChessboard* board, int count, int n, int y) {
-    if(board == NULL){
-        board = buildNxNChessboard(n);
-    }
-    if(y == n) {
-        return ++count;
-    }
+int nQueens(struct nxnChessboard* board, int* count, int n, int y) {
+    if(y == n) return ++*count;
     for(int x = 0; x < n; x++) {
         int* columns = board->column;
         int* diag1 = board->diag1;
@@ -45,5 +41,14 @@ int nQueens(struct nxnChessboard* board, int count, int n, int y) {
         nQueens(board, count, n, y+1);
         columns[x] = diag1[x+y] = diag2[n+x-y-1] = 0;
     }
-    return count;
+    return *count;
+}
+
+int main() {
+    int n = 8;
+    struct nxnChessboard* board = buildNxNChessboard(n);
+    int count = 0;
+    printf("%d queens: %d", n, nQueens(board, &count, n, 0));
+    freeNxNChessboard(board);
+    return 0;
 }
