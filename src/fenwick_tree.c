@@ -14,11 +14,15 @@ int fenwick_tree_add(int k, int x, int len, int* tree) {
 }
 
 int* fenwick_tree_init(int len, int* array, int* tree) {
-    for(int i = 0; i < len + 1; i++) {
-        tree[i] = 0;
+    tree[0] = 0;
+    for(int i = 1; i < len + 1; i++) {
+        tree[i] = array[i];
     }
     for(int i = 1; i < len + 1; i++) {
-        fenwick_tree_add(i, array[i - 1], len + 1, tree);
+        int parent = i + i&-i;
+        if(parent <= len) {
+            tree[parent] += tree[i];
+        }
     }
     return tree;
 }
